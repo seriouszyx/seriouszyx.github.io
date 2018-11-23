@@ -3,19 +3,19 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle:
-description:
+title:  seriouszyx
+subtitle: live
+description: Henu cs 专业一名挣扎的后端
 keywords:
-author: John Doe
-language:
+author: Yixiang Zhao
+language: zh-Hans
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: https://seriouszyx.github.io/
 root: /
-permalink: :year/:month/:day/:title/
+permalink: :category/:year/:month/:day/:title.html
 permalink_defaults:
 
 # Directory
@@ -41,7 +41,7 @@ future: true
 highlight:
   enable: true
   line_number: true
-  auto_detect: false
+  auto_detect: true
   tab_replace:
   
 # Home page setting
@@ -72,6 +72,16 @@ pagination_dir: page
 
 # Extensions
 ## Plugins: https://hexo.io/plugins/
+##  RSS
+feed:
+  type: atom
+  path: atom.xml
+# 文章数，0 为全部
+  limit: 0
+  hub:
+# 是否包含文章内容
+  content: true
+
 ## Themes: https://hexo.io/themes/
 theme: next
 

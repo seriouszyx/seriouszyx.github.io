@@ -1,1 +1,33 @@
 // Custom styles.
+
+// 站点名字体
+.site-title {
+
+}
+
+// 菜单超链接样式
+.menu .menu-item a:hover {
+    border-bottom-color: rgba(161, 102, 171, 0);
+}
+
+// 文章标题字体
+.posts-expand .post-title {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+// 文章标题动态效果
+.posts-expand .post-title-link::before {
+    background-image: linear-gradient(90deg, #a166ab 0%, #ef4e7b 25%, #f37055 50%, #ef4e7b 75%, #a166ab 100%);
+}
+// 文章内链接文本样式
+.post-body p a{
+  color: #0593d3;
+  border-bottom: none;
+  border-bottom: 1px solid #0593d3;
+  &:hover {
+    color: #fc6423;
+    border-bottom: none;
+    border-bottom: 1px solid #fc6423;
+  }
+}

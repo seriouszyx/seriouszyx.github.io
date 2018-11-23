@@ -1,0 +1,2 @@
+title: tags
+type: "tags"
