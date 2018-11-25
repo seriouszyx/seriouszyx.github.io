@@ -84,7 +84,7 @@ index_with_subtitle: false
 
 # When running the site in a subdirectory (e.g. domain.tld/blog), remove the leading slash (/archives -> archives)
 menu:
-  home: / || home #首页
+  home: /  
   categories: /categories/
   about: /about/
   archives: /archives/
@@ -174,7 +174,7 @@ toc:
   enable: true
 
   # Automatically add list number to toc.
-  number: true
+  number: false
 
   # If true, all words will placed on next lines if header width longer then sidebar width.
   wrap: true
@@ -244,7 +244,7 @@ post_meta:
 # Dependencies: https://github.com/willin/hexo-wordcount
 post_wordcount:
   item_text: true
-  wordcount: true
+  wordcount: false
   min2read: false
   totalcount: false
   separated_meta: true
@@ -379,6 +379,21 @@ changyan:
   appid:
   appkey:
 
+# Valine.
+# You can get your appid and appkey from https://leancloud.cn
+# more info please open https://valine.js.org
+valine:
+  enable: true
+  appid: 6dpTn64BlB3dEdcvG7RI4pMo-gzGzoHsz # 填写 leancloud  appid
+  appkey: rIRTS8vIL6Jx02cXPihaHN4c # 填写 leancloud  appkey
+  notify: false # mail notifier , https://github.com/xCss/Valine/wiki
+  verify: false # Verification code
+  placeholder: 想说些什么🐎 # comment box placeholder
+  avatar: mm # gravatar style
+  guest_info: nick,mail,link # custom comment header
+  pageSize: 10 # pagination size
+
+
 # Support for youyan comments system.
 # You can get your uid from http://www.uyan.cc
 #youyan_uid: your uid
@@ -468,9 +483,9 @@ rating:
 # Show number of visitors to each article.
 # You can visit https://leancloud.cn get AppID and AppKey.
 leancloud_visitors:
-  enable: false
-  app_id: #<app_id>
-  app_key: #<app_key>
+  enable: true
+  app_id: MmSyFSMUtk82Pt4lr13xBBNY-gzGzoHsz
+  app_key: z7moP8rXW5J0y9ah7m5iFJ9F
 
 # Show PV/UV of the website/page with busuanzi.
 # Get more information on http://ibruce.info/2015/04/04/busuanzi/
@@ -537,6 +552,7 @@ local_search:
   trigger: auto
   # show top n results per article, show all results by setting to -1
   top_n_per_article: 1
+  
 
 
 # ---------------------------------------------------------------
@@ -586,7 +602,7 @@ use_motion: true
 fancybox: true
 
 # Progress bar in the top during page loading.
-pace: false
+pace: true
 # Themes list:
 #pace-theme-big-counter
 #pace-theme-bounce
@@ -715,3 +731,7 @@ version: 5.1.2
 # 文章末尾添加“本文结束”标记
 passage_end_tag:
   enabled: true
+
+# Online contact 
+daovoice: true
+daovoice_app_id: f10bbdc2

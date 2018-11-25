@@ -7,6 +7,7 @@ categories:
 tags:
 - JavaWeb
 - Java
+copyright: true
 ---
 
 Spring IoC 容器是 Spring 框架中最核心的部分，也是初学者难以理解的部分，对于这种关键的设计，简单实现一次能最大限度地加深理解，了解其中思想，对以后的开发也大有裨益。
