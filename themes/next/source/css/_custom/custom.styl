@@ -7,6 +7,7 @@
 
 // 菜单超链接样式
 .menu .menu-item a:hover {
+	margin-top: 2px;
     border-bottom-color: rgba(161, 102, 171, 0);
 }
 
@@ -30,4 +31,20 @@
     border-bottom: none;
     border-bottom: 1px solid #fc6423;
   }
+}
+
+// 背景
+@media screen and (min-width:1200px) {
+
+    body {
+    background-image:url(/images/bg.jpg);
+    background-size:cover;
+    background-repeat: no-repeat;
+    background-attachment:fixed;
+    background-position:50% 50%; 
+    }
+
+    #footer a {
+        color:#eee;
+    }
 }
