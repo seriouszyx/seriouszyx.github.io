@@ -62,7 +62,7 @@ get_font_family(config) {
 }
 
 // Font families.
-$font-family-chinese      = "PingFang SC", "Microsoft YaHei"
+$font-family-chinese      = -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "STHeiti", "Source Han Sans SC", "Noto Sans CJK SC", "WenQuanYi Micro Hei", "Droid Sans Fallback", "Microsoft YaHei"
 
 $font-family-base         = $font-family-chinese, sans-serif
 $font-family-base         = get_font_family('global'), $font-family-chinese, sans-serif if get_font_family('global')
@@ -91,7 +91,7 @@ $font-weight-bolder       = 700
 
 
 // Font size
-$font-size-base           = 14px
+$font-size-base           = 16px
 $font-size-base           = unit(hexo-config('font.global.size'), px) if hexo-config('font.global.size') is a 'unit'
 $font-size-small          = $font-size-base - 2px
 $font-size-smaller        = $font-size-base - 4px
