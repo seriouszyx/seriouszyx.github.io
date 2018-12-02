@@ -52,6 +52,10 @@ favicon:
   #android_manifest: /images/manifest.json
   #ms_browserconfig: /images/browserconfig.xml
 
+# Set default keywords (Use a comma to separate)
+# 站点关键字，利于 SEO 大概，记得用英文逗号分隔
+keywords: seriouszyx,JavaScript,java,哲学,Hexo,博客,Coldplay
+
 # Set rss to false to disable feed link.
 # Leave rss as empty to use site's feed link, and install hexo-generator-feed: `npm install hexo-generator-feed --save`.
 # Set rss to specific value if you have burned your feed already.
@@ -137,7 +141,7 @@ exturl: false
 # Value after `||` delimeter is the name of FontAwesome icon. If icon (with or without delimeter) is not specified, question icon will be loaded.
 menu:
   home: / || home
-  about: /about/ || user
+  about: /about/ || futbol-o
   tags: /tags/ || tags
   categories: /categories/ || th
   archives: /archives/ || archive
@@ -703,7 +707,7 @@ busuanzi_count:
   total_visitors_icon: user
   total_views: true
   total_views_icon: eye
-  post_views: true
+  post_views: false
   post_views_icon: eye
 
 

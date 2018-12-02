@@ -22,7 +22,7 @@
     <link itemprop="mainEntityOfPage" href="{{ config.url }}{{ url_for(post.path) }}">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="{{ author }}">
+      <meta itemprop="name" content="{{ theme.author }}">
       <meta itemprop="description" content="{{ description }}">
       <meta itemprop="image" content="{{ url_for( theme.avatar.url | default(theme.images + '/avatar.gif') ) }}">
     </span>

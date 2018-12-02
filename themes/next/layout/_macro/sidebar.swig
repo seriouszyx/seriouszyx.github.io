@@ -33,10 +33,10 @@
             <a href="/">
               <img class="site-author-image" itemprop="image"
                 src="{{ url_for( theme.avatar.url | default(theme.images + '/avatar.gif') ) }}"
-                alt="{{ author }}" />
+                alt="{{ theme.author }}" />
             </a>
             {% endif %}
-              <p class="site-author-name" itemprop="name">{{ author }}</p>
+              <p class="site-author-name" itemprop="name">{{ theme.author }}</p>
               <p class="site-description motion-element" itemprop="description">{#
               #}{{ description }}{#
             #}</p>
