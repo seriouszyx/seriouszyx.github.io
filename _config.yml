@@ -82,12 +82,23 @@ feed:
 # 是否包含文章内容
   content: true
 
+# 
+leancloud_counter_security:
+  enable_sync: true
+  app_id: MmSyFSMUtk82Pt4lr13xBBNY-gzGzoHsz
+  app_key: z7moP8rXW5J0y9ah7m5iFJ9F
+  username:
+  password:
+
 ## Themes: https://hexo.io/themes/
 theme: next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type: git
-  repo: https://github.com/seriouszyx/seriouszyx.github.io.git
-  branch: master
+  -
+    type: git
+    repo: https://github.com/seriouszyx/seriouszyx.github.io.git
+    branch: master
+  - 
+    type: leancloud_counter_security_sync
