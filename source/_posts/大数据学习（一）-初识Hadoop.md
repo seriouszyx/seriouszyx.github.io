@@ -29,13 +29,13 @@ image: https://i.loli.net/2018/12/27/5c2478c2654a3.jpg
 
 常见的结构化数据库为 mysql、sqlserver。
 
-![strucured data](https://pic1.zhimg.com/v2-5d51b65ba00ce5564471fbf8f4fc6954_r.jpg)
+![zhhihu1.jpg](https://i.loli.net/2018/12/30/5c287655d4f10.jpg)
 
 `非结构化数据库`是指其字段长度可变，并且每个字段的记录又可以由可重复或不可重复的子字段构成的数据库。无法用结构化的数据模型表示，例如：文档、图片、声音、视频等。在大数据时代，对非关系型数据库的需求日益增加，数据库技术相应地进入了“后关系数据库时代”。
 
 非结构化数据库代表为 HBase、mongodb。
 
-![unstructured data](https://pic1.zhimg.com/80/v2-27e5113596ab21aae1d64516ef015100_hd.jpg)
+![v2-27e5113596ab21aae1d64516ef015100_1200x500.jpg](https://i.loli.net/2018/12/30/5c2876565ece1.jpg)
 
 可以大致归纳，结构化数据是先有结构、再有数据；非结构化数据是先有数据、再有结构。
 
@@ -118,7 +118,7 @@ hadoop fs -get example.txt
 
 MapReduce 是用来处理大规模数据的一个并行编程框架，采用了对数据“分而治之”的方法。
 
-![](https://upload-images.jianshu.io/upload_images/40658-2de7c5066daf7ab1.png)
+![40658-2de7c5066daf7ab1.png](https://i.loli.net/2018/12/30/5c28765631bc8.png)
 
 MapReduce 是一个离线计算框架，它将计算分为两个阶段，Map（并行处理输入数据）和 Reduce（对 Map 结果汇总）。其中 Map 和 Reduce 函数提供了两个高层接口，由用户去编程实现。
 
@@ -130,13 +130,14 @@ Reduce 函数的一般处理逻辑是：**(k2;[v2])---->reduce 处理---->[(k3;v
 
 在经过 Map 和 Reduce 的抽象后，并行结构模型就变成了下面这样：
 
-![](https://upload-images.jianshu.io/upload_images/40658-df82b7a1775fac75.png)
+![40658-df82b7a1775fac75.png](https://i.loli.net/2018/12/30/5c28765664bab.png)
 
 上图中可以发现，中间有一个同步障（Barrier），其作用是等所有的 map 节点处理完后才进入 reduce，并且这个阶段同时进行数据加工整理过程（Aggregation & Shuffle），以便 reduce 节点可以完全基于本节点上的数据计算最终结果。
 
 不过这仍然不是完整的 MapReduce 模型，在上述框架图中，还少了两个步骤 Combiner 和 Partitioner。
 
-![](https://upload-images.jianshu.io/upload_images/40658-39cc7b851195657c.png)
+![40658-39cc7b851195657c.png](https://i.loli.net/2018/12/30/5c287656a01e5.png)
+
 
 上述图以`词频统计（WordCount）`为例。
 
@@ -178,7 +179,7 @@ hdfs 主要使用`三副本机制`
 
 `Yarn` 是 Hadoop 集群的新一代资源管理系统。Hadoop 2.0 对 MapReduce 框架做了彻底的设计重构，我们称 Hadoop 2.0 中的 MapReduce 为 MRv2 或者 Yarn。
 
-![](https://img-blog.csdn.net/20151029092726524)
+![20151029092726524 (2).jpg](https://i.loli.net/2018/12/30/5c28775f7eaa5.jpg)
 
 在 Hadoop 2.x 中，Yarn 把 job 的概念换成了 `application`，因为运行的应用不只是 MapReduce 了，还可能是其他应用，如一个 DAG（有向无环图 Directed Acyclic Graph，例如 Storm 应用）。
 
@@ -209,7 +210,7 @@ ResourceManager 主要完成以下几个功能：
 
 也通过配置第一次在本机上配置了 Hadoop 的运行环境，运行了伪分布式样例。
 
-接下来会结合一个具体问题深入理解 Hadoop 的放方方面面。
+接下来会结合一个具体问题深入理解 Hadoop 的方方面面。
 
 <br />
 
