@@ -215,8 +215,8 @@ ResourceManager 主要完成以下几个功能：
 <br />
 
 >   References:
->   [大数据学习笔记](https://chu888chu888.gitbooks.io/hadoopstudy/content/)
->   [一文读懂大数据平台——写给大数据开发初学者的话!](https://zhuanlan.zhihu.com/p/26545566)
+>    [大数据学习笔记](https://chu888chu888.gitbooks.io/hadoopstudy/content/)
+>    [一文读懂大数据平台——写给大数据开发初学者的话!](https://zhuanlan.zhihu.com/p/26545566)
 >   [Hadoop HDFS和MapReduce](https://www.jianshu.com/p/ed6b35f52e3c)
 >   [HDFS文件操作](http://pangjiuzala.github.io/2015/08/03/HDFS%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/)
 >   [hadoop笔记4--MapReduce框架](https://www.jianshu.com/p/35be7bdca902)
