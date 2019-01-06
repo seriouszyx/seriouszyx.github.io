@@ -21,7 +21,7 @@
     "hexo-generator-tag": "^0.2.0",
     "hexo-leancloud-counter-security": "^1.4.0",
     "hexo-renderer-ejs": "^0.3.1",
-    "hexo-renderer-marked": "^0.3.2",
+    "hexo-renderer-kramed": "^0.1.4",
     "hexo-renderer-stylus": "^0.3.3",
     "hexo-server": "^0.3.1",
     "hexo-wordcount": "^6.0.1"

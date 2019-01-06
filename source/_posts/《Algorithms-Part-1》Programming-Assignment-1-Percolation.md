@@ -7,8 +7,10 @@ categories:
     - 公开课
 description:
 image:
+mathjax: true
 ---
 
+coursera 课程 《Algorithms,Part 1》第一周作业解答 —— 渗透模型。
 
 <!-- more -->
 
