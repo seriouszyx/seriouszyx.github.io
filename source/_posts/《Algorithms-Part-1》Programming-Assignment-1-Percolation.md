@@ -4,7 +4,7 @@ tags: ['coursera', 'Algorithms', 'Programming Assignment']
 copyright: true
 date: 2019-01-06 16:07:13
 categories:
-    - 公开课
+    - 知识总结
 description:
 image:
 mathjax: true

@@ -540,7 +540,7 @@ valine:
   appkey: rIRTS8vIL6Jx02cXPihaHN4c  # your leancloud application appkey
   notify: false # mail notifier , https://github.com/xCss/Valine/wiki
   verify: false # Verification code
-  placeholder: 想说些什么🐎 # comment box placeholder
+  placeholder: 别急，慢慢说 # comment box placeholder
   avatar: mm # gravatar style
   guest_info: nick,mail,link # custom comment header
   pageSize: 10 # pagination size
@@ -620,8 +620,8 @@ needmoreshare2:
 # See: https://www.google.com/webmasters
 #google_site_verification:
 
-# Google Analytics
-#google_analytics:
+Google Analytics:
+  google_analytics: UA-135559540-1
 
 # Bing Webmaster tools verification setting
 # See: https://www.bing.com/webmaster

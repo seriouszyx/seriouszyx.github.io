@@ -3,7 +3,7 @@ layout: spring
 title: IoC容器浅析及简单实现
 date: 2018-11-25 14:43:04
 categories:
-- 技术相关
+- 知识总结
 tags:
 - JavaWeb
 - Java

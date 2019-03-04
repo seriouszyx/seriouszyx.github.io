@@ -1,11 +1,10 @@
 ---
-title: 大数据学习（一） | 初识 Hadoop
+title: 大数据学习 | 初识 Hadoop
 tags: ['大数据','Hadoop']
 copyright: true
 date: 2018-12-25 12:39:24
 categories:
-- 大数据
-- Hadoop
+- 知识总结
 description: 
 image: https://i.loli.net/2018/12/27/5c2478c2654a3.jpg
 ---
