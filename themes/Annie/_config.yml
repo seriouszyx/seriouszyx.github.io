@@ -55,12 +55,12 @@ comment:
     enable: true
 
 gitalk:
-    enable: false
-    clientID: '333--' 
-    clientSecret: '333--' 
-    repo: annie-gitalk 
-    owner: Sariay 
-    admin: Sariay 
+    enable: true
+    clientID: '9e176d0e8dd97b9d46af' 
+    clientSecret: 'e215f9a10b626332c3e937f4c535d97beaa09f6c' 
+    repo: seriouszyx.github.io
+    owner: seriouszyx 
+    admin: seriouszyx 
     distractionFreeMode: true
     #去除 more、index.html、?query=123等格式尾部 
     hrefTrimend: '#.*$,\\?.*$,index.html$' 
