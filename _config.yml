@@ -92,10 +92,10 @@ feed:
 # 
 leancloud_counter_security:
   enable_sync: true
-  app_id: MmSyFSMUtk82Pt4lr13xBBNY-gzGzoHsz
-  app_key: z7moP8rXW5J0y9ah7m5iFJ9F
-  username:
-  password:
+  app_id: 3b6EVCkzCVhWYgXpJuYT5noi-gzGzoHsz
+  app_key: m5xYJtJXBQaVWxg20rJ4qE5l
+  username: seriouszyx
+  password: zhaoyixiang123
 
 ## Themes: https://hexo.io/themes/
 theme: Annie
