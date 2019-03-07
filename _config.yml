@@ -15,7 +15,7 @@ timezone:
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: https://seriouszyx.github.io/
 root: /
-permalink: :category/:year/:month/:day/:title.html
+permalink: :year/:month/:day/:title.html
 permalink_defaults:
 
 # Directory
@@ -39,11 +39,18 @@ post_asset_folder: false
 relative_link: false
 future: true
 highlight:
-  enable: true
+  enable: false
   line_number: true
   auto_detect: false
   tab_replace:
-  
+
+prism_plugin:
+  mode: 'preprocess'    # realtime/preprocess
+  theme: 'tomorrow'
+  line_number: true    # default false
+  custom_css: ''     # optional
+
+
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
@@ -91,7 +98,15 @@ leancloud_counter_security:
   password:
 
 ## Themes: https://hexo.io/themes/
-theme: next
+theme: Annie
+
+search:
+  path: search.json
+  zipPath: search.zip
+  versionPath: searchVersion.txt
+  field: post
+  #field: post, page or all（3个可选参数）
+
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html

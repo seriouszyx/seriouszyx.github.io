@@ -1,6 +1,8 @@
 ---
 title: 关于我
 date: 2018-12-02 19:47:24
+layout: about
+type: about
 comments: true
 ---
 
@@ -36,7 +38,11 @@ bilibili、NBA 2K、韦德、WJMZBMR、GitHub、CSTG、cyfwlp、老番茄、敖�
 点击右下角通过 DaoVoice 联系我
 常用邮箱：674965440@qq.com
 
+<br/>
+
 -------
+
+<br/>
 
 <center>
 次は现実世界で会おう。<br/>

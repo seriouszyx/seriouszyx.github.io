@@ -1,0 +1,58 @@
+<%
+  var pagetitle = page.title;
+
+  if (is_home()) 
+  {
+    pagetitle = config.title;
+  }
+  else if (is_archive())
+  {
+    pagetitle = __('archive_a'); 
+    if (is_month())
+    {
+      pagetitle += ': ' + page.year + '/' + page.month;
+    } 
+    else if (is_year())
+    {
+      pagetitle += ': ' + page.year;
+    }
+  } 
+  else if (is_category())
+  {
+    pagetitle = __('category') + ': ' + page.category;
+  } 
+  else if (is_tag())
+  {
+    pagetitle = __('tag') + ': ' + page.tag;
+  }
+%>
+
+<head>
+	<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+  <title>
+    <% if( pagetitle === config.title ) { %>
+      <%= config.title %>
+    <% } else { %>
+      <%= pagetitle + ' ' + '|' + ' ' + config.title %>
+    <% } %>
+  </title>
+  <meta name="author" content="<%- config.author %>">
+  <meta name="keywords" content="<%- config.keywords %>" />
+  <meta name="description" content="<%- config.subtitle %>" />
+	<!-- favicon -->
+  <%- favicon_tag(theme.favicon) %>
+
+  <!-- css -->
+  <%- css(['css/style.css','https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css'])%>
+  <% if(page.type === "gallery"){ %>
+    <%- css(['css/style.css','gallery/natural.css','gallery/natural-gallery.full.css']) %>
+  <% } %>
+
+    <!-- jquery -->
+	<%- js(['js/jquery-2.1.1.min.js'])%>
+
+  <!-- leancloud -->
+  <%- js(['https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js', 'js/leancloud.js'])%>
+</head>

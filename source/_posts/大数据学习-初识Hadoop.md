@@ -6,7 +6,7 @@ date: 2018-12-25 12:39:24
 categories:
 - 知识总结
 description: 
-image: https://i.loli.net/2018/12/27/5c2478c2654a3.jpg
+cover: https://i.loli.net/2018/12/27/5c2478c2654a3.jpg
 ---
 
 最近想要了解一些前沿技术，不能一门心思眼中只有 web，因为我目前对 Java 语言及其生态相对熟悉，所以在网上搜集了 Hadoop 相关文章，并做了整合。

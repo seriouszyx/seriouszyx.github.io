@@ -1,0 +1,22 @@
+<% if (theme.motto.enable) { %>
+    <%- partial('third/motto') %>
+<% } %>
+
+<% if (theme.local_search.enable) { %>
+    <%- partial('_partial/third/search') %>
+<% } %>
+
+<% if (theme.love.enable) { %>
+    <%- js('js/love.js') %>
+<% } %>
+
+<!--back to top-->
+<% if (theme.totop.enable) { %>
+    <%- partial('_partial/widget/totop') %> 
+<% } %>
+
+ <% if(page.type === "gallery"){ %>
+    <%- js('gallery/natural-gallery.full.js') %>
+<% } %>
+
+<%- js(['js/vibrant.js','js/chinese.js','js/main.js']) %>

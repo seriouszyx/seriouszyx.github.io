@@ -1,0 +1,153 @@
+# 01-header
+# menu
+menu:
+    home: /
+    archive: /archives
+    categories: /categories
+    tags: /tags
+    阅读: /reading
+    about: /about
+    gallery: /gallery
+
+# favicon & avtor
+# if the value of avtor is false, the 'say' is optional.
+favicon: /img/favicon.ico
+avtor: /img/logo.png
+say: Welcome 
+
+# background_image
+# /img/1.jpg
+# https://source.unsplash.com/collection/954550/1920x1080
+# https://sariay.github.io/Random-img/
+# May be cause CROS bug!
+background_image:
+    mode: normal #normal or random
+    normal_url: /img/bg.jpg
+    random_max: 110 
+    random_url: https://sariay.github.io/Random-img/
+    
+# show motto
+motto:
+    enable: true
+
+# 02-PROLOADER
+# animation: spinner, transition or cyclic
+preloader:
+    enable: true
+    animation: transition
+
+# 03-INDEX
+# index-style: pure, cart
+index_style: cart
+
+# index_cart_cover
+cover: /img/cart_cover.jpg
+
+# 04-POST
+# post_relate
+relate:
+    enable: true
+    posts_limit: 5
+    posts_excerpt: 120
+
+# post_comment
+comment:
+    enable: true
+
+gitalk:
+    enable: false
+    clientID: '333--' 
+    clientSecret: '333--' 
+    repo: annie-gitalk 
+    owner: Sariay 
+    admin: Sariay 
+    distractionFreeMode: true
+    #去除 more、index.html、?query=123等格式尾部 
+    hrefTrimend: '#.*$,\\?.*$,index.html$' 
+    
+valine: 
+    enable: false
+    appid: 'DU--'
+    appkey: 'DU--'
+    placeholder: no any!
+    
+livere: 
+    enable: false
+    livere_uid: 'sdd'
+    
+# post_count
+leancloud_count:
+    enable: true
+    appid: 'MmSyFSMUtk82Pt4lr13xBBNY-gzGzoHsz'
+    appkey: 'z7moP8rXW5J0y9ah7m5iFJ9F'
+    like_post:
+        enable: true
+    visit_post:
+        enable: true
+    topN_post: 
+        enable: true #param1 for topN_post
+        limit: 10 #param2 for topN_post
+busuanzi_count:
+    enable: true
+
+# post_toc
+post_toc:
+    enable: true
+    katelog: true
+    
+# post_mathJax
+mathjax:
+  enable: true
+  
+# post_code
+code_copy:
+    enable: true
+
+# post_excerpt for index page
+excerpt_cart: 80
+excerpt_pure: 300   
+excerpt_link: true
+
+# 05-FOOTER
+# social
+social:
+    enable: true
+    github: http://github.com/seriouszyx
+    weibo: http://github.com/
+    email: mailto:http://github.com/
+    qq: http://github.com/
+    twitter: http://github.com/
+
+# copyright  
+since: 2018
+cotent_author: seriouszyx
+
+# 06-OTHERS
+# rss
+rss: /atom.xml
+
+# gallery 
+# format: natural or square
+gallery_format: natural
+# one time to load 4 rows or other count, 0 to load img automatically when scrolling.(0,1,2,3,4,5,6......)
+gallery_limit: 0
+# data url
+gallery_data: gallery/data.json
+
+#when click, emerge heart
+love:
+    enable: false
+
+#totop
+totop:
+    enable: true
+
+# Local search
+# Dependencies: https://github.com/flashlab/hexo-generator-search
+local_search:
+    enable: true
+    # if auto, trigger search by changing input
+    # if manual, trigger search by pressing enter key or search button
+    trigger: auto
+    # show top n results per article, show all results by setting to -1
+    top_n_per_article: -1

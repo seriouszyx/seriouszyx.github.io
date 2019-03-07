@@ -1,0 +1,20 @@
+<footer>
+	<div class="social">
+		<%- partial('social') %>
+	</div>
+		
+	<div class="copyright">
+		<p>
+			<% if( theme.since && theme.since < date(new Date(), 'YYYY') ) { %> 
+				&copy;<%= theme.since %> - <%= date(new Date(), 'YYYY') %>, content by <%= theme.content_author || config.author || config.title %>. All Rights Reserved.
+			<% } else { %> 
+				&copy;<%= date(new Date(), 'YYYY') %>, content by <%= theme.author || config.content_author || config.title %>. All Rights Reserved.
+			<% } %>
+			
+			<%- partial('third/statistics', {module: 'busuanzi'}) %>
+		</p>
+		<p>
+			<%- link_to("http://hexo.io/", "Hexo", {external: true})%> Theme <%- link_to("https://github.com/Sariay/hexo-theme-Annie", "Annie", {external: true})%> by Sariay. 					
+		</p>
+	</div>		
+</footer>
