@@ -91,7 +91,7 @@ feed:
 
 # 
 leancloud_counter_security:
-  enable_sync: true
+  enable_sync: false
   app_id: 3b6EVCkzCVhWYgXpJuYT5noi-gzGzoHsz
   app_key: m5xYJtJXBQaVWxg20rJ4qE5l
   username: seriouszyx
@@ -115,5 +115,5 @@ deploy:
     type: git
     repo: https://github.com/seriouszyx/seriouszyx.github.io.git
     branch: master
-  - 
-    type: leancloud_counter_security_sync
+  # - 
+  #   type: leancloud_counter_security_sync

@@ -148,8 +148,10 @@
 .article-content img {
 	opacity: 1;
 	cursor: pointer;
-	width: 100%;
+	width: auto;
 	height: auto;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .article-content video {

@@ -78,11 +78,8 @@ livere:
 # post_count
 leancloud_count:
     enable: true
-    appid: '3b6EVCkzCVhWYgXpJuYT5noi-gzGzoHsz'
-    appkey: 'm5xYJtJXBQaVWxg20rJ4qE5l'
-    # Dependencies: https://github.com/theme-next/hexo-leancloud-counter-security
-    security: true
-    betterPerformance: false
+    appid: 'mtpW2sIlIHeJQk0FGq2ddMVQ-gzGzoHsz'
+    appkey: 'S8VWUb1LK61DctReez2JM8P1'
     like_post:
         enable: true
     visit_post:
