@@ -14,41 +14,10 @@ menu:
 favicon: /img/favicon.ico
 avtor: /img/logo.png
 say: Welcome 
-
-# background_image
-# /img/1.jpg
-# https://source.unsplash.com/collection/954550/1920x1080
-# https://sariay.github.io/Random-img/
-# May be cause CROS bug!
-background_image:
-    mode: normal #normal or random
-    normal_url: /img/bg.jpg
-    random_max: 110 
-    random_url: https://sariay.github.io/Random-img/
     
 # show motto
 motto:
     enable: true
-
-# 02-PROLOADER
-# animation: spinner, transition or cyclic
-preloader:
-    enable: true
-    animation: transition
-
-# 03-INDEX
-# index-style: pure, cart
-index_style: cart
-
-# index_cart_cover
-cover: /img/cart_cover.jpg
-
-# 04-POST
-# post_relate
-relate:
-    enable: true
-    posts_limit: 5
-    posts_excerpt: 120
 
 # post_comment
 comment:
@@ -75,11 +44,11 @@ livere:
     enable: false
     livere_uid: 'sdd'
     
-# post_count
+post_count
 leancloud_count:
     enable: true
-    appid: 'mtpW2sIlIHeJQk0FGq2ddMVQ-gzGzoHsz'
-    appkey: 'S8VWUb1LK61DctReez2JM8P1'
+    appid: 'F7uhh1n53I0qSLQhBBRBH2Ql-gzGzoHsz'
+    appkey: 'cGopFeviqeSNOO7BF17xnhMn'
     like_post:
         enable: true
     visit_post:
@@ -89,6 +58,13 @@ leancloud_count:
         limit: 10 #param2 for topN_post
 busuanzi_count:
     enable: true
+
+leancloud_counter_security:
+  enable_sync: true
+  app_id: F7uhh1n53I0qSLQhBBRBH2Ql-gzGzoHsz  # 同前文的id
+  app_key: cGopFeviqeSNOO7BF17xnhMn # 同前文的key
+  username: seriouszyx
+  password: hf3ESfe765DSF
 
 # post_toc
 post_toc:

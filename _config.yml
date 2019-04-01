@@ -39,16 +39,16 @@ post_asset_folder: false
 relative_link: false
 future: true
 highlight:
-  enable: false
+  enable: true
   line_number: true
   auto_detect: false
   tab_replace:
 
-prism_plugin:
-  mode: 'preprocess'    # realtime/preprocess
-  theme: 'tomorrow'
-  line_number: true    # default false
-  custom_css: ''     # optional
+# prism_plugin:
+#   mode: 'preprocess'    # realtime/preprocess
+#   theme: 'tomorrow'
+#   line_number: true    # default false
+#   custom_css: ''     # optional
 
 
 # Home page setting
@@ -92,13 +92,13 @@ feed:
 # 
 leancloud_counter_security:
   enable_sync: false
-  app_id: 3b6EVCkzCVhWYgXpJuYT5noi-gzGzoHsz
-  app_key: m5xYJtJXBQaVWxg20rJ4qE5l
+  app_id: mtpW2sIlIHeJQk0FGq2ddMVQ-gzGzoHsz
+  app_key: S8VWUb1LK61DctReez2JM8P1
   username: seriouszyx
-  password: zhaoyixiang123
+  password: hf3ESfe765DSF
 
 ## Themes: https://hexo.io/themes/
-theme: Annie
+theme: next
 
 search:
   path: search.json

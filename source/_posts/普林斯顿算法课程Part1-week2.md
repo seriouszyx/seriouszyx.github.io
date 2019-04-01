@@ -4,8 +4,9 @@ tags: [coursera, algorithms, Java]
 copyright: true
 date: 2019-03-26 10:20:07
 categories: Princeton-Algorithms
-cover:
 ---
+
+
 
 ## 栈和队列
 
@@ -13,6 +14,8 @@ cover:
 * 队列：先进（入队）先出（出队）
 
 在实现之前，老师提到了模块化的思想，它使得我们能够用模块式可复用的算法与数据结构的库来构建更复杂的算法和数据结构，也使我们能在必要的时候更关注效率。这门课也会严格遵守这种风格。
+
+<!-- more -->
 
 ### 栈
 
@@ -62,6 +65,7 @@ public class LinkedStackOfStrings {
     }
 }
 ```
+
 
 上面的代码也体现了使用 Java 学习数据结构的优点，不需要考虑麻烦的指针，而且垃圾回收机制也避免了主动释放内存。
 

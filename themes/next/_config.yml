@@ -535,7 +535,7 @@ changyan:
 # You can get your appid and appkey from https://leancloud.cn
 # more info please open https://valine.js.org
 valine:
-  enable: true # When enable is set to be true, leancloud_visitors is recommended to be closed for the re-initialization problem within different leancloud adk version.
+  enable: false # When enable is set to be true, leancloud_visitors is recommended to be closed for the re-initialization problem within different leancloud adk version.
   appid: 6dpTn64BlB3dEdcvG7RI4pMo-gzGzoHsz  # your leancloud application appid
   appkey: rIRTS8vIL6Jx02cXPihaHN4c  # your leancloud application appkey
   notify: false # mail notifier , https://github.com/xCss/Valine/wiki
@@ -570,11 +570,11 @@ gitment:
 # Demo: https://gitalk.github.io
 # Reference: https://asdfv1929.github.io/2018/01/20/gitalk/, https://liujunzhou.cn/2018/8/10/gitalk-error/#more
 gitalk:
-  enable: false
+  enable: true
   github_id: seriouszyx  # Github repo owner
   repo: seriouszyx.github.io  # Repository name to store issues.
-  client_id: 85a4089e90d1372ea8be  # Github Application Client ID
-  client_secret: c8ae14dce96af31416df101b9e3e13ddf999a25a  # Github Application Client Secret
+  client_id: 9e176d0e8dd97b9d46af  # Github Application Client ID
+  client_secret: e215f9a10b626332c3e937f4c535d97beaa09f6c  # Github Application Client Secret
   admin_user: seriouszyx  # GitHub repo owner and collaborators, only these guys can initialize github issues
   distraction_free_mode: true # Facebook-like distraction free mode
 
@@ -683,8 +683,8 @@ rating:
 # You can visit https://leancloud.cn get AppID and AppKey.
 leancloud_visitors:
   enable: true
-  app_id: MmSyFSMUtk82Pt4lr13xBBNY-gzGzoHsz #<app_id>
-  app_key: z7moP8rXW5J0y9ah7m5iFJ9F #<app_key>
+  app_id: mtpW2sIlIHeJQk0FGq2ddMVQ-gzGzoHsz #<app_id>
+  app_key: S8VWUb1LK61DctReez2JM8P1 #<app_key>
   # Dependencies: https://github.com/theme-next/hexo-leancloud-counter-security
   # If you don't care about security in lc counter and just want to use it directly
   # (without hexo-leancloud-counter-security plugin), set the `security` to `false`.

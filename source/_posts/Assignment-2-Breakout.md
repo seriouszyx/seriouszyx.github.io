@@ -9,12 +9,14 @@ cover: https://raw.githubusercontent.com/seriouszyx/PicBed/master/img/QQ20190118
 
 ---
 
+
 ## 简答
 
 1. Java支持的数据类型有哪些？什么是自动拆装箱？
 2. 接口和抽象类的区别是什么？
 3. String s = new String("abc"); 创建了几个对象？为什么？
 
+<!-- more -->
 
 ## Console Programming
 
