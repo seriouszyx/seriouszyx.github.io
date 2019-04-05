@@ -6,7 +6,10 @@ date: 2019-03-26 10:20:07
 categories: Princeton-Algorithms
 ---
 
+![](/uploads/paw2.png)
 
+
+<!-- more -->
 
 ## 栈和队列
 
@@ -15,7 +18,7 @@ categories: Princeton-Algorithms
 
 在实现之前，老师提到了模块化的思想，它使得我们能够用模块式可复用的算法与数据结构的库来构建更复杂的算法和数据结构，也使我们能在必要的时候更关注效率。这门课也会严格遵守这种风格。
 
-<!-- more -->
+
 
 ### 栈
 
