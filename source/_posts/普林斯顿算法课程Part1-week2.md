@@ -340,6 +340,7 @@ public static void sort(Comparable[] a) {
 
 因为要求中提到了每个方法最差要达到常数时间复杂度，所以毫无疑问使用链表实现，设置头结点和指向前节点的指针，便于逆序访问。
 
+{% fold 点击显/隐内容 %}
 ```java
 public class Deque<Item> implements Iterable<Item> {
 
@@ -474,9 +475,13 @@ public class Deque<Item> implements Iterable<Item> {
     
 }
 ```
+{% endfold %}
+
 
 随机队列要求出队的元素是随机的，我使用的是数组实现，随机一个索引，如果索引即为最后一个元素，则将其删除，否则将索引的元素与最后一个元素交换位置，再将它删除。
 
+
+{% fold 点击显/隐内容 %}
 ```java
 public class RandomizedQueue<Item> implements Iterable<Item> {
 
@@ -589,5 +594,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 }
 ```
+
+{% endfold %}
+
 
 <hr />
