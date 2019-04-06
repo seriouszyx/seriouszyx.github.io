@@ -3,11 +3,14 @@ title: 'Assignment #2: Breakout'
 tags: [Java,Java基础]
 copyright: true
 date: 2019-03-17 09:54:02
-categories: Java
+categories: Java-beginner
 description:
-cover: https://raw.githubusercontent.com/seriouszyx/PicBed/master/img/QQ20190118-1.jpg
 
 ---
+
+![](/uploads/a2.png)
+
+<!-- more -->
 
 
 ## 简答
@@ -16,7 +19,6 @@ cover: https://raw.githubusercontent.com/seriouszyx/PicBed/master/img/QQ20190118
 2. 接口和抽象类的区别是什么？
 3. String s = new String("abc"); 创建了几个对象？为什么？
 
-<!-- more -->
 
 ## Console Programming
 

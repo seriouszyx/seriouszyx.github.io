@@ -1,14 +1,14 @@
 ---
 title: 使用Forking工作流提交作业
-tags: []
+tags: [git]
 copyright: true
 date: 2019-03-08 13:23:13
-categories:
-cover:
+categories: Java-beginner
 ---
 
+![](/uploads/fork.png)
 
-
+<!-- more -->
 
 ## 工作方式
 
@@ -18,7 +18,6 @@ cover:
 
 <img src="https://raw.githubusercontent.com/seriouszyx/PicBed/master/img/git-workflows-forking.png" width="500" hegiht="313" />
 
-<!-- more -->
 
 Forking 工作流的一个主要优势是，贡献的代码可以被集成，而不需要所有人都能 push 代码到仅有的中央仓库（我的远程仓库）中。 开发者 push 到自己的服务端仓库，而只有项目维护者才能 push 到正式仓库。 这样项目维护者可以接受任何开发者的提交，但无需给他正式代码库的写权限。
 
