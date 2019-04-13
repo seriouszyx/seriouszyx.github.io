@@ -3,11 +3,13 @@ title: 'Assignment #1: Warmups'
 tags: [Java, Java基础]
 copyright: true
 date: 2019-03-12 17:57:50
-categories: Java
+categories: Java-beginner
 description:
 ---
 
+![](/uploads/a1.jpg)
 
+<!-- more -->
 
 ## 简答
 
@@ -17,7 +19,6 @@ description:
 
 >   简答题可以去网上找相关内容，不过要在最后给出参考链接。不能只答一两句话，单纯的复制粘贴网上的答案，要结合自己的理解，必要时可以举例、代码、作图用来解释。
 
-<!-- more -->
 
 ## The Fibonacci sequence
 
