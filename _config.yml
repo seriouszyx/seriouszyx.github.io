@@ -113,7 +113,9 @@ search:
 deploy:
   -
     type: git
-    repo: https://github.com/seriouszyx/seriouszyx.github.io.git
+    repo: 
+      github: https://github.com/seriouszyx/seriouszyx.github.io.git
+      coding: https://gitee.com/seriouszyx/seriouszyx.coding.me.git
     branch: master
   - 
     type: leancloud_counter_security_sync
