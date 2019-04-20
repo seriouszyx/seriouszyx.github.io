@@ -855,7 +855,7 @@ lazyload: false
 
 # Progress bar in the top during page loading.
 # Dependencies: https://github.com/theme-next/theme-next-pace
-pace: true
+pace: false
 # Themes list:
 #pace-theme-big-counter
 #pace-theme-bounce
@@ -1058,8 +1058,8 @@ vendors:
   # Examples:
   # gitalk_js: https://cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.min.js
   # gitalk_css: https://cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.css
-  gitalk_js:
-  gitalk_css:
+  gitalk_js: https://unpkg.com/gitalk@1.4.0/dist/gitalk.min.js
+  gitalk_css: https://unpkg.com/gitalk@1.4.0/dist/gitalk.css
 
   # Internal version: 0.7.3
   # See: https://github.com/emn178/js-md5/
