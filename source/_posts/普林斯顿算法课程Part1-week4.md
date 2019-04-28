@@ -390,6 +390,7 @@ A* search 算法的操作可以想象成一棵博弈树，为了最终找到操�
 
 Board 类主要就是记录输入数据，并实现比较规则以及一些生成方法供后续使用。
 
+{% fold 点击显/隐内容 %}
 ```java
 public class Board {
 
@@ -581,9 +582,11 @@ public class Board {
 }
 
 ```
+{% endfold %}
 
 Solver 类包含一个内部类，即搜索节点，它主要包括 Board 和移动次数等信息。构造函数实现了 A* search 算法，其余方法只是为了输出结果。
 
+{% fold 点击显/隐内容 %}
 ```java
 public class Solver {
 
@@ -679,6 +682,7 @@ public class Solver {
     }
 }
 ```
+{% endfold %}
 
 讲义中提到的几点优化一定要完成，效率会提高不少。还有一定要注意 Board 的输出格式，我就是少了个空格曾经一度得零分十几分。
 
