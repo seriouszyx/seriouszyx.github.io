@@ -6,7 +6,7 @@ date: 2019-04-28 17:13:18
 categories: Princeton-Algorithms
 ---
 
-![](/uploads/paw5.png)
+![](/uploads/paw5.jpg)
 
 <!-- more -->
 
