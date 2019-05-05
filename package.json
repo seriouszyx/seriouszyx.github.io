@@ -13,6 +13,7 @@
     "gulp-uglify": "^3.0.1",
     "hexo": "^3.7.0",
     "hexo-deployer-git": "^1.0.0",
+    "hexo-filter-optimize": "^0.2.5",
     "hexo-generator-archive": "^0.1.5",
     "hexo-generator-category": "^0.1.3",
     "hexo-generator-feed": "^1.2.2",
@@ -25,6 +26,7 @@
     "hexo-renderer-kramed": "^0.1.4",
     "hexo-renderer-stylus": "^0.3.3",
     "hexo-server": "^0.3.1",
+    "hexo-service-worker": "^1.0.1",
     "hexo-wordcount": "^6.0.1"
   }
 }
