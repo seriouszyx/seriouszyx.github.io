@@ -570,7 +570,7 @@ gitment:
 # Demo: https://gitalk.github.io
 # Reference: https://asdfv1929.github.io/2018/01/20/gitalk/, https://liujunzhou.cn/2018/8/10/gitalk-error/#more
 gitalk:
-  enable: true
+  enable: false
   github_id: seriouszyx  # Github repo owner
   repo: seriouszyx.github.io  # Repository name to store issues.
   client_id: 9e176d0e8dd97b9d46af  # Github Application Client ID

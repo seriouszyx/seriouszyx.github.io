@@ -13,14 +13,14 @@ timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://seriouszyx.github.io/
-root: /
+url: https://seriouszyx.github.io/blog
+root: /blog/
 permalink: :year/:month/:day/:title.html
 permalink_defaults:
 
 # Directory
 source_dir: source
-public_dir: public
+public_dir: public/blog
 tag_dir: tags
 archive_dir: archives
 category_dir: categories
@@ -113,8 +113,8 @@ deploy:
   -
     type: git
     repo: 
-      github: https://github.com/seriouszyx/seriouszyx.github.io.git
-      coding: https://gitee.com/seriouszyx/seriouszyx.coding.me.git
+      github: https://github.com/seriouszyx/blog.git
+      # coding: https://gitee.com/seriouszyx/seriouszyx.coding.me.git
     branch: master
   - 
     type: leancloud_counter_security_sync
