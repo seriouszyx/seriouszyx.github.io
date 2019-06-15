@@ -94,6 +94,8 @@
     {% endif %}
   </div>
 
+  <script id="ribbon" size="300" alpha='0.6' zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.min.js"></script>
+
   {% include '_scripts/vendors.swig' %}
   {% include '_scripts/commons.swig' %}
 
