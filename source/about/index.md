@@ -13,12 +13,15 @@ comments: true
 HENU 计算机科学与技术专业 2017 级本科生
 缺乏创新思维的工科男
 努力在这个喧嚣的时代保持独立思考
+不喜欢被贴标签
 想成为有趣的人
 
 ##  学习方向
 
 Java Web 开发者，习惯使用 Spring 和 Java 生态，目前在学习 Java 以及计算机基础内容
-本科毕业后会攻读研究生，保持成绩，力争保研至 Top 10
+本科毕业后会攻读研究生，保持成绩，力争保研。
+
+<img src="https://ghchart.rshah.org/seriouszyx" alt="Github commit chart" />
 
 ##  个人兴趣
 
