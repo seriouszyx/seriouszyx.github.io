@@ -2261,30 +2261,8 @@ kbd {
 .back2top__icon:hover {
   color: #fc6423;
 }
-.zoomimg-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.6);
-  opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: alpha(opacity=0);
-}
-.zoomimg {
+a.fancybox {
   cursor: zoom-in;
-}
-.zoomimg--hide {
-  visibility: hidden;
-}
-.zoomimg-clone {
-  position: absolute;
-  z-index: 2;
-  background-color: #fff;
-  cursor: zoom-out;
-  will-change: transform;
 }
 .lazyload-block {
   -webkit-box-sizing: content-box;
