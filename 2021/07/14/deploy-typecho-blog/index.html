@@ -1,0 +1,523 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/icons/favicon-16x16.png?v=2.6.2" type="image/png" sizes="16x16"><link rel="icon" href="/assets/icons/favicon-32x32.png?v=2.6.2" type="image/png" sizes="32x32"><link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=2.6.2" sizes="180x180"><link rel="mask-icon" href="/assets/icons/safari-pinned-tab.svg?v=2.6.2" color="#54bcff"><meta name="google-site-verification" content="9xsNXs6L7nuMa2Xm38zRjEg7Ed3qU7GD5CVI6Dbc_f0"><meta name="baidu-site-verification" content="code-bykGufpoRh"><meta name="description" content="首先一般搭建动态博客都会有一个云服务器，国内的话供应商一般是阿里云或者腾讯云，我这里使用的是腾讯云，基本的操作逻辑大同小异。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS 基于 Docker 搭建 Typecho 博客系统">
+<meta property="og:url" content="https://seriouszyx.github.io/2021/07/14/deploy-typecho-blog/index.html">
+<meta property="og:site_name" content="隐秀">
+<meta property="og:description" content="首先一般搭建动态博客都会有一个云服务器，国内的话供应商一般是阿里云或者腾讯云，我这里使用的是腾讯云，基本的操作逻辑大同小异。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img.seriouszyx.com/20210714235652.png#vwid=1646&vhei=876">
+<meta property="og:image" content="https://img.seriouszyx.com/20210714235730.png#vwid=1695&vhei=426">
+<meta property="og:image" content="https://img.seriouszyx.com/20210714235804.png#vwid=1377&vhei=99">
+<meta property="og:image" content="https://img.seriouszyx.com/20210714235847.png#vwid=1920&vhei=946">
+<meta property="og:image" content="https://img.seriouszyx.com/20210714235921.png#vwid=1920&vhei=2145">
+<meta property="og:image" content="https://img.seriouszyx.com/20210714235946.png#vwid=1920&vhei=781">
+<meta property="og:image" content="https://img.seriouszyx.com/20210715000019.png#vwid=1920&vhei=944">
+<meta property="og:image" content="https://img.seriouszyx.com/20210715000053.png#vwid=1920&vhei=1015">
+<meta property="og:image" content="https://img.seriouszyx.com/20210715000124.png#vwid=1920&vhei=950">
+<meta property="article:published_time" content="2021-07-14T13:40:49.000Z">
+<meta property="article:modified_time" content="2021-12-25T06:29:28.003Z">
+<meta property="article:author" content="Yixiang Zhao">
+<meta property="article:tag" content="seriouszyx, 隐秀, blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.seriouszyx.com/20210714235652.png#vwid=1646&vhei=876"><title>CentOS 基于 Docker 搭建 Typecho 博客系统 | 隐秀</title><link ref="canonical" href="https://seriouszyx.github.io/2021/07/14/deploy-typecho-blog/"><link rel="alternate" href="/atom.xml" type="application/atom+xml"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.6.2"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="dns-prefetch" href="https://hm.baidu.com"><script src="https://www.googletagmanager.com/gtag/js?id=UA-135559540-1" async=""></script><script>if (window.location.hostname !== 'localhost') {
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'UA-135559540-1');
+}</script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement('script');
+  hm.src = 'https://hm.baidu.com/hm.js?e2160ff518b5a935969dfd0e761cc62a';
+  hm.async = true;
+
+  if (false) {
+    hm.setAttribute('data-pjax', '');
+  }
+  var s = document.getElementsByTagName('script')[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();</script><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: undefined,
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: true,
+  fancybox: true,
+  zoomImage: undefined,
+  galleryWaterfall: undefined,
+  lazyload: true,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner header-inner--height header-inner--bgcolor"><nav class="header-nav header-nav--sticky"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="javascript:;" onclick="return false;"><span class="header-nav-menu-item__icon"><i class="fas fa-fingerprint"></i></span><span class="header-nav-menu-item__text">关于</span></a><div class="header-nav-submenu"><div class="header-nav-submenu-item"><a class="header-nav-submenu-item__link" href="/about/"><span class="header-nav-submenu-item__icon"><i class="fas fa-user"></i></span><span class="header-nav-submenu-item__text">作者</span></a></div><div class="header-nav-submenu-item"><a class="header-nav-submenu-item__link" href="/homepage/"><span class="header-nav-submenu-item__icon"><i class="fas fa-reply"></i></span><span class="header-nav-submenu-item__text">主页</span></a></div></div></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">CentOS 基于 Docker 搭建 Typecho 博客系统</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-07-14</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-12-25</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">2.2k</span></span><span class="post-meta-item post-meta-item--visitors leancloud_visitors" id="/2021/07/14/deploy-typecho-blog/" data-flag-title="CentOS 基于 Docker 搭建 Typecho 博客系统"><span class="post-meta-item__icon"><i class="fas fa-eye"></i></span><span class="post-meta-item__info">阅读次数</span><span class="post-meta-item__value leancloud-visitors-count"></span></span></div></header><div class="post-body"><p>首先一般搭建动态博客都会有一个云服务器，国内的话供应商一般是阿里云或者腾讯云，我这里使用的是腾讯云，基本的操作逻辑大同小异。</p>
+<a id="more"></a>
+
+
+        <h1 id="云服务器"   >
+          <a href="#云服务器" class="heading-link"><i class="fas fa-link"></i></a><a href="#云服务器" class="headerlink" title="云服务器"></a>云服务器</h1>
+      <p>首先一般搭建动态博客都会有一个云服务器，国内的话供应商一般是阿里云或者腾讯云，我这里使用的是腾讯云，基本的操作逻辑大同小异。</p>
+<p>下面是我服务器的配置信息。</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img.seriouszyx.com/20210714235652.png#vwid=1646&vhei=876" >
+      </p>
+
+        <h1 id="安装-Docker"   >
+          <a href="#安装-Docker" class="heading-link"><i class="fas fa-link"></i></a><a href="#安装-Docker" class="headerlink" title="安装 Docker"></a>安装 Docker</h1>
+      
+        <h2 id="yum-换源"   >
+          <a href="#yum-换源" class="heading-link"><i class="fas fa-link"></i></a><a href="#yum-换源" class="headerlink" title="yum 换源"></a>yum 换源</h2>
+      <p>首先将 yum 进行换源处理，以获得更快的下载速度。备份 <code>CentOS-Base.repo</code> 文件，以便更改配置文件出错恢复默认。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak</span><br></pre></td></tr></table></div></figure>
+<p>之后下载新的 <code>CentOS-Base.repo</code> 到 <code>/etc/yum.repos.d</code> 。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo</span><br></pre></td></tr></table></div></figure>
+<p>根据自己服务器的版本下载相应的配置文件，比如机器的操作系统是 CentOS7，就把下载链接最后的部分改为 <code>CentOS-7.repo</code> 。</p>
+<p>下载成功后运行 <code>yum makecache</code> 生成缓存即可，这样使用 yum 下载软件包时访问的就是阿里的镜像，速度会快很多。</p>
+
+        <h2 id="安装-Docker-1"   >
+          <a href="#安装-Docker-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#安装-Docker-1" class="headerlink" title="安装 Docker"></a>安装 Docker</h2>
+      <p>在新主机上首次安装 Docker Engine-Community 之前，需要设置 Docker 仓库，之后就可以从仓库安装和更新 Docker。</p>
+<p>先安装所需的软件包，<code>yum-utils</code> 提供了 yum-config-manager ，并且 device mapper 存储驱动程序需要 <code>device-mapper-persistent-data</code> 和 <code>lvm2</code>。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y yum-utils device-mapper-persistent-data lvm2</span><br></pre></td></tr></table></div></figure>
+<p>使用以下命令来设置稳定的仓库，国内的阿里源会加快下载速度。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo yum-config-manager \</span><br><span class="line">    --add-repo \</span><br><span class="line">    http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</span><br></pre></td></tr></table></div></figure>
+<p>安装最新版本的 <code>Docker Engine-Community</code> 和 <code>containerd</code>。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></div></figure>
+<p>安装后输入 <code>serivce docker status</code>  查看 Docker 运行状态，如下所示即正常运行。</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img.seriouszyx.com/20210714235730.png#vwid=1695&vhei=426" >
+      </p>
+
+        <h2 id="Docker-换源"   >
+          <a href="#Docker-换源" class="heading-link"><i class="fas fa-link"></i></a><a href="#Docker-换源" class="headerlink" title="Docker 换源"></a>Docker 换源</h2>
+      <p>修改镜像配置文件。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/docker/daemon.json</span><br></pre></td></tr></table></div></figure>
+<p>添加国内源。</p>
+<figure class="highlight json"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;registry-mirrors&quot;</span>: [</span><br><span class="line">       <span class="string">&quot;https://docker.mirrors.ustc.edu.cn&quot;</span>,</span><br><span class="line">       <span class="string">&quot;http://hub-mirror.c.163.com&quot;</span>,</span><br><span class="line">       <span class="string">&quot;https://registry.docker-cn.com&quot;</span></span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+<p>使用 <code>service docker restart</code> 命令重启 Docker 服务后生效。</p>
+
+        <h1 id="安装-Typecho-依赖环境"   >
+          <a href="#安装-Typecho-依赖环境" class="heading-link"><i class="fas fa-link"></i></a><a href="#安装-Typecho-依赖环境" class="headerlink" title="安装 Typecho 依赖环境"></a>安装 Typecho 依赖环境</h1>
+      <p>所有容器依赖的一些数据都放在 <code>/data</code> 目录下，包括数据库、网站源码、Nginx 的 conf 等，目的是为了以后迁移方便，直接将 <code>/data</code> 拷贝到新服务器就可以。</p>
+
+        <h2 id="安装数据库-MySQL"   >
+          <a href="#安装数据库-MySQL" class="heading-link"><i class="fas fa-link"></i></a><a href="#安装数据库-MySQL" class="headerlink" title="安装数据库 MySQL"></a>安装数据库 MySQL</h2>
+      <p>使用 Docker 安装 MySQL5.7，注意密码项的自定义修改。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password --mount <span class="built_in">type</span>=<span class="built_in">bind</span>,<span class="built_in">source</span>=/data/mysql,target=/var/lib/mysql --restart=always --name mysql5.7 mysql:5.7</span><br></pre></td></tr></table></div></figure>
+<p><code>--mount</code> 命令也可以用 <code>-v /data/mysql:/var/lib/mysql</code> 代替，官方更推荐使用 <code>--mount</code>，详情请看<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://docs.docker.com/storage/bind-mounts/" >官网</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span>。</p>
+<p>对于 <code>docker run</code> 命令的部分参数说明：</p>
+<ul>
+<li>-d 代表 daemon，即后台运行。</li>
+<li>-p 是映射容器的3306端口到宿主机的3306端口，规则是：<code>-p IP:host_port:container_port</code> 。</li>
+<li>-e 是设置 MySQL 的密码。</li>
+<li>–mount 是让容器的<code>/var/lib/mysql</code> 映射到宿主机的 <code>/data/mysql</code> 目录中。</li>
+<li>–restart=always 是为了在 Docker 重启时，容器能够自动启动。</li>
+</ul>
+
+        <h2 id="安装-Nginx"   >
+          <a href="#安装-Nginx" class="heading-link"><i class="fas fa-link"></i></a><a href="#安装-Nginx" class="headerlink" title="安装 Nginx"></a>安装 Nginx</h2>
+      <figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 80:80 -p 443:443 --mount <span class="built_in">type</span>=<span class="built_in">bind</span>,<span class="built_in">source</span>=/data/nginx/conf.d,target=/etc/nginx/conf.d --mount <span class="built_in">type</span>=<span class="built_in">bind</span>,<span class="built_in">source</span>=/data/solution,target=/data/solution --restart=always -d --name nginx nginx</span><br></pre></td></tr></table></div></figure>
+<ul>
+<li><code>--mount type=bind,source=/data/nginx/conf.d,target=/etc/nginx/conf.d</code> 是为了将 Nginx 的配置目录映射到宿主机的目录中，这样当 Nginx 容器被销毁时，依然能保留配置。</li>
+<li><code>/data/solution</code> 用于存放网站项目，也是为了数据与容器分离。</li>
+<li>-d 这里同时映射了80和443端口。</li>
+</ul>
+
+        <h2 id="安装-PHP"   >
+          <a href="#安装-PHP" class="heading-link"><i class="fas fa-link"></i></a><a href="#安装-PHP" class="headerlink" title="安装 PHP"></a>安装 PHP</h2>
+      <p>可以在 PHP 的<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://hub.docker.com/_/php" >官方镜像源</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span>找到最新版本的 PHP，在实际使用中，我们可能还需要装一些 PHP 的扩展，而官方源中支持已经帮我们安装了一些扩展的 PHP 镜像，如 <code>php:&lt;version&gt;-fpm</code>，其中的 <code>&lt;version&gt;</code> 指的是 PHP 版本，具体可以从官方镜像源找到。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name php-fpm -p 9000:9000 --mount <span class="built_in">type</span>=<span class="built_in">bind</span>,<span class="built_in">source</span>=/data/solution,target=/data/solution --restart=always -d php:7.4-fpm</span><br></pre></td></tr></table></div></figure>
+<p>这里也将网站根目录 <code>/data/solution</code> 映射到 PHP 容器中，为了 PHP 能正确读取 Nginx 中的 root 配置项。 </p>
+<p>由于 Typecho 需要用到 <code>pdo_mysql</code> 扩展，因此要在 <code>php-fpm</code> 上安装这个扩展。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入到`php-fpm`容器内部</span></span><br><span class="line">docker <span class="built_in">exec</span> -it php-fpm bash</span><br><span class="line"><span class="comment"># 安装扩展</span></span><br><span class="line">docker-php-ext-install pdo_mysql</span><br><span class="line"><span class="comment"># 查看是否已经成功安装</span></span><br><span class="line">php -m</span><br><span class="line"><span class="comment"># 退出容器</span></span><br><span class="line"><span class="built_in">exit</span></span><br></pre></td></tr></table></div></figure>
+<p>安装后重启 <code>php-fpm</code>，<code>pdo_mysql</code> 则安装成功。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker restart php-fpm</span><br></pre></td></tr></table></div></figure>
+
+        <h1 id="自定义-Bridge-网络"   >
+          <a href="#自定义-Bridge-网络" class="heading-link"><i class="fas fa-link"></i></a><a href="#自定义-Bridge-网络" class="headerlink" title="自定义 Bridge 网络"></a>自定义 Bridge 网络</h1>
+      <p>执行命令看一下，现在机器上已经运行着 Nginx、PHP、MySQL 三个服务，现在需要让它们之间能够相互通信，这里使用自定义 Bridge 网络的方法。</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img.seriouszyx.com/20210714235804.png#vwid=1377&vhei=99" >
+      </p>
+<p>实际上启动容器时，Docker 会将容器绑定到默认的 Bridge 网络中，使用 <code>docker network inspect bridge</code> 命令打印此时默认的网络：</p>
+<figure class="highlight json"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">&quot;Name&quot;</span>: <span class="string">&quot;typecho&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;Id&quot;</span>: <span class="string">&quot;d9d06a7e7410e75183eb09019bb895a12a01d2f7405f80e09d40811c578ff396&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;Created&quot;</span>: <span class="string">&quot;2021-06-11T13:10:53.453912588+08:00&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;Scope&quot;</span>: <span class="string">&quot;local&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;Driver&quot;</span>: <span class="string">&quot;bridge&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;EnableIPv6&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">&quot;IPAM&quot;</span>: &#123;</span><br><span class="line">            <span class="attr">&quot;Driver&quot;</span>: <span class="string">&quot;default&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;Options&quot;</span>: &#123;&#125;,</span><br><span class="line">            <span class="attr">&quot;Config&quot;</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">&quot;Subnet&quot;</span>: <span class="string">&quot;172.18.0.0/16&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;Gateway&quot;</span>: <span class="string">&quot;172.18.0.1&quot;</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;Internal&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">&quot;Attachable&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">&quot;Ingress&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">&quot;ConfigFrom&quot;</span>: &#123;</span><br><span class="line">            <span class="attr">&quot;Network&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;ConfigOnly&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">&quot;Containers&quot;</span>: &#123;</span><br><span class="line">            <span class="attr">&quot;2d4b9daf908252e40b8cca8e772e9dece8c1c36a467f2846fc0786d4964817cd&quot;</span>: &#123;</span><br><span class="line">                <span class="attr">&quot;Name&quot;</span>: <span class="string">&quot;mysql5.7&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;EndpointID&quot;</span>: <span class="string">&quot;8afe4a42884234acda9c8b996faed20d98015e6c919455edaf0d24f63bc22764&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;MacAddress&quot;</span>: <span class="string">&quot;02:42:ac:12:00:02&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;IPv4Address&quot;</span>: <span class="string">&quot;172.18.0.2/16&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;IPv6Address&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">&quot;8cd032a4eeff30e7a54d81b6f92449160b243c793ba9d1a239cb4587896f2721&quot;</span>: &#123;</span><br><span class="line">                <span class="attr">&quot;Name&quot;</span>: <span class="string">&quot;php-fpm&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;EndpointID&quot;</span>: <span class="string">&quot;211aa7e5ab248aee84cc7875b76842037e1c597eb3f5b546b3705ac971c52c0a&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;MacAddress&quot;</span>: <span class="string">&quot;02:42:ac:12:00:04&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;IPv4Address&quot;</span>: <span class="string">&quot;172.18.0.4/16&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;IPv6Address&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">&quot;ff4b411e355f1000552b892601164499a0c077fdd4a8eb22bb8c5e92f0757d83&quot;</span>: &#123;</span><br><span class="line">                <span class="attr">&quot;Name&quot;</span>: <span class="string">&quot;nginx&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;EndpointID&quot;</span>: <span class="string">&quot;e10b908ac0e0f6bd872a0b23d7ff30f58845700b7fe48568325d73ad38ba1747&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;MacAddress&quot;</span>: <span class="string">&quot;02:42:ac:12:00:03&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;IPv4Address&quot;</span>: <span class="string">&quot;172.18.0.3/16&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;IPv6Address&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;Options&quot;</span>: &#123;&#125;,</span><br><span class="line">        <span class="attr">&quot;Labels&quot;</span>: &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></div></figure>
+<p>可以看到 MySQL、php-fpm、Nginx 在默认 Bridge 中的 IP 分别是 <code>172.18.0.2</code>、<code>172.18.0.4</code>、<code>172.18.0.3</code>，  可以通过容器在宿主机中的 IP 来访问对应的服务，比如 php-fpm 想要访问 MySQL，可以在 php-fpm 容器中通过 <code>172.18.0.2:3306</code> 来访问。</p>
+<p>这种方式只能使用 IP 来访问对应的容器的服务，而 IP 可能会变化的，因此是不推荐使用在生产环境的。而用户自定义的 Bridge 网络，不仅支持 IP 访问，还支持直接使用容器名称访问。</p>
+<p>创建一个自定义 Bridge 网络，假设名称是 <code>typecho</code>。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker network create typecho</span><br></pre></td></tr></table></div></figure>
+<p>通过 <code>docker network connect $&#123;网络名&#125; $&#123;容器名&#125;</code> 来将容器绑定到 <code>typecho</code> 网络上。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker network connect typecho mysql5.7</span><br><span class="line">docker network connect typecho php-fpm</span><br><span class="line">docker network connect typecho nginx</span><br></pre></td></tr></table></div></figure>
+<p>现在三个容器已经绑定到自定义的 Bridge 网络上了。例如，在 Nginx 容器中，就可以直接通过 <code>php-fpm</code> 的名字来调用 PHP 的服务了。</p>
+
+        <h1 id="安装-Typecho"   >
+          <a href="#安装-Typecho" class="heading-link"><i class="fas fa-link"></i></a><a href="#安装-Typecho" class="headerlink" title="安装 Typecho"></a>安装 Typecho</h1>
+      <p>进入 MySQL 容器创建数据库 <code>typecho</code> 。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it mysql5.7 bash</span><br><span class="line">mysql -uroot -p </span><br><span class="line">输入密码</span><br><span class="line">create database typecho;</span><br></pre></td></tr></table></div></figure>
+<p>进入 Typecho 官方<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://typecho.org/download" >下载页面</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span>，发现分为<code>稳定版</code>和<code>开发版</code>两种，按照一般的软件安装思路，当然是选择稳定版，但是 Typecho 的稳定版在2017年后就没有更新了，会遇到许多问题，比如我之前的安装中就遇到了<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/typecho/typecho/issues/683" >此类错误</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span> ，随后切换至开发版后问题解决。</p>
+<p>复制开发版的下载链接，下载到服务器的 <code>/data</code> 目录下并解压到 <code>/solution</code> 目录下。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://nightly.link/typecho/typecho/workflows/Typecho-dev-Ci/master/typecho_build.zip </span><br><span class="line"></span><br><span class="line">unzip typecho_build.zip -d ./solution/typecho</span><br></pre></td></tr></table></div></figure>
+<p>然后配置 Nginx 使得网站可以正常访问。注意其中 Nginx 要访问 php-fpm，在配置文件中可通过名字访问其 Docker 容器。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">	listen 80;</span><br><span class="line">	server_name localhost;</span><br><span class="line">	root   /data/solution/typecho;   <span class="comment"># 这里是网站的存放路径</span></span><br><span class="line">  index  index.php;</span><br><span class="line"></span><br><span class="line">	<span class="comment"># 下面直接照写</span></span><br><span class="line">	location / &#123;</span><br><span class="line">    	try_files <span class="variable">$uri</span> <span class="variable">$uri</span>/ /index.php$is_args<span class="variable">$args</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	location ~ \.php$ &#123;</span><br><span class="line">        include fastcgi.conf;</span><br><span class="line">        include fastcgi_params;</span><br><span class="line">        fastcgi_pass php-fpm:9000;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+<p>配置成功后重启 Nginx 容器，访问服务器的 IP 地址，开始配置 Typecho 博客系统。</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img.seriouszyx.com/20210714235847.png#vwid=1920&vhei=946" >
+      </p>
+<p>数据库适配器选择安装好的 <code>pdo-mysql</code> ，因为已经配置了自定义 Bridge 网络，数据库地址填入容器名即可访问数据库。</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img.seriouszyx.com/20210714235921.png#vwid=1920&vhei=2145" >
+      </p>
+<p>完成配置信息后会显示如下界面，需要复制文本框中的内容，然后创建 <code>config.inc.php</code> 文件粘贴进去。</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /data/solution/typecho/config.inc.php</span><br></pre></td></tr></table></div></figure>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img.seriouszyx.com/20210714235946.png#vwid=1920&vhei=781" >
+      </p>
+<p>最终会显示安装成功页面，并可以查看默认的用户名和密码。</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img.seriouszyx.com/20210715000019.png#vwid=1920&vhei=944" >
+      </p>
+<p>下面两个链接分别是博客页面和后台控制面板。</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img.seriouszyx.com/20210715000053.png#vwid=1920&vhei=1015" >
+      </p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img.seriouszyx.com/20210715000124.png#vwid=1920&vhei=950" >
+      </p>
+<p>Typecho 博客系统至此安装完成。</p>
+<hr>
+<ol>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000021390958" >Centos8使用docker迁移typecho博客</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://blog.csdn.net/wudinaniya/article/details/105758739" >将CentOS的yum源更换为国内镜像源</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://www.runoob.com/docker/centos-docker-install.html" >CentOS Docker 安装</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://wiki.dongxing.xin/pages/b1c12d/#php-%E5%AE%89%E8%A3%85" >Typecho 环境配置和博客搭建</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+</ol>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://seriouszyx.github.io">Yixiang Zhao</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://seriouszyx.github.io/2021/07/14/deploy-typecho-blog/">https://seriouszyx.github.io/2021/07/14/deploy-typecho-blog/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-reward reward"><div class="reward-button">请我喝杯咖啡~</div><div class="reward-qrcode"><span class="reward-qrcode-alipay"><img class="reward-qrcode-alipay__img" src="/assets/others/alipay.png"><div class="reward-qrcode-alipay__text">支付宝打赏</div></span><span class="reward-qrcode-wechat"><img class="reward-qrcode-wechat__img" src="/assets/others/wechat.png"><div class="reward-qrcode-wechat__text">微信打赏</div></span></div></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2021/09/01/scanner-analysis-and-detect/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">网络扫描探测工具的分析与识别</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2021/06/01/what-is-blockchain/"><span class="paginator-prev__text">到底什么才是区块链</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div><div class="comments" id="comments"><div id="valine-container"></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">1.</span> <span class="toc-text">
+          云服务器</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-Docker"><span class="toc-number">2.</span> <span class="toc-text">
+          安装 Docker</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#yum-%E6%8D%A2%E6%BA%90"><span class="toc-number">2.1.</span> <span class="toc-text">
+          yum 换源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-Docker-1"><span class="toc-number">2.2.</span> <span class="toc-text">
+          安装 Docker</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-%E6%8D%A2%E6%BA%90"><span class="toc-number">2.3.</span> <span class="toc-text">
+          Docker 换源</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-Typecho-%E4%BE%9D%E8%B5%96%E7%8E%AF%E5%A2%83"><span class="toc-number">3.</span> <span class="toc-text">
+          安装 Typecho 依赖环境</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E6%95%B0%E6%8D%AE%E5%BA%93-MySQL"><span class="toc-number">3.1.</span> <span class="toc-text">
+          安装数据库 MySQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-Nginx"><span class="toc-number">3.2.</span> <span class="toc-text">
+          安装 Nginx</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-PHP"><span class="toc-number">3.3.</span> <span class="toc-text">
+          安装 PHP</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89-Bridge-%E7%BD%91%E7%BB%9C"><span class="toc-number">4.</span> <span class="toc-text">
+          自定义 Bridge 网络</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-Typecho"><span class="toc-number">5.</span> <span class="toc-text">
+          安装 Typecho</span></a></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="https://i.loli.net/2021/01/17/NUEISxoqirzvPBf.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">Yixiang Zhao</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/seriouszyx" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="https://weibo.com/u/5865669785" target="_blank" rel="noopener" data-popover="微博" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-weibo"></i></span></a><a class="sidebar-ov-social-item" href="https://www.zhihu.com/people/pie-yi" target="_blank" rel="noopener" data-popover="知乎" data-popover-pos="up"><span class="sidebar-ov-social-item__icon">知</span></a></div><div class="sidebar-ov-feed"><span class="sidebar-ov-feed-rss"><a class="sidebar-ov-feed-rss__link" href="/atom.xml" target="_blank" rel="noopener"><span class="sidebar-ov-feed-rss__icon"><i class="fas fa-rss"></i></span><span>RSS 订阅</span></a></span></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">8</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">0</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">2</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span><a href="https://github.com/seriouszyx" rel="noopener" target="_blank">seriouszyx</a></span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.3.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.6.2</span></div><div class="busuanzi"><span class="busuanzi-siteuv"><span class="busuanzi-siteuv__icon"><i class="fas fa-user"></i></span><span class="busuanzi-siteuv__info">访问人数</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_uv"></span></span><span class="busuanzi-sitepv"><span class="busuanzi-siteuv__icon"><i class="fas fa-eye"></i></span><span class="busuanzi-siteuv__info">浏览总量</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_pv"></span></span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/ribbon.js@latest/dist/ribbon.min.js" size="120" alpha="0.6" zIndex="-1"></script><script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.json';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);
+
+function safeOpenUrl(url) {
+  var newTab = window.open();
+  newTab.opener = null;
+  newTab.location = url;
+}
+
+function extSearch(engine) {
+  var engines = {
+    google: 'https://www.google.com/search?q=',
+    bing: 'https://cn.bing.com/search?q=',
+    baidu: 'https://www.baidu.com/s?ie=UTF-8&wd=',
+  };
+  var host = window.location.host;
+  var query = $('.search-input input').val().toLowerCase().trim();
+  var uri = engines[engine] + query + ' site:' + host;
+
+  if (query) {
+    safeOpenUrl(uri);
+  } else {
+    Stun.utils.popAlert('warning', 'Please enter characters');
+  }
+}
+
+var assistSearchList = window.CONFIG.assistSearch;
+
+if (Array.isArray(assistSearchList)) {
+  assistSearchList.forEach(function (name) {
+    document.querySelector('.search-btns-item--' + name).addEventListener('click', function () {
+      extSearch(name);
+    }, false);
+  });
+}</script><script src="https://cdn.jsdelivr.net/gh/sukkaw/busuanzi@latest/bsz.pure.mini.js" async></script><script src="https://cdn.jsdelivr.net/npm/leancloud-storage@latest/dist/av-min.js"></script><script src="https://cdn.jsdelivr.net/npm/valine@latest/dist/Valine.min.js"></script><script>function loadValine () {
+  var GUEST_INFO = ['nick', 'mail', 'link'];
+  var guest_info = 'nick,mail,link';
+
+  guest_info = guest_info.split(',').filter(function(item) {
+    return GUEST_INFO.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#valine-container',
+    appId: '5LClFOVFGRKS3hJmQRaMv2Os-gzGzoHsz',
+    appKey: 'zlWsxvIXdOlOnnG0X4KlWKUs',
+    notify: true,
+    verify: true,
+    placeholder: '别急，慢慢说...',
+    avatar: 'mp',
+    meta: guest_info,
+    pageSize: '10' || 10,
+    visitor: true,
+    recordIP: true,
+    lang: 'zh-cn' || 'zh-cn',
+    path: window.location.pathname
+  });
+}
+
+if (false) {
+  loadValine();
+} else {
+  window.addEventListener('DOMContentLoaded', loadValine, false);
+}</script><script src="/js/utils.js?v=2.6.2"></script><script src="/js/stun-boot.js?v=2.6.2"></script><script src="/js/scroll.js?v=2.6.2"></script><script src="/js/header.js?v=2.6.2"></script><script src="/js/sidebar.js?v=2.6.2"></script><script type="application/json" src="/search.json"></script></body></html>
