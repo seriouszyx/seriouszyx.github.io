@@ -1,611 +1,399 @@
-Stun.utils = Stun.$u = {
-  /**
-   * Debounce
-   * @param {Object} func Callback function
-   * @param {Number} wait Waiting time
-   * @param {Boolean} immediate Run immediately
-   */
-  debounce: function (func, wait, immediate) {
-    var timeout
-    return function () {
-      var context = this
-      var args = arguments
+/* global NexT, CONFIG */
 
-      if (timeout) clearTimeout(timeout)
-      if (immediate) {
-        var callNow = !timeout
-        timeout = setTimeout(function () {
-          timeout = null
-        }, wait)
-        if (callNow) func.apply(context, args)
-      } else {
-        timeout = setTimeout(function () {
-          func.apply(context, args)
-        }, wait)
-      }
-    }
-  },
-  /**
-   * Throttle
-   * @param {Object} func Callback function
-   * @param {Number} wait Waiting time
-   * @param {Object} options leading: Boolean, trailing: Boolean
-   */
-  throttle: function (func, wait, options) {
-    var timeout, context, args
-    var previous = 0
-    if (!options) options = {}
+HTMLElement.prototype.wrap = function(wrapper) {
+  this.parentNode.insertBefore(wrapper, this);
+  this.parentNode.removeChild(this);
+  wrapper.appendChild(this);
+};
 
-    var later = function () {
-      previous = options.leading === false ? 0 : new Date().getTime()
-      timeout = null
-      func.apply(context, args)
-      if (!timeout) context = args = null
-    }
-    var throttled = function () {
-      var now = new Date().getTime()
-      if (!previous && options.leading === false) previous = now
-      var remaining = wait - (now - previous)
-      context = this
-      args = arguments
-      if (remaining <= 0 || remaining > wait) {
-        if (timeout) {
-          clearTimeout(timeout)
-          timeout = null
-        }
-        previous = now
-        func.apply(context, args)
-        if (!timeout) context = args = null
-      } else if (!timeout && options.trailing !== false) {
-        timeout = setTimeout(later, remaining)
-      }
-    }
-    return throttled
-  },
-  hasMobileUA: function () {
-    var nav = window.navigator
-    var ua = nav.userAgent
-    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g
-    return pa.test(ua)
-  },
-  isTablet: function () {
-    return (
-      window.screen.width > 767 &&
-      window.screen.width < 992 &&
-      this.hasMobileUA()
-    )
-  },
-  isMobile: function () {
-    return window.screen.width < 767 && this.hasMobileUA()
-  },
-  isDesktop: function () {
-    return !this.isTablet() && !this.isMobile()
-  },
-  Cookies: function () {
-    function extend () {
-      var i = 0
-      var result = {}
-      for (; i < arguments.length; i++) {
-        var attributes = arguments[i]
-        for (var key in attributes) {
-          result[key] = attributes[key]
-        }
-      }
-      return result
-    }
-
-    function init (converter) {
-      function api (key, value, attributes) {
-        var result
-        if (typeof document === 'undefined') {
-          return
-        }
-        // Write
-        if (arguments.length > 1) {
-          attributes = extend({ path: '/' }, api.defaults, attributes)
-          if (typeof attributes.expires === 'number') {
-            var expires = new Date()
-            expires.setMilliseconds(
-              expires.getMilliseconds() + attributes.expires * 864e5
-            )
-            attributes.expires = expires
-          }
-          // We're using "expires" because "max-age" is not supported by IE
-          attributes.expires = attributes.expires
-            ? attributes.expires.toUTCString()
-            : ''
-          try {
-            result = JSON.stringify(value)
-            if (/^[{[]/.test(result)) {
-              value = result
-            }
-          } catch (e) {
-            /* empty */
-          }
-          if (!converter.write) {
-            value = encodeURIComponent(String(value)).replace(
-              /%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g,
-              decodeURIComponent
-            )
-          } else {
-            value = converter.write(value, key)
-          }
-          key = encodeURIComponent(String(key))
-          key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent)
-          key = key.replace(/[()]/g, escape)
-
-          var stringifiedAttributes = ''
-          for (var attributeName in attributes) {
-            if (!attributes[attributeName]) {
-              continue
-            }
-            stringifiedAttributes += '; ' + attributeName
-            if (attributes[attributeName] === true) {
-              continue
-            }
-            stringifiedAttributes += '=' + attributes[attributeName]
-          }
-          return (document.cookie = key + '=' + value + stringifiedAttributes)
-        }
-        // Read
-        if (!key) {
-          result = {}
-        }
-        // To prevent the for loop in the first place assign an empty array
-        // in case there are no cookies at all. Also prevents odd result when
-        // calling "get()"
-        var cookies = document.cookie ? document.cookie.split('; ') : []
-        var rdecode = /(%[0-9A-Z]{2})+/g
-        var i = 0
-
-        for (; i < cookies.length; i++) {
-          var parts = cookies[i].split('=')
-          var cookie = parts.slice(1).join('=')
-
-          if (cookie.charAt(0) === '"') {
-            cookie = cookie.slice(1, -1)
-          }
-          try {
-            var name = parts[0].replace(rdecode, decodeURIComponent)
-            cookie = converter.read
-              ? converter.read(cookie, name)
-              : converter(cookie, name) ||
-                cookie.replace(rdecode, decodeURIComponent)
-            if (this.json) {
-              try {
-                cookie = JSON.parse(cookie)
-              } catch (e) {
-                /* empty */
-              }
-            }
-            if (key === name) {
-              result = cookie
-              break
-            }
-            if (!key) {
-              result[name] = cookie
-            }
-          } catch (e) {
-            /* empty */
-          }
-        }
-        return result
-      }
-      api.set = api
-      api.get = function (key) {
-        return api.call(api, key)
-      }
-      api.getJSON = function () {
-        return api.apply({ json: true }, [].slice.call(arguments))
-      }
-      api.defaults = {}
-      api.remove = function (key, attributes) {
-        api(key, '', extend(attributes, { expires: -1 }))
-      }
-      api.withConverter = init
-      return api
-    }
-    return init(function () {})
-  },
-  showThemeInConsole: function () {
-    var stunInfo = '主题不错？⭐star 支持一下 ->'
-    var stunURL = 'https://github.com/liuyib/hexo-theme-stun'
-    var stunNameStr =
-      '\n\n      ___          ___            ___            ___      \n     /\\  \\        /\\  \\          /\\__\\          /\\__\\     \n    /::\\  \\       \\:\\  \\        /:/  /         /::|  |    \n   /:/\\ \\  \\       \\:\\  \\      /:/  /         /:|:|  |    \n  _\\:\\ \\ \\  \\      /::\\  \\    /:/  /  ___    /:/|:|  |__  \n /\\ \\:\\ \\ \\__\\    /:/\\:\\__\\  /:/__/  /\\__\\  /:/ |:| /\\__\\ \n \\:\\ \\:\\ \\/__/   /:/  \\/__/  \\:\\  \\ /:/  /  \\/__|:|/:/  / \n  \\:\\ \\:\\__\\    /:/  /        \\:\\  /:/  /       |:/:/  /  \n   \\:\\/:/  /    \\/__/          \\:\\/:/  /        |::/  /   \n    \\::/  /                     \\::/  /         /:/  /    \n     \\/__/                       \\/__/          \\/__/     \n                                                          \n'
-    var stunInfoStyle =
-      'background-color: #49b1f5; color: #fff; padding: 8px; font-size: 14px;'
-    var stunURLStyle =
-      'background-color: #ffbca2; padding: 8px; font-size: 14px;'
-    var stunNameStyle = 'background-color: #eaf8ff;'
-
-    console.log(
-      '%c%s%c%s%c%s',
-      stunInfoStyle,
-      stunInfo,
-      stunURLStyle,
-      stunURL,
-      stunNameStyle,
-      stunNameStr
-    )
-  },
-  /**
-   * Change the event code to keyCode.
-   * @param {String} code Event code
-   */
-  codeToKeyCode: function (code) {
-    var codes = {
-      ArrowLeft: 37,
-      ArrowRight: 39,
-      Escape: 27,
-      Enter: 13
-    }
-    return codes[code]
-  },
-  /**
-   * "Alert" component
-   * @param {String} status The Status of message. Values: success / info / warning / error.
-   * @param {String} text The text to show.
-   * @param {Number} delay Message stay time (unit is 's', default 5s).
-   */
-  popAlert: function (status, text, delay) {
-    if ($('.stun-message').length !== 0) {
-      $('.stun-message').remove()
-    }
-
-    var $alert = $(
-      '<div class="stun-message">' +
-        `<div class="stun-alert stun-alert-${status}">` +
-        `<i class="stun-alert-icon ${CONFIG.fontIcon.prompt[status]}"></i>` +
-        `<span class="stun-alert-description">${text}</span>` +
-        '</div>' +
-        '</div>'
-    )
-
-    $('body').append($alert)
-    $(document).ready(function () {
-      $('.stun-alert')
-        .velocity('stop')
-        .velocity('transition.slideDownBigIn', {
-          duration: 300
-        })
-        .velocity('reverse', {
-          delay: delay * 1000 || 5000,
-          duration: 260,
-          complete: function () {
-            $('.stun-alert').css('display', 'none')
-          }
-        })
+(function() {
+  const onPageLoaded = () => document.dispatchEvent(
+    new Event('page:loaded', {
+      bubbles: true
     })
-  },
-  /**
-   * Copy any text.
-   * @param {HTMLElement} container Container of text.
-   */
-  copyText: function (container) {
-    try {
-      var selection = window.getSelection()
-      var range = document.createRange()
-      // Select text by the content of node.
-      range.selectNodeContents(container)
-      selection.removeAllRanges()
-      selection.addRange(range)
+  );
 
-      var text = selection.toString()
-      var input = document.createElement('input')
-      // Create a temporary input to make the
-      // execCommand command take effect.
-      input.style.display = 'none'
-      input.setAttribute('readonly', 'readonly')
-      input.setAttribute('value', text)
-      document.body.appendChild(input)
-      input.setSelectionRange(0, -1)
-
-      if (document.execCommand('copy')) {
-        document.execCommand('copy')
-        document.body.removeChild(input)
-        return true
-      }
-      document.body.removeChild(input)
-    } catch (e) {
-      return false
-    }
-  },
-  // Wrap images with fancybox support.
-  wrapImageWithFancyBox: function () {
-    $('.content img')
-      .not(':hidden')
-      .each(function () {
-        var $img = $(this)
-        var imgTitle = $img.attr('title') || $img.attr('alt')
-        var $imgWrap = $img.parent('a')
-        var imgSource = ['data-src', 'data-original', 'src']
-        var imgSrc = ''
-
-        if (!$imgWrap[0]) {
-          for (var i = 0; i < imgSource.length; i++) {
-            if ($img.attr(imgSource[i])) {
-              imgSrc = $img.attr(imgSource[i])
-              break
-            }
-          }
-          $imgWrap = $img
-            .wrap(`<a class="fancybox" href="${imgSrc}"></a>`)
-            .parent('a')
-          if ($img.is('.gallery img')) {
-            $imgWrap.attr('data-fancybox', 'gallery')
-          } else {
-            $imgWrap.attr('data-fancybox', 'default')
-          }
-        }
-        if (imgTitle) {
-          $imgWrap.attr('title', imgTitle).attr('data-caption', imgTitle)
-        }
-      })
-
-    $().fancybox({
-      selector: '[data-fancybox]',
-      loop: true,
-      transitionEffect: 'slide',
-      hash: false,
-      buttons: [
-        'share',
-        'slideShow',
-        'fullScreen',
-        'download',
-        'thumbs',
-        'close'
-      ]
-    })
-  },
-  // Display the image in the gallery as a waterfall.
-  showImageToWaterfall: function () {
-    var gConfig = CONFIG.galleryWaterfall
-    var colWidth = parseInt(gConfig.colWidth)
-    var colGapX = parseInt(gConfig.gapX)
-    var GALLERY_IMG_SELECTOR = '.gallery img'
-
-    this.waitAllImageLoad(GALLERY_IMG_SELECTOR, function () {
-      $('.gallery').masonry({
-        itemSelector: GALLERY_IMG_SELECTOR,
-        columnWidth: colWidth,
-        percentPosition: true,
-        gutter: colGapX,
-        transitionDuration: 0
-      })
-    })
-  },
-  // Lazy load the images of post.
-  lazyLoadImage: function () {
-    $('img.lazyload').lazyload()
-  },
-  // Add a mark icon to the link with `target="_blank"` attribute.
-  addIconToExternalLink: function (container) {
-    if (!$(container)[0]) {
-      return
-    }
-
-    var $wrapper = $('<span class="exturl"></span>')
-    var $icon = $(
-      '<span class="exturl__icon">' +
-        `<i class="${CONFIG.externalLink.icon.name}"></i>` +
-        '</span>'
-    )
-
-    $(container)
-      .find('a[target="_blank"]')
-      .addClass('exturl__link')
-      .wrap($wrapper)
-      .parent('.exturl')
-      .append($icon)
-  },
-  // Switch to the prev / next post by shortcuts.
-  registerSwitchPost: function () {
-    var keyLeft = this.codeToKeyCode('ArrowLeft')
-    var keyRight = this.codeToKeyCode('ArrowRight')
-
-    $(document).on('keydown', function (e) {
-      var isPrev = e.keyCode === keyLeft
-      var isNext = e.keyCode === keyRight
-
-      if (e.ctrlKey) {
-        if (isPrev) {
-          var prevElem = $('.paginator-prev a')[0]
-          prevElem && prevElem.click()
-        } else if (isNext) {
-          var nextElem = $('.paginator-next a')[0]
-          nextElem && nextElem.click()
-        }
-      }
-    })
-  },
-  // Show / Hide the reward QR.
-  registerShowReward: function () {
-    $('.reward-button').on('click', function () {
-      var $container = $('.reward-qrcode')
-      if ($container.is(':visible')) {
-        $container.css('display', 'none')
-      } else {
-        $container.velocity('stop').velocity('transition.slideDownIn', {
-          duration: 300
-        })
-      }
-    })
-  },
-  // Click to zoom in image, without fancybox.
-  registerZoomImage: function () {
-    $('#content-wrap img')
-      .not(':hidden')
-      .each(function () {
-        if ($(this).attr('data-zoom') === 'none') return
-        $(this).addClass('zoomimg')
-      })
-
-    var $imgMask = $('<div class="zoomimg-mask"></div>')
-    var $imgClone = null
-    var isZoom = false
-
-    $(window).on('scroll', closeZoom)
-    $(document).on('click', closeZoom)
-
-    $('.zoomimg').on('click', function (e) {
-      e.stopPropagation()
-      if (isZoom) {
-        closeZoom()
-        return
-      }
-      isZoom = true
-      $imgClone = $(this)
-        .clone()
-        .addClass('zoomimg-clone')
-
-      var SIDE_GAP = parseInt(CONFIG.zoomImage.gapAside || 20)
-      var imgRect = this.getBoundingClientRect()
-      var imgOuterW = $(this).outerWidth()
-      var imgOuterH = $(this).outerHeight()
-      var imgW = $(this).width()
-      var imgH = $(this).height()
-      var imgL = $(this).offset().left + (imgOuterW - imgW) / 2
-      var imgT = $(this).offset().top + (imgOuterH - imgH) / 2
-      var winW = $(window).width() - SIDE_GAP * 2
-      var winH = $(window).height() - SIDE_GAP * 2
-      var scaleX = winW / imgW
-      var scaleY = winH / imgH
-      var scale = (scaleX < scaleY ? scaleX : scaleY) || 1
-      var translateX = winW / 2 - (imgRect.x + imgOuterW / 2) + SIDE_GAP
-      var translateY = winH / 2 - (imgRect.y + imgOuterH / 2) + SIDE_GAP
-
-      $(this).addClass('zoomimg--hide')
-      $('body')
-        .append($imgMask)
-        .append($imgClone)
-      $imgMask.velocity({
-        opacity: 1
-      })
-      $imgClone.css({
-        left: imgL,
-        top: imgT,
-        width: imgW,
-        height: imgH
-      })
-      $imgClone.velocity(
-        {
-          translateX: translateX,
-          translateY: translateY,
-          scale: scale
-        },
-        { duration: 300 }
-      )
-    })
-
-    function closeZoom () {
-      if (!isZoom) {
-        return
-      }
-
-      isZoom = false
-      $imgClone.velocity('reverse')
-      $imgMask.velocity('reverse', {
-        complete: function () {
-          $imgMask.remove()
-          $imgClone.remove()
-          $('.zoomimg').removeClass('zoomimg--hide')
-        }
-      })
-    }
-  },
-  /**
-   * Add the header to code block.
-   * @param {string} type The type of header. value: 'carbon' | null.
-   */
-  addCodeHeader: function (type) {
-    $('figure.highlight').each(function () {
-      if (!$(this).find('figcaption')[0]) {
-        var content = ''
-        if (!type) {
-          var CODEBLOCK_CLASS_NAME = 'highlight'
-          var lang = $(this)
-            .attr('class')
-            .split(/\s/)
-            .filter(function (e) {
-              return e !== CODEBLOCK_CLASS_NAME
-            })
-
-          content += `<div class="custom-lang">${lang}</div>`
-        } else if (type === 'carbon') {
-          content += `
-            <div class="custom-carbon">
-              <div class="custom-carbon-dot custom-carbon-dot--red"></div>
-              <div class="custom-carbon-dot custom-carbon-dot--yellow"></div>
-              <div class="custom-carbon-dot custom-carbon-dot--green"></div>
-            </div>
-          `
-        }
-
-        $(`<figcaption class="custom">${content}</figcaption>`).insertBefore(
-          $(this)
-            .children()
-            .first()
-        )
-      }
-    })
-  },
-  addCopyButton: function (type) {
-    var btnContainer = '.post-copyright,'
-    var $copyIcon = $(
-      `<div class="copy-button" data-popover="${CONFIG.prompt.copyButton}" data-popover-pos="up">` +
-        `<i class="${CONFIG.fontIcon.copyBtn}"></i>` +
-        '</div>'
-    )
-
-    if (type === 'simple' || type === 'carbon') {
-      btnContainer += '.highlight figcaption:not(".custom")'
-    } else {
-      btnContainer += '.highlight figcaption'
-    }
-    // Add a copy button to the selected elements.
-    $(btnContainer).append($copyIcon)
-  },
-  registerCopyEvent: function () {
-    $('.copy-button').on('click', function () {
-      var container = null
-      // Select the container of code block.
-      var codeContainer = $(this)
-        .parents('figure.highlight')
-        .find('td.code')[0]
-
-      if (codeContainer) {
-        container = codeContainer
-      } else {
-        // Select the container of text.
-        container = $(this).parent()[0]
-      }
-      if (Stun.utils.copyText(container)) {
-        Stun.utils.popAlert('success', CONFIG.prompt.copySuccess)
-      } else {
-        Stun.utils.popAlert('error', CONFIG.prompt.copyError)
-      }
-    })
-  },
-  /**
-   * Wait for all images to load.
-   * @param {String} selector jQuery selector.
-   * @param {Function} callback Callback.
-   */
-  waitAllImageLoad: function (selector, callback) {
-    var imgDefereds = []
-    $(selector).each(function () {
-      var dfd = $.Deferred()
-      $(this).bind('load', function () {
-        dfd.resolve()
-      })
-
-      if (this.complete) {
-        setTimeout(function () {
-          dfd.resolve()
-        }, 500)
-      }
-      imgDefereds.push(dfd)
-    })
-    $.when.apply(null, imgDefereds).then(callback)
+  if (document.readyState === 'loading') {
+    document.addEventListener('readystatechange', onPageLoaded, { once: true });
+  } else {
+    onPageLoaded();
   }
-}
+  document.addEventListener('pjax:success', onPageLoaded);
+})();
+
+NexT.utils = {
+
+  registerExtURL: function() {
+    document.querySelectorAll('span.exturl').forEach(element => {
+      const link = document.createElement('a');
+      // https://stackoverflow.com/questions/30106476/using-javascripts-atob-to-decode-base64-doesnt-properly-decode-utf-8-strings
+      link.href = decodeURIComponent(atob(element.dataset.url).split('').map(c => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      link.rel = 'noopener external nofollow noreferrer';
+      link.target = '_blank';
+      link.className = element.className;
+      link.title = element.title;
+      link.innerHTML = element.innerHTML;
+      element.parentNode.replaceChild(link, element);
+    });
+  },
+
+  /**
+   * One-click copy code support.
+   */
+  registerCopyCode: function() {
+    let figure = document.querySelectorAll('figure.highlight');
+    if (figure.length === 0) figure = document.querySelectorAll('pre:not(.mermaid)');
+    figure.forEach(element => {
+      element.querySelectorAll('.code .line span').forEach(span => {
+        span.classList.forEach(name => {
+          span.classList.replace(name, `hljs-${name}`);
+        });
+      });
+      if (!CONFIG.copycode) return;
+      element.insertAdjacentHTML('beforeend', '<div class="copy-btn"><i class="fa fa-copy fa-fw"></i></div>');
+      const button = element.querySelector('.copy-btn');
+      button.addEventListener('click', () => {
+        const lines = element.querySelector('.code') || element.querySelector('code');
+        const code = lines.innerText;
+        if (navigator.clipboard) {
+          // https://caniuse.com/mdn-api_clipboard_writetext
+          navigator.clipboard.writeText(code).then(() => {
+            button.querySelector('i').className = 'fa fa-check-circle fa-fw';
+          }, () => {
+            button.querySelector('i').className = 'fa fa-times-circle fa-fw';
+          });
+        } else {
+          const ta = document.createElement('textarea');
+          ta.style.top = window.scrollY + 'px'; // Prevent page scrolling
+          ta.style.position = 'absolute';
+          ta.style.opacity = '0';
+          ta.readOnly = true;
+          ta.value = code;
+          document.body.append(ta);
+          ta.select();
+          ta.setSelectionRange(0, code.length);
+          ta.readOnly = false;
+          const result = document.execCommand('copy');
+          button.querySelector('i').className = result ? 'fa fa-check-circle fa-fw' : 'fa fa-times-circle fa-fw';
+          ta.blur(); // For iOS
+          button.blur();
+          document.body.removeChild(ta);
+        }
+      });
+      element.addEventListener('mouseleave', () => {
+        setTimeout(() => {
+          button.querySelector('i').className = 'fa fa-copy fa-fw';
+        }, 300);
+      });
+    });
+  },
+
+  wrapTableWithBox: function() {
+    document.querySelectorAll('table').forEach(element => {
+      const box = document.createElement('div');
+      box.className = 'table-container';
+      element.wrap(box);
+    });
+  },
+
+  registerVideoIframe: function() {
+    document.querySelectorAll('iframe').forEach(element => {
+      const supported = [
+        'www.youtube.com',
+        'player.vimeo.com',
+        'player.youku.com',
+        'player.bilibili.com',
+        'www.tudou.com'
+      ].some(host => element.src.includes(host));
+      if (supported && !element.parentNode.matches('.video-container')) {
+        const box = document.createElement('div');
+        box.className = 'video-container';
+        element.wrap(box);
+        const width = Number(element.width);
+        const height = Number(element.height);
+        if (width && height) {
+          box.style.paddingTop = (height / width * 100) + '%';
+        }
+      }
+    });
+  },
+
+  registerScrollPercent: function() {
+    const backToTop = document.querySelector('.back-to-top');
+    const readingProgressBar = document.querySelector('.reading-progress-bar');
+    // For init back to top in sidebar if page was scrolled after page refresh.
+    window.addEventListener('scroll', () => {
+      if (backToTop || readingProgressBar) {
+        const contentHeight = document.body.scrollHeight - window.innerHeight;
+        const scrollPercent = contentHeight > 0 ? Math.min(100 * window.scrollY / contentHeight, 100) : 0;
+        if (backToTop) {
+          backToTop.classList.toggle('back-to-top-on', Math.round(scrollPercent) >= 5);
+          backToTop.querySelector('span').innerText = Math.round(scrollPercent) + '%';
+        }
+        if (readingProgressBar) {
+          readingProgressBar.style.setProperty('--progress', scrollPercent.toFixed(2) + '%');
+        }
+      }
+      if (!Array.isArray(NexT.utils.sections)) return;
+      let index = NexT.utils.sections.findIndex(element => {
+        return element && element.getBoundingClientRect().top > 10;
+      });
+      if (index === -1) {
+        index = NexT.utils.sections.length - 1;
+      } else if (index > 0) {
+        index--;
+      }
+      this.activateNavByIndex(index);
+    }, { passive: true });
+
+    backToTop && backToTop.addEventListener('click', () => {
+      window.anime({
+        targets  : document.scrollingElement,
+        duration : 500,
+        easing   : 'linear',
+        scrollTop: 0
+      });
+    });
+  },
+
+  /**
+   * Tabs tag listener (without twitter bootstrap).
+   */
+  registerTabsTag: function() {
+    // Binding `nav-tabs` & `tab-content` by real time permalink changing.
+    document.querySelectorAll('.tabs ul.nav-tabs .tab').forEach(element => {
+      element.addEventListener('click', event => {
+        event.preventDefault();
+        // Prevent selected tab to select again.
+        if (element.classList.contains('active')) return;
+        const nav = element.parentNode;
+        // Add & Remove active class on `nav-tabs` & `tab-content`.
+        [...nav.children].forEach(target => {
+          target.classList.toggle('active', target === element);
+        });
+        // https://stackoverflow.com/questions/20306204/using-queryselector-with-ids-that-are-numbers
+        const tActive = document.getElementById(element.querySelector('a').getAttribute('href').replace('#', ''));
+        [...tActive.parentNode.children].forEach(target => {
+          target.classList.toggle('active', target === tActive);
+        });
+        // Trigger event
+        tActive.dispatchEvent(new Event('tabs:click', {
+          bubbles: true
+        }));
+        if (!CONFIG.stickytabs) return;
+        const offset = nav.parentNode.getBoundingClientRect().top + window.scrollY + 10;
+        window.anime({
+          targets  : document.scrollingElement,
+          duration : 500,
+          easing   : 'linear',
+          scrollTop: offset
+        });
+      });
+    });
+
+    window.dispatchEvent(new Event('tabs:register'));
+  },
+
+  registerCanIUseTag: function() {
+    // Get responsive height passed from iframe.
+    window.addEventListener('message', ({ data }) => {
+      if (typeof data === 'string' && data.includes('ciu_embed')) {
+        const featureID = data.split(':')[1];
+        const height = data.split(':')[2];
+        document.querySelector(`iframe[data-feature=${featureID}]`).style.height = parseInt(height, 10) + 5 + 'px';
+      }
+    }, false);
+  },
+
+  registerActiveMenuItem: function() {
+    document.querySelectorAll('.menu-item a[href]').forEach(target => {
+      const isSamePath = target.pathname === location.pathname || target.pathname === location.pathname.replace('index.html', '');
+      const isSubPath = !CONFIG.root.startsWith(target.pathname) && location.pathname.startsWith(target.pathname);
+      target.classList.toggle('menu-item-active', target.hostname === location.hostname && (isSamePath || isSubPath));
+    });
+  },
+
+  registerLangSelect: function() {
+    const selects = document.querySelectorAll('.lang-select');
+    selects.forEach(sel => {
+      sel.value = CONFIG.page.lang;
+      sel.addEventListener('change', () => {
+        const target = sel.options[sel.selectedIndex];
+        document.querySelectorAll('.lang-select-label span').forEach(span => {
+          span.innerText = target.text;
+        });
+        // Disable Pjax to force refresh translation of menu item
+        window.location.href = target.dataset.href;
+      });
+    });
+  },
+
+  registerSidebarTOC: function() {
+    this.sections = [...document.querySelectorAll('.post-toc li a.nav-link')].map(element => {
+      const target = document.getElementById(decodeURI(element.getAttribute('href')).replace('#', ''));
+      // TOC item animation navigate.
+      element.addEventListener('click', event => {
+        event.preventDefault();
+        const offset = target.getBoundingClientRect().top + window.scrollY;
+        window.anime({
+          targets  : document.scrollingElement,
+          duration : 500,
+          easing   : 'linear',
+          scrollTop: offset,
+          complete : () => {
+            history.pushState(null, document.title, element.href);
+          }
+        });
+      });
+      return target;
+    });
+  },
+
+  registerPostReward: function() {
+    const button = document.querySelector('.reward-container button');
+    if (!button) return;
+    button.addEventListener('click', () => {
+      document.querySelector('.post-reward').classList.toggle('active');
+    });
+  },
+
+  activateNavByIndex: function(index) {
+    const target = document.querySelectorAll('.post-toc li a.nav-link')[index];
+    if (!target || target.classList.contains('active-current')) return;
+
+    document.querySelectorAll('.post-toc .active').forEach(element => {
+      element.classList.remove('active', 'active-current');
+    });
+    target.classList.add('active', 'active-current');
+    let parent = target.parentNode;
+    while (!parent.matches('.post-toc')) {
+      if (parent.matches('li')) parent.classList.add('active');
+      parent = parent.parentNode;
+    }
+    // Scrolling to center active TOC element if TOC content is taller then viewport.
+    const tocElement = document.querySelector('.sidebar-panel-container');
+    if (!tocElement.parentNode.classList.contains('sidebar-toc-active')) return;
+    window.anime({
+      targets  : tocElement,
+      duration : 200,
+      easing   : 'linear',
+      scrollTop: tocElement.scrollTop - (tocElement.offsetHeight / 2) + target.getBoundingClientRect().top - tocElement.getBoundingClientRect().top
+    });
+  },
+
+  updateSidebarPosition: function() {
+    if (window.innerWidth < 992 || CONFIG.scheme === 'Pisces' || CONFIG.scheme === 'Gemini') return;
+    // Expand sidebar on post detail page by default, when post has a toc.
+    const hasTOC = document.querySelector('.post-toc');
+    let display = CONFIG.page.sidebar;
+    if (typeof display !== 'boolean') {
+      // There's no definition sidebar in the page front-matter.
+      display = CONFIG.sidebar.display === 'always' || (CONFIG.sidebar.display === 'post' && hasTOC);
+    }
+    if (display) {
+      window.dispatchEvent(new Event('sidebar:show'));
+    }
+  },
+
+  activateSidebarPanel: function(index) {
+    const duration = 200;
+    const sidebar = document.querySelector('.sidebar-inner');
+    const panel = document.querySelector('.sidebar-panel-container');
+    const activeClassName = ['sidebar-toc-active', 'sidebar-overview-active'];
+
+    if (sidebar.classList.contains(activeClassName[index])) return;
+
+    window.anime({
+      duration,
+      targets   : panel,
+      easing    : 'linear',
+      opacity   : 0,
+      translateY: [0, -20],
+      complete  : () => {
+        // Prevent adding TOC to Overview if Overview was selected when close & open sidebar.
+        sidebar.classList.replace(activeClassName[1 - index], activeClassName[index]);
+        window.anime({
+          duration,
+          targets   : panel,
+          easing    : 'linear',
+          opacity   : [0, 1],
+          translateY: [-20, 0]
+        });
+      }
+    });
+  },
+
+  getScript: function(src, options = {}, legacyCondition) {
+    if (typeof options === 'function') {
+      return this.getScript(src, {
+        condition: legacyCondition
+      }).then(options);
+    }
+    const {
+      condition = false,
+      attributes: {
+        id = '',
+        async = false,
+        defer = false,
+        crossOrigin = '',
+        dataset = {},
+        ...otherAttributes
+      } = {},
+      parentNode = null
+    } = options;
+    return new Promise((resolve, reject) => {
+      if (condition) {
+        resolve();
+      } else {
+        const script = document.createElement('script');
+
+        if (id) script.id = id;
+        if (crossOrigin) script.crossOrigin = crossOrigin;
+        script.async = async;
+        script.defer = defer;
+        Object.assign(script.dataset, dataset);
+        Object.entries(otherAttributes).forEach(([name, value]) => {
+          script.setAttribute(name, String(value));
+        });
+
+        script.onload = resolve;
+        script.onerror = reject;
+
+        if (typeof src === 'object') {
+          const { url, integrity } = src;
+          script.src = url;
+          if (integrity) {
+            script.integrity = integrity;
+            script.crossOrigin = 'anonymous';
+          }
+        } else {
+          script.src = src;
+        }
+        (parentNode || document.head).appendChild(script);
+      }
+    });
+  },
+
+  loadComments: function(selector, legacyCallback) {
+    if (legacyCallback) {
+      return this.loadComments(selector).then(legacyCallback);
+    }
+    return new Promise(resolve => {
+      const element = document.querySelector(selector);
+      if (!CONFIG.comments.lazyload || !element) {
+        resolve();
+        return;
+      }
+      const intersectionObserver = new IntersectionObserver((entries, observer) => {
+        const entry = entries[0];
+        if (!entry.isIntersecting) return;
+
+        resolve();
+        observer.disconnect();
+      });
+      intersectionObserver.observe(element);
+    });
+  }
+};

@@ -1,565 +1,531 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/icons/favicon-16x16.png?v=2.6.2" type="image/png" sizes="16x16"><link rel="icon" href="/assets/icons/favicon-32x32.png?v=2.6.2" type="image/png" sizes="32x32"><link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=2.6.2" sizes="180x180"><link rel="mask-icon" href="/assets/icons/safari-pinned-tab.svg?v=2.6.2" color="#54bcff"><meta name="google-site-verification" content="9xsNXs6L7nuMa2Xm38zRjEg7Ed3qU7GD5CVI6Dbc_f0"><meta name="baidu-site-verification" content="code-bykGufpoRh"><meta name="description" content="网络扫描探测工具 Zmap | Angry IP Scanner | Masscan 的分析与识别">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"seriouszyx.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":true,"comments":{"style":"buttons","active":"disqusjs","storage":true,"lazyload":false,"nav":null,"activeClass":"disqusjs"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="网络扫描探测工具 Zmap | Angry IP Scanner | Masscan 的分析与识别">
 <meta property="og:type" content="article">
 <meta property="og:title" content="网络扫描探测工具的分析与识别">
-<meta property="og:url" content="https://seriouszyx.github.io/2021/09/01/scanner-analysis-and-detect/index.html">
+<meta property="og:url" content="https://seriouszyx.com/2021/09/01/scanner-analysis-and-detect/index.html">
 <meta property="og:site_name" content="隐秀">
 <meta property="og:description" content="网络扫描探测工具 Zmap | Angry IP Scanner | Masscan 的分析与识别">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044955.png#vwid=1999&vhei=694">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044047.png#vwid=2652&vhei=1128">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044067.png#vwid=2225&vhei=653">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044558.png#vwid=2560&vhei=908">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044591.png#vwid=2560&vhei=371">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044623.png#vwid=2560&vhei=235">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044663.png#vwid=2560&vhei=798">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044692.png#vwid=942&vhei=522">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044714.png#vwid=2560&vhei=1275">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044740.png#vwid=2558&vhei=1534">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044760.png#vwid=2560&vhei=930">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044783.png#vwid=2560&vhei=325">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044806.png#vwid=2560&vhei=1068">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044826.png#vwid=1346&vhei=278">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044847.png#vwid=2560&vhei=1250">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044871.png#vwid=2560&vhei=277">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044891.png#vwid=2560&vhei=162">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044912.png#vwid=2560&vhei=260">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044935.png#vwid=2560&vhei=1250">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044988.png#vwid=1524&vhei=877">
-<meta property="og:image" content="https://img.seriouszyx.com/202109011044015.png#vwid=622&vhei=624">
-<meta property="article:published_time" content="2021-09-01T14:30:24.000Z">
-<meta property="article:modified_time" content="2021-12-27T13:50:04.144Z">
-<meta property="article:author" content="Yixiang Zhao">
-<meta property="article:tag" content="seriouszyx, 隐秀, blog">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044955.png#vwid=1999&amp;vhei=694">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044047.png#vwid=2652&amp;vhei=1128">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044067.png#vwid=2225&amp;vhei=653">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044558.png#vwid=2560&amp;vhei=908">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044591.png#vwid=2560&amp;vhei=371">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044623.png#vwid=2560&amp;vhei=235">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044663.png#vwid=2560&amp;vhei=798">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044692.png#vwid=942&amp;vhei=522">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044714.png#vwid=2560&amp;vhei=1275">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044740.png#vwid=2558&amp;vhei=1534">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044760.png#vwid=2560&amp;vhei=930">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044783.png#vwid=2560&amp;vhei=325">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044806.png#vwid=2560&amp;vhei=1068">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044826.png#vwid=1346&amp;vhei=278">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044847.png#vwid=2560&amp;vhei=1250">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044871.png#vwid=2560&amp;vhei=277">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044891.png#vwid=2560&amp;vhei=162">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044912.png#vwid=2560&amp;vhei=260">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044935.png#vwid=2560&amp;vhei=1250">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044988.png#vwid=1524&amp;vhei=877">
+<meta property="og:image" content="https://img.seriouszyx.com/202109011044015.png#vwid=622&amp;vhei=624">
+<meta property="article:published_time" content="2021-09-01T06:30:24.000Z">
+<meta property="article:modified_time" content="2022-02-11T13:56:42.048Z">
+<meta property="article:author" content="seriouszyx">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img.seriouszyx.com/202109011044955.png#vwid=1999&vhei=694"><title>网络扫描探测工具的分析与识别 | 隐秀</title><link ref="canonical" href="https://seriouszyx.github.io/2021/09/01/scanner-analysis-and-detect/"><link rel="alternate" href="/atom.xml" type="application/atom+xml"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.6.2"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="dns-prefetch" href="https://hm.baidu.com"><script src="https://www.googletagmanager.com/gtag/js?id=UA-135559540-1" async=""></script><script>if (window.location.hostname !== 'localhost') {
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){ dataLayer.push(arguments); }
-  gtag('js', new Date());
-  gtag('config', 'UA-135559540-1');
-}</script><script>var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement('script');
-  hm.src = 'https://hm.baidu.com/hm.js?e2160ff518b5a935969dfd0e761cc62a';
-  hm.async = true;
+<meta name="twitter:image" content="https://img.seriouszyx.com/202109011044955.png#vwid=1999&amp;vhei=694">
 
-  if (false) {
-    hm.setAttribute('data-pjax', '');
-  }
-  var s = document.getElementsByTagName('script')[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();</script><script>var Stun = window.Stun || {};
-var CONFIG = {
-  root: '/',
-  algolia: undefined,
-  assistSearch: undefined,
-  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
-  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
-  header: undefined,
-  postWidget: {"endText":true},
-  nightMode: {"enable":true},
-  back2top: {"enable":true},
-  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
-  reward: true,
-  fancybox: true,
-  zoomImage: undefined,
-  galleryWaterfall: undefined,
-  lazyload: true,
-  pjax: undefined,
-  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
-  shortcuts: undefined,
-  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
-  sourcePath: {"js":"js","css":"css","images":"images"},
-};
 
-window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner header-inner--height header-inner--bgcolor"><nav class="header-nav header-nav--sticky"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="javascript:;" onclick="return false;"><span class="header-nav-menu-item__icon"><i class="fas fa-fingerprint"></i></span><span class="header-nav-menu-item__text">关于</span></a><div class="header-nav-submenu"><div class="header-nav-submenu-item"><a class="header-nav-submenu-item__link" href="/about/"><span class="header-nav-submenu-item__icon"><i class="fas fa-user"></i></span><span class="header-nav-submenu-item__text">作者</span></a></div><div class="header-nav-submenu-item"><a class="header-nav-submenu-item__link" href="/homepage/"><span class="header-nav-submenu-item__icon"><i class="fas fa-reply"></i></span><span class="header-nav-submenu-item__text">主页</span></a></div></div></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">网络扫描探测工具的分析与识别</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-09-01</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-12-27</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">2.7k</span></span><span class="post-meta-item post-meta-item--visitors leancloud_visitors" id="/2021/09/01/scanner-analysis-and-detect/" data-flag-title="网络扫描探测工具的分析与识别"><span class="post-meta-item__icon"><i class="fas fa-eye"></i></span><span class="post-meta-item__info">阅读次数</span><span class="post-meta-item__value leancloud-visitors-count"></span></span></div></header><div class="post-body">
-        <h2 id="扫描探测工具识别"   >
-          <a href="#扫描探测工具识别" class="heading-link"><i class="fas fa-link"></i></a><a href="#扫描探测工具识别" class="headerlink" title="扫描探测工具识别"></a>扫描探测工具识别</h2>
-      <p>网络扫描探测通常是发起网络入侵的第一步，攻击者可以利用扫描探测工具获取网络中的主机系统、TCP/UDP 端口的开放情况、子域名、网站指纹、WAF、CDN、中间件类别等重要信息，识别出存在安全漏洞的主机或系统，从而发起有针对性的网络入侵行为。此外，一些扫描工具同时具备漏洞利用的能力。因此，对网络扫描探测行为进行识别和研究，有利于及时发现网络攻击的前兆，发现网络攻击行为，快速定位网络服务中存在的漏洞，对网络安全防护工作十分有意义。</p>
+<link rel="canonical" href="https://seriouszyx.com/2021/09/01/scanner-analysis-and-detect/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://seriouszyx.com/2021/09/01/scanner-analysis-and-detect/","path":"2021/09/01/scanner-analysis-and-detect/","title":"网络扫描探测工具的分析与识别"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>网络扫描探测工具的分析与识别 | 隐秀</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">隐秀</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">seriouszyx</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%AB%E6%8F%8F%E6%8E%A2%E6%B5%8B%E5%B7%A5%E5%85%B7%E8%AF%86%E5%88%AB"><span class="nav-number">1.</span> <span class="nav-text">扫描探测工具识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zmap"><span class="nav-number">2.</span> <span class="nav-text">Zmap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90"><span class="nav-number">2.1.</span> <span class="nav-text">抓包分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">2.2.</span> <span class="nav-text">源码分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Angry-IP-Scanner"><span class="nav-number">3.</span> <span class="nav-text">Angry IP Scanner</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90-1"><span class="nav-number">3.1.</span> <span class="nav-text">抓包分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-1"><span class="nav-number">3.2.</span> <span class="nav-text">源码分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Masscan"><span class="nav-number">4.</span> <span class="nav-text">Masscan</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90-2"><span class="nav-number">4.1.</span> <span class="nav-text">抓包分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-2"><span class="nav-number">4.2.</span> <span class="nav-text">源码分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Demo-%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">Demo 设计与实现</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="seriouszyx"
+      src="/assets/others/avatar.png">
+  <p class="site-author-name" itemprop="name">seriouszyx</p>
+  <div class="site-description" itemprop="description">哈哈哈哈</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/seriouszyx" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;seriouszyx" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://seriouszyx.com/2021/09/01/scanner-analysis-and-detect/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/others/avatar.png">
+      <meta itemprop="name" content="seriouszyx">
+      <meta itemprop="description" content="哈哈哈哈">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="隐秀">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网络扫描探测工具的分析与识别
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-09-01 14:30:24" itemprop="dateCreated datePublished" datetime="2021-09-01T14:30:24+08:00">2021-09-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-02-11 21:56:42" itemprop="dateModified" datetime="2022-02-11T21:56:42+08:00">2022-02-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="扫描探测工具识别"><a href="#扫描探测工具识别" class="headerlink" title="扫描探测工具识别"></a>扫描探测工具识别</h2><p>网络扫描探测通常是发起网络入侵的第一步，攻击者可以利用扫描探测工具获取网络中的主机系统、TCP/UDP 端口的开放情况、子域名、网站指纹、WAF、CDN、中间件类别等重要信息，识别出存在安全漏洞的主机或系统，从而发起有针对性的网络入侵行为。此外，一些扫描工具同时具备漏洞利用的能力。因此，对网络扫描探测行为进行识别和研究，有利于及时发现网络攻击的前兆，发现网络攻击行为，快速定位网络服务中存在的漏洞，对网络安全防护工作十分有意义。</p>
 <p>本文以下列三个常见扫描器为代表，探究扫描器的特有指纹信息，编写 Demo 进行扫描器的识别。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044955.png#vwid=1999&vhei=694" >
-      </p>
-
-        <h2 id="Zmap"   >
-          <a href="#Zmap" class="heading-link"><i class="fas fa-link"></i></a><a href="#Zmap" class="headerlink" title="Zmap"></a>Zmap</h2>
-      
-        <h3 id="抓包分析"   >
-          <a href="#抓包分析" class="heading-link"><i class="fas fa-link"></i></a><a href="#抓包分析" class="headerlink" title="抓包分析"></a>抓包分析</h3>
-      <p>ZMap 被设计用来针对整个 IPv4 地址空间或其中的大部分实施综合扫描的工具。</p>
+<p><img data-src="https://img.seriouszyx.com/202109011044955.png#vwid=1999&amp;vhei=694"></p>
+<h2 id="Zmap"><a href="#Zmap" class="headerlink" title="Zmap"></a>Zmap</h2><h3 id="抓包分析"><a href="#抓包分析" class="headerlink" title="抓包分析"></a>抓包分析</h3><p>ZMap 被设计用来针对整个 IPv4 地址空间或其中的大部分实施综合扫描的工具。</p>
 <p>默认情况下，ZMap 会对于指定端口实施尽可能大速率的 TCP SYN 扫描。如下图所示，客户端在发送一个 SYN 包的时候，如果对方端口开放，就会发送一个 SYN-ACK，那么就表明这个端口开放，这时候我们发送 RST 包，防止占用对方资源；如果对方端口不开放，那么我们就会收到对方主机的 RST 包。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044047.png#vwid=2652&vhei=1128" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044047.png#vwid=2652&amp;vhei=1128"></p>
 <p>较为保守的情况下，对 10,000 个随机的地址的 80 端口以 10Mbps 的速度扫描，如下所示：</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044067.png#vwid=2225&vhei=653" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044067.png#vwid=2225&amp;vhei=653"></p>
 <p>在生成的 csv 结果文件中，以下 IP 地址的 80 端口开放：</p>
-<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">47.243.139.246</span><br><span class="line">20.205.204.152</span><br><span class="line">121.36.193.65</span><br><span class="line">156.245.39.71</span><br><span class="line">13.238.233.150</span><br><span class="line">142.234.31.240</span><br><span class="line">68.183.75.244</span><br><span class="line">185.48.122.237</span><br><span class="line">52.25.116.123</span><br><span class="line">104.127.1.181</span><br><span class="line">185.248.102.245</span><br><span class="line">95.217.201.8</span><br><span class="line">3.125.24.134</span><br><span class="line">23.15.117.202</span><br></pre></td></tr></table></div></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">47.243.139.246</span><br><span class="line">20.205.204.152</span><br><span class="line">121.36.193.65</span><br><span class="line">156.245.39.71</span><br><span class="line">13.238.233.150</span><br><span class="line">142.234.31.240</span><br><span class="line">68.183.75.244</span><br><span class="line">185.48.122.237</span><br><span class="line">52.25.116.123</span><br><span class="line">104.127.1.181</span><br><span class="line">185.248.102.245</span><br><span class="line">95.217.201.8</span><br><span class="line">3.125.24.134</span><br><span class="line">23.15.117.202</span><br></pre></td></tr></tbody></table></figure>
+
 <p>抓包结果如下所示，Zmap 向随机的 10,000 个 IP 的 80 端口发送 SYN 数据包。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044558.png#vwid=2560&vhei=908" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044558.png#vwid=2560&amp;vhei=908"></p>
 <p>如果 IP 的 80 端口开放，以 47.243.139.246 为例，筛选出的数据包如下图所示，具体解释为：</p>
 <ol>
 <li>向 47.243.139.246 的 80 端口发送 SYN 数据包</li>
 <li>接收到 47.243.139.246 的 80 端口的 SYN/ACK 包，证明该 IP 的 80 端口可用</li>
 <li>向 47.243.139.246 的 80 端口发送 RST 数据包，防止占用对方资源</li>
 </ol>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044591.png#vwid=2560&vhei=371" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044591.png#vwid=2560&amp;vhei=371"></p>
 <p>如果 IP 的 80 端口不开放，以 44.102.170.124 为例，筛选出的数据包如下图所示。Zmap 向其发送 SYN 请求后没有得到应答，故判断该 IP 的 80 端口不可用。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044623.png#vwid=2560&vhei=235" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044623.png#vwid=2560&amp;vhei=235"></p>
 <p>查看 Zmap 向哪些 IP 发送了 RST 数据包，则证明这些 IP 的 80 端口可用。筛选结果如下图所示，目的地址与上述的 csv 结果文件一致。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044663.png#vwid=2560&vhei=798" >
-      </p>
-
-        <h3 id="源码分析"   >
-          <a href="#源码分析" class="heading-link"><i class="fas fa-link"></i></a><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3>
-      <p>Zmap 整体函数调用图如下所示。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044692.png#vwid=942&vhei=522" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044663.png#vwid=2560&amp;vhei=798"></p>
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p>Zmap 整体函数调用图如下所示。</p>
+<p><img data-src="https://img.seriouszyx.com/202109011044692.png#vwid=942&amp;vhei=522"></p>
 <p>通过图我们可以直观的看到整个程序调用的过程。Zmap 在启动时候，先获取环境信息，如 IP、网关等。然后读取配置文件选择使用哪种扫描方式，然后在 Probe_modules 切换到对应的模块，然后启动。</p>
 <p>下面侧重分析 SYN 扫描这个模块，整个执行的过程中，会有一个线程专门负责发送，另外有一个使用 libpcap 组件抓包，发送和接收就独立开来。</p>
-<p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/zmap/zmap/blob/main/src/probe_modules/module_tcp_synscan.c" >zmap/src/probe_modules/module_tcp_synscan.c</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span> 是用于执行 TCP SYN 扫描的探测模块，在初始化阶段的 synscan_init_perthread 函数中，依次调用 make_ip_header 函数和 make_tcp_header 函数进行数据包 header 的封装。</p>
-<figure class="highlight c"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">synscan_init_perthread</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">void</span> *buf, <span class="keyword">macaddr_t</span> *src, <span class="keyword">macaddr_t</span> *gw,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">port_h_t</span> dst_port,</span></span></span><br><span class="line"><span class="function"><span class="params">    UNUSED <span class="keyword">void</span> **arg_ptr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ether_header</span> *<span class="title">eth_header</span> =</span> (struct ether_header *)buf;</span><br><span class="line">    make_eth_header(eth_header, src, gw);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ip</span> *<span class="title">ip_header</span> =</span> (struct ip *)(&amp;eth_header[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">uint16_t</span> len = htons(<span class="keyword">sizeof</span>(struct ip) + ZMAP_TCP_SYNSCAN_TCP_HEADER_LEN);</span><br><span class="line">    make_ip_header(ip_header, IPPROTO_TCP, len);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tcphdr</span> *<span class="title">tcp_header</span> =</span> (struct tcphdr *)(&amp;ip_header[<span class="number">1</span>]);</span><br><span class="line">    make_tcp_header(tcp_header, dst_port, TH_SYN);</span><br><span class="line">    set_mss_option(tcp_header);</span><br><span class="line">    <span class="keyword">return</span> EXIT_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
-<p>这两个函数编写于 <span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/zmap/zmap/blob/main/src/probe_modules/packet.c" >zmap/src/probe_modules/packet.c</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span> 中。分析 make_ip_header 函数可知，在下示第 7 行，IP 的 identification number 被设置为固定的 54321。</p>
-<figure class="highlight c"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">make_ip_header</span><span class="params">(struct ip *iph, <span class="keyword">uint8_t</span> protocol, <span class="keyword">uint16_t</span> len)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    iph-&gt;ip_hl = <span class="number">5</span>;  <span class="comment">// Internet Header Length</span></span><br><span class="line">    iph-&gt;ip_v = <span class="number">4</span>;   <span class="comment">// IPv4</span></span><br><span class="line">    iph-&gt;ip_tos = <span class="number">0</span>; <span class="comment">// Type of Service</span></span><br><span class="line">    iph-&gt;ip_len = len;</span><br><span class="line">    iph-&gt;ip_id = htons(<span class="number">54321</span>); <span class="comment">// identification number</span></span><br><span class="line">    iph-&gt;ip_off = <span class="number">0</span>;	   <span class="comment">// fragmentation flag</span></span><br><span class="line">    iph-&gt;ip_ttl = MAXTTL;      <span class="comment">// time to live (TTL)</span></span><br><span class="line">    iph-&gt;ip_p = protocol;      <span class="comment">// upper layer protocol =&gt; TCP</span></span><br><span class="line">    <span class="comment">// we set the checksum = 0 for now because that&#x27;s</span></span><br><span class="line">    <span class="comment">// what it needs to be when we run the IP checksum</span></span><br><span class="line">    iph-&gt;ip_sum = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
-<p>分析 make_tcp_header 函数可知，在下示第 10 行，TCP 的 window 被设置为固定的 65535。</p>
-<figure class="highlight c"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">make_tcp_header</span><span class="params">(struct tcphdr *tcp_header, <span class="keyword">port_h_t</span> dest_port,</span></span></span><br><span class="line"><span class="function"><span class="params">		     <span class="keyword">uint16_t</span> th_flags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    tcp_header-&gt;th_seq = random();</span><br><span class="line">    tcp_header-&gt;th_ack = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_x2 = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_off = <span class="number">5</span>; <span class="comment">// data offset</span></span><br><span class="line">    tcp_header-&gt;th_flags = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_flags |= th_flags;</span><br><span class="line">    tcp_header-&gt;th_win = htons(<span class="number">65535</span>); <span class="comment">// largest possible window</span></span><br><span class="line">    tcp_header-&gt;th_sum = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_urp = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_dport = htons(dest_port);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
-<p>查看抓取的 SYN 数据包，如下图所示，IP 的 ID 和 TCP 的 window 确实为 54321 和 65535，所以这两个固定值可作为扫描器特征。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044714.png#vwid=2560&vhei=1275" >
-      </p>
+<p><a target="_blank" rel="noopener" href="https://github.com/zmap/zmap/blob/main/src/probe_modules/module_tcp_synscan.c">zmap/src/probe_modules/module_tcp_synscan.c</a> 是用于执行 TCP SYN 扫描的探测模块，在初始化阶段的 synscan_init_perthread 函数中，依次调用 make_ip_header 函数和 make_tcp_header 函数进行数据包 header 的封装。</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">synscan_init_perthread</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">void</span> *buf, <span class="keyword">macaddr_t</span> *src, <span class="keyword">macaddr_t</span> *gw,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">port_h_t</span> dst_port,</span></span></span><br><span class="line"><span class="function"><span class="params">    UNUSED <span class="keyword">void</span> **arg_ptr)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ether_header</span> *<span class="title">eth_header</span> =</span> (struct ether_header *)buf;</span><br><span class="line">    make_eth_header(eth_header, src, gw);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ip</span> *<span class="title">ip_header</span> =</span> (struct ip *)(&amp;eth_header[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">uint16_t</span> len = htons(<span class="keyword">sizeof</span>(struct ip) + ZMAP_TCP_SYNSCAN_TCP_HEADER_LEN);</span><br><span class="line">    make_ip_header(ip_header, IPPROTO_TCP, len);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tcphdr</span> *<span class="title">tcp_header</span> =</span> (struct tcphdr *)(&amp;ip_header[<span class="number">1</span>]);</span><br><span class="line">    make_tcp_header(tcp_header, dst_port, TH_SYN);</span><br><span class="line">    set_mss_option(tcp_header);</span><br><span class="line">    <span class="keyword">return</span> EXIT_SUCCESS;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-        <h2 id="Angry-IP-Scanner"   >
-          <a href="#Angry-IP-Scanner" class="heading-link"><i class="fas fa-link"></i></a><a href="#Angry-IP-Scanner" class="headerlink" title="Angry IP Scanner"></a>Angry IP Scanner</h2>
-      
-        <h3 id="抓包分析-1"   >
-          <a href="#抓包分析-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#抓包分析-1" class="headerlink" title="抓包分析"></a>抓包分析</h3>
-      <p>Angry IP Scanner（简称 angryip） 是一款开源跨平台的网络扫描器，主要用于扫描 IP 地址和端口。</p>
+<p>这两个函数编写于 <a target="_blank" rel="noopener" href="https://github.com/zmap/zmap/blob/main/src/probe_modules/packet.c">zmap/src/probe_modules/packet.c</a> 中。分析 make_ip_header 函数可知，在下示第 7 行，IP 的 identification number 被设置为固定的 54321。</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">make_ip_header</span><span class="params">(struct ip *iph, <span class="keyword">uint8_t</span> protocol, <span class="keyword">uint16_t</span> len)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    iph-&gt;ip_hl = <span class="number">5</span>;  <span class="comment">// Internet Header Length</span></span><br><span class="line">    iph-&gt;ip_v = <span class="number">4</span>;   <span class="comment">// IPv4</span></span><br><span class="line">    iph-&gt;ip_tos = <span class="number">0</span>; <span class="comment">// Type of Service</span></span><br><span class="line">    iph-&gt;ip_len = len;</span><br><span class="line">    iph-&gt;ip_id = htons(<span class="number">54321</span>); <span class="comment">// identification number</span></span><br><span class="line">    iph-&gt;ip_off = <span class="number">0</span>;	   <span class="comment">// fragmentation flag</span></span><br><span class="line">    iph-&gt;ip_ttl = MAXTTL;      <span class="comment">// time to live (TTL)</span></span><br><span class="line">    iph-&gt;ip_p = protocol;      <span class="comment">// upper layer protocol =&gt; TCP</span></span><br><span class="line">    <span class="comment">// we set the checksum = 0 for now because that's</span></span><br><span class="line">    <span class="comment">// what it needs to be when we run the IP checksum</span></span><br><span class="line">    iph-&gt;ip_sum = <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>分析 make_tcp_header 函数可知，在下示第 10 行，TCP 的 window 被设置为固定的 65535。</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">make_tcp_header</span><span class="params">(struct tcphdr *tcp_header, <span class="keyword">port_h_t</span> dest_port,</span></span></span><br><span class="line"><span class="function"><span class="params">		     <span class="keyword">uint16_t</span> th_flags)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    tcp_header-&gt;th_seq = random();</span><br><span class="line">    tcp_header-&gt;th_ack = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_x2 = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_off = <span class="number">5</span>; <span class="comment">// data offset</span></span><br><span class="line">    tcp_header-&gt;th_flags = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_flags |= th_flags;</span><br><span class="line">    tcp_header-&gt;th_win = htons(<span class="number">65535</span>); <span class="comment">// largest possible window</span></span><br><span class="line">    tcp_header-&gt;th_sum = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_urp = <span class="number">0</span>;</span><br><span class="line">    tcp_header-&gt;th_dport = htons(dest_port);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>查看抓取的 SYN 数据包，如下图所示，IP 的 ID 和 TCP 的 window 确实为 54321 和 65535，所以这两个固定值可作为扫描器特征。</p>
+<p><img data-src="https://img.seriouszyx.com/202109011044714.png#vwid=2560&amp;vhei=1275"></p>
+<h2 id="Angry-IP-Scanner"><a href="#Angry-IP-Scanner" class="headerlink" title="Angry IP Scanner"></a>Angry IP Scanner</h2><h3 id="抓包分析-1"><a href="#抓包分析-1" class="headerlink" title="抓包分析"></a>抓包分析</h3><p>Angry IP Scanner（简称 angryip） 是一款开源跨平台的网络扫描器，主要用于扫描 IP 地址和端口。</p>
 <p>angryip 默认使用 Windows ICMP 方法扫描各个 ip 地址，扫描每个 IP 的 80、443 和 8080 端口。以 IP 范围 123.56.104.200~123.56.104.250 为例，扫描结果如下图所示，红色代表 IP 不可用，蓝色代表 IP 可用端口不可用，绿色代表 IP 和端口均可用。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044740.png#vwid=2558&vhei=1534" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044740.png#vwid=2558&amp;vhei=1534"></p>
 <p>在捕获的数据包中，以 123.56.104.218 为例，该 IP 被标记为绿色，下面是与它有关的数据包抓取结果。</p>
 <p>图中第一个红框处 angryip 与 123.56.104.218 进行了 3 次 ping，且都予以回复，说明该 IP 可用。第二个红框处 angryip 分别测试 123.56.104.218 的 80、443 和 8080 端口，其中 80 和 443 端口予以回复，说明这两个端口可用。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044760.png#vwid=2560&vhei=930" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044760.png#vwid=2560&amp;vhei=930"></p>
 <p>在不可用的 IP 中，以 123.56.104.204 为例，与它相关的数据包抓取结果如下。angryip 向其发送 3 次 ping 请求，都没有得到回复，则判断其 IP 不可用，也没有向其端口发送数据包。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044783.png#vwid=2560&vhei=325" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044783.png#vwid=2560&amp;vhei=325"></p>
+<h3 id="源码分析-1"><a href="#源码分析-1" class="headerlink" title="源码分析"></a>源码分析</h3><p>因为无论 IP 和端口是否可用，angryip 都会先发送 ping 数据包，所以通过 ping 阶段的源码分析其工具的特征。</p>
+<p>分析 <a target="_blank" rel="noopener" href="https://github.com/angryip/ipscan/blob/64ec7090acdba380a62d5d2e1a6c630cc5302197/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java">ipscan/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java</a> 源码，该测试类调用 pinger.ping () 方法 3 次，并计算平均时长。</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ICMPSharedPingerTest</span> </span>{</span><br><span class="line">    <span class="meta">@Test</span> <span class="meta">@Ignore("this test works only under root")</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPing</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>{</span><br><span class="line">	Pinger pinger = <span class="keyword">new</span> ICMPSharedPinger(<span class="number">1000</span>);</span><br><span class="line">	PingResult result = pinger.ping(<span class="keyword">new</span> ScanningSubject(InetAddress.getLocalHost()), <span class="number">3</span>);</span><br><span class="line">	assertTrue(result.getAverageTime() &gt;= <span class="number">0</span>);</span><br><span class="line">	assertTrue(result.getAverageTime() &lt; <span class="number">50</span>);</span><br><span class="line">	assertTrue(result.getTTL() &gt;= <span class="number">0</span>);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-        <h3 id="源码分析-1"   >
-          <a href="#源码分析-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#源码分析-1" class="headerlink" title="源码分析"></a>源码分析</h3>
-      <p>因为无论 IP 和端口是否可用，angryip 都会先发送 ping 数据包，所以通过 ping 阶段的源码分析其工具的特征。</p>
-<p>分析 <span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/angryip/ipscan/blob/64ec7090acdba380a62d5d2e1a6c630cc5302197/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java" >ipscan/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span> 源码，该测试类调用 pinger.ping()方法 3 次，并计算平均时长。</p>
-<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ICMPSharedPingerTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span> <span class="meta">@Ignore(&quot;this test works only under root&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPing</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">	Pinger pinger = <span class="keyword">new</span> ICMPSharedPinger(<span class="number">1000</span>);</span><br><span class="line">	PingResult result = pinger.ping(<span class="keyword">new</span> ScanningSubject(InetAddress.getLocalHost()), <span class="number">3</span>);</span><br><span class="line">	assertTrue(result.getAverageTime() &gt;= <span class="number">0</span>);</span><br><span class="line">	assertTrue(result.getAverageTime() &lt; <span class="number">50</span>);</span><br><span class="line">	assertTrue(result.getTTL() &gt;= <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
-<p>该方法在 <span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/angryip/ipscan/blob/master/src/net/azib/ipscan/core/net/WindowsPinger.java" >ipscan/test/net/azib/ipscan/core/net/WindowsPinger.java</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span> 中，源码如下所示，判断 IP 类型，并调用 IPv6 和 IPv4 对应的方法。</p>
-<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> PingResult <span class="title">ping</span><span class="params">(ScanningSubject subject, <span class="keyword">int</span> count)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (subject.isIPv6())</span><br><span class="line">	<span class="keyword">return</span> ping6(subject, count);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">	<span class="keyword">return</span> ping4(subject, count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
-<p>以 IPv4 为例，方法中定义了数据包的数据大小为 32，即 sendDataSize = 32。后续使用 Memory()方法创建 SendData 对象，并未对其进行赋值，故默认值应全为 0。</p>
-<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> PingResult <span class="title">ping4</span><span class="params">(ScanningSubject subject, <span class="keyword">int</span> count)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    Pointer handle = dll.IcmpCreateFile();</span><br><span class="line">    <span class="keyword">if</span> (handle == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">&quot;Unable to create Windows native ICMP handle&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> sendDataSize = <span class="number">32</span>;</span><br><span class="line">    <span class="keyword">int</span> replyDataSize = sendDataSize + (<span class="keyword">new</span> IcmpEchoReply().size()) + <span class="number">10</span>;</span><br><span class="line">    Pointer sendData = <span class="keyword">new</span> Memory(sendDataSize);</span><br><span class="line">    sendData.clear(sendDataSize);</span><br><span class="line">    Pointer replyData = <span class="keyword">new</span> Memory(replyDataSize);</span><br><span class="line"></span><br><span class="line">    PingResult result = <span class="keyword">new</span> PingResult(subject.getAddress(), count);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">	IpAddrByVal ipaddr = toIpAddr(subject.getAddress());</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= count &amp;&amp; !currentThread().isInterrupted(); i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> numReplies = dll.IcmpSendEcho(handle, ipaddr, sendData, (<span class="keyword">short</span>) sendDataSize, <span class="keyword">null</span>, replyData, replyDataSize, timeout);</span><br><span class="line">	    IcmpEchoReply echoReply = <span class="keyword">new</span> IcmpEchoReply(replyData);</span><br><span class="line">	    <span class="keyword">if</span> (numReplies &gt; <span class="number">0</span> &amp;&amp; echoReply.status == <span class="number">0</span> &amp;&amp; Arrays.equals(echoReply.address.bytes, ipaddr.bytes)) &#123;</span><br><span class="line">		result.addReply(echoReply.roundTripTime);</span><br><span class="line">		result.setTTL(echoReply.options.ttl &amp; <span class="number">0xFF</span>);</span><br><span class="line">	    &#125;</span><br><span class="line">	&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">finally</span> &#123;</span><br><span class="line">	dll.IcmpCloseHandle(handle);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+<p>该方法在 <a target="_blank" rel="noopener" href="https://github.com/angryip/ipscan/blob/master/src/net/azib/ipscan/core/net/WindowsPinger.java">ipscan/test/net/azib/ipscan/core/net/WindowsPinger.java</a> 中，源码如下所示，判断 IP 类型，并调用 IPv6 和 IPv4 对应的方法。</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> PingResult <span class="title">ping</span><span class="params">(ScanningSubject subject, <span class="keyword">int</span> count)</span> <span class="keyword">throws</span> IOException </span>{</span><br><span class="line">    <span class="keyword">if</span> (subject.isIPv6())</span><br><span class="line">	<span class="keyword">return</span> ping6(subject, count);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">	<span class="keyword">return</span> ping4(subject, count);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>以 IPv4 为例，方法中定义了数据包的数据大小为 32，即 sendDataSize = 32。后续使用 Memory () 方法创建 SendData 对象，并未对其进行赋值，故默认值应全为 0。</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> PingResult <span class="title">ping4</span><span class="params">(ScanningSubject subject, <span class="keyword">int</span> count)</span> <span class="keyword">throws</span> IOException </span>{</span><br><span class="line">    Pointer handle = dll.IcmpCreateFile();</span><br><span class="line">    <span class="keyword">if</span> (handle == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">"Unable to create Windows native ICMP handle"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> sendDataSize = <span class="number">32</span>;</span><br><span class="line">    <span class="keyword">int</span> replyDataSize = sendDataSize + (<span class="keyword">new</span> IcmpEchoReply().size()) + <span class="number">10</span>;</span><br><span class="line">    Pointer sendData = <span class="keyword">new</span> Memory(sendDataSize);</span><br><span class="line">    sendData.clear(sendDataSize);</span><br><span class="line">    Pointer replyData = <span class="keyword">new</span> Memory(replyDataSize);</span><br><span class="line"></span><br><span class="line">    PingResult result = <span class="keyword">new</span> PingResult(subject.getAddress(), count);</span><br><span class="line">    <span class="keyword">try</span> {</span><br><span class="line">	IpAddrByVal ipaddr = toIpAddr(subject.getAddress());</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= count &amp;&amp; !currentThread().isInterrupted(); i++) {</span><br><span class="line">            <span class="keyword">int</span> numReplies = dll.IcmpSendEcho(handle, ipaddr, sendData, (<span class="keyword">short</span>) sendDataSize, <span class="keyword">null</span>, replyData, replyDataSize, timeout);</span><br><span class="line">	    IcmpEchoReply echoReply = <span class="keyword">new</span> IcmpEchoReply(replyData);</span><br><span class="line">	    <span class="keyword">if</span> (numReplies &gt; <span class="number">0</span> &amp;&amp; echoReply.status == <span class="number">0</span> &amp;&amp; Arrays.equals(echoReply.address.bytes, ipaddr.bytes)) {</span><br><span class="line">		result.addReply(echoReply.roundTripTime);</span><br><span class="line">		result.setTTL(echoReply.options.ttl &amp; <span class="number">0xFF</span>);</span><br><span class="line">	    }</span><br><span class="line">	}</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">finally</span> {</span><br><span class="line">	dll.IcmpCloseHandle(handle);</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
 <p>在实际抓包中，每个发出的 ICMP 请求中，Data 的大小均为 32 字节，且全为 0，所以可将它作为 angryip 的特征。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044806.png#vwid=2560&vhei=1068" >
-      </p>
-
-        <h2 id="Masscan"   >
-          <a href="#Masscan" class="heading-link"><i class="fas fa-link"></i></a><a href="#Masscan" class="headerlink" title="Masscan"></a>Masscan</h2>
-      
-        <h3 id="抓包分析-2"   >
-          <a href="#抓包分析-2" class="heading-link"><i class="fas fa-link"></i></a><a href="#抓包分析-2" class="headerlink" title="抓包分析"></a>抓包分析</h3>
-      <p>Masscan 默认使用 SYN 扫描，以 IP 123.56.104.218 为例，扫描其 1~600 端口，结果如下所示。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044826.png#vwid=1346&vhei=278" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044806.png#vwid=2560&amp;vhei=1068"></p>
+<h2 id="Masscan"><a href="#Masscan" class="headerlink" title="Masscan"></a>Masscan</h2><h3 id="抓包分析-2"><a href="#抓包分析-2" class="headerlink" title="抓包分析"></a>抓包分析</h3><p>Masscan 默认使用 SYN 扫描，以 IP 123.56.104.218 为例，扫描其 1~600 端口，结果如下所示。</p>
+<p><img data-src="https://img.seriouszyx.com/202109011044826.png#vwid=1346&amp;vhei=278"></p>
 <p>抓包结果如下所示，Masscan 向 123.56.104.218 的 1~600 端口进行随机化扫描，发出 SYN 请求。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044847.png#vwid=2560&vhei=1250" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044847.png#vwid=2560&amp;vhei=1250"></p>
 <p> 查看 80 端口的数据包，下图可知 80 端口向 Masscan 回复，说明该端口可用。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044871.png#vwid=2560&vhei=277" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044871.png#vwid=2560&amp;vhei=277"></p>
 <p>查看 81 端口的数据包，发现并没有数据包回复，说明该端口不可用。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044891.png#vwid=2560&vhei=162" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044891.png#vwid=2560&amp;vhei=162"></p>
 <p>筛选收到的 SYN/ACK 数据包，得到 22、443 和 80 端口，说明 123.56.104.218 的 1~600 中这 3 个端口可用。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044912.png#vwid=2560&vhei=260" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044912.png#vwid=2560&amp;vhei=260"></p>
+<h3 id="源码分析-2"><a href="#源码分析-2" class="headerlink" title="源码分析"></a>源码分析</h3><p>观察抓包分析中结果可以发现，所有发出的 SYN 请求中，窗口大小都是 1024。</p>
+<p><img data-src="https://img.seriouszyx.com/202109011044935.png#vwid=2560&amp;vhei=1250"></p>
+<p>在 Masscan 的主函数 <a target="_blank" rel="noopener" href="https://github.com/robertdavidgraham/masscan/blob/master/src/main.c">masscan/src/main.c</a> 文件中，默认使用以下代码初始化 TCP 数据包的模板。</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">template_packet_init(</span><br><span class="line">    parms-&gt;tmplset,</span><br><span class="line">    parms-&gt;source_mac,</span><br><span class="line">    parms-&gt;router_mac_ipv4,</span><br><span class="line">    parms-&gt;router_mac_ipv6,</span><br><span class="line">    masscan-&gt;payloads.udp,</span><br><span class="line">    masscan-&gt;payloads.oproto,</span><br><span class="line">    stack_if_datalink(masscan-&gt;nic[index].adapter),</span><br><span class="line">    masscan-&gt;seed);</span><br></pre></td></tr></tbody></table></figure>
 
-        <h3 id="源码分析-2"   >
-          <a href="#源码分析-2" class="heading-link"><i class="fas fa-link"></i></a><a href="#源码分析-2" class="headerlink" title="源码分析"></a>源码分析</h3>
-      <p>观察抓包分析中结果可以发现，所有发出的 SYN 请求中，窗口大小都是 1024。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044935.png#vwid=2560&vhei=1250" >
-      </p>
-<p>在 Masscan 的主函数 <span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/robertdavidgraham/masscan/blob/master/src/main.c" >masscan/src/main.c</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span> 文件中，默认使用以下代码初始化 TCP 数据包的模板。</p>
-<figure class="highlight c"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">template_packet_init(</span><br><span class="line">    parms-&gt;tmplset,</span><br><span class="line">    parms-&gt;source_mac,</span><br><span class="line">    parms-&gt;router_mac_ipv4,</span><br><span class="line">    parms-&gt;router_mac_ipv6,</span><br><span class="line">    masscan-&gt;payloads.udp,</span><br><span class="line">    masscan-&gt;payloads.oproto,</span><br><span class="line">    stack_if_datalink(masscan-&gt;nic[index].adapter),</span><br><span class="line">    masscan-&gt;seed);</span><br></pre></td></tr></table></div></figure>
-<p>该函数位于 <span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/robertdavidgraham/masscan/blob/master/src/templ-pkt.c" >masscan/src/templ.pkt.c</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span> 中，其中对于 TCP 的初始化代码如下所示。</p>
-<figure class="highlight c"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* [TCP] */</span></span><br><span class="line">_template_init(&amp;templset-&gt;pkts[Proto_TCP],</span><br><span class="line">               source_mac, router_mac_ipv4, router_mac_ipv6,</span><br><span class="line">               default_tcp_template,</span><br><span class="line">               <span class="keyword">sizeof</span>(default_tcp_template)<span class="number">-1</span>,</span><br><span class="line">               data_link);</span><br><span class="line">templset-&gt;count++;</span><br></pre></td></tr></table></div></figure>
+<p>该函数位于 <a target="_blank" rel="noopener" href="https://github.com/robertdavidgraham/masscan/blob/master/src/templ-pkt.c">masscan/src/templ.pkt.c</a> 中，其中对于 TCP 的初始化代码如下所示。</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* [TCP] */</span></span><br><span class="line">_template_init(&amp;templset-&gt;pkts[Proto_TCP],</span><br><span class="line">               source_mac, router_mac_ipv4, router_mac_ipv6,</span><br><span class="line">               default_tcp_template,</span><br><span class="line">               <span class="keyword">sizeof</span>(default_tcp_template)<span class="number">-1</span>,</span><br><span class="line">               data_link);</span><br><span class="line">templset-&gt;count++;</span><br></pre></td></tr></tbody></table></figure>
+
 <p>其中调用的 default_tcp_template 定义在该文件头部，下述 7 行指定 IP 的 length 为 40，下述 10 行指定 TLL 为 255，下述 18 行指定 ack 为 0，下述 21 行指定 window 的大小为 1024，可以将这些指标视为 Masscan 的特征。</p>
-<figure class="highlight c"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> default_tcp_template[] =</span><br><span class="line">    <span class="string">&quot;\0\1\2\3\4\5&quot;</span>  <span class="comment">/* Ethernet: destination */</span></span><br><span class="line">    <span class="string">&quot;\6\7\x8\x9\xa\xb&quot;</span>  <span class="comment">/* Ethernet: source */</span></span><br><span class="line">    <span class="string">&quot;\x08\x00&quot;</span>      <span class="comment">/* Ethernet type: IPv4 */</span></span><br><span class="line">    <span class="string">&quot;\x45&quot;</span>          <span class="comment">/* IP type */</span></span><br><span class="line">    <span class="string">&quot;\x00&quot;</span></span><br><span class="line">    <span class="string">&quot;\x00\x28&quot;</span>      <span class="comment">/* total length = 40 bytes */</span></span><br><span class="line">    <span class="string">&quot;\x00\x00&quot;</span>      <span class="comment">/* identification */</span></span><br><span class="line">    <span class="string">&quot;\x00\x00&quot;</span>      <span class="comment">/* fragmentation flags */</span></span><br><span class="line">    <span class="string">&quot;\xFF\x06&quot;</span>      <span class="comment">/* TTL=255, proto=TCP */</span></span><br><span class="line">    <span class="string">&quot;\xFF\xFF&quot;</span>      <span class="comment">/* checksum */</span></span><br><span class="line">    <span class="string">&quot;\0\0\0\0&quot;</span>      <span class="comment">/* source address */</span></span><br><span class="line">    <span class="string">&quot;\0\0\0\0&quot;</span>      <span class="comment">/* destination address */</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&quot;\0\0&quot;</span>          <span class="comment">/* source port */</span></span><br><span class="line">    <span class="string">&quot;\0\0&quot;</span>          <span class="comment">/* destination port */</span></span><br><span class="line">    <span class="string">&quot;\0\0\0\0&quot;</span>      <span class="comment">/* sequence number */</span></span><br><span class="line">    <span class="string">&quot;\0\0\0\0&quot;</span>      <span class="comment">/* ack number */</span></span><br><span class="line">    <span class="string">&quot;\x50&quot;</span>          <span class="comment">/* header length */</span></span><br><span class="line">    <span class="string">&quot;\x02&quot;</span>          <span class="comment">/* SYN */</span></span><br><span class="line">    <span class="string">&quot;\x04\x0&quot;</span>        <span class="comment">/* window fixed to 1024 */</span></span><br><span class="line">    <span class="string">&quot;\xFF\xFF&quot;</span>      <span class="comment">/* checksum */</span></span><br><span class="line">    <span class="string">&quot;\x00\x00&quot;</span>      <span class="comment">/* urgent pointer */</span></span><br><span class="line">    <span class="string">&quot;\x02\x04\x05\xb4&quot;</span>  <span class="comment">/* added options [mss 1460] */</span></span><br><span class="line">;</span><br></pre></td></tr></table></div></figure>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> default_tcp_template[] =</span><br><span class="line">    <span class="string">"\0\1\2\3\4\5"</span>  <span class="comment">/* Ethernet: destination */</span></span><br><span class="line">    <span class="string">"\6\7\x8\x9\xa\xb"</span>  <span class="comment">/* Ethernet: source */</span></span><br><span class="line">    <span class="string">"\x08\x00"</span>      <span class="comment">/* Ethernet type: IPv4 */</span></span><br><span class="line">    <span class="string">"\x45"</span>          <span class="comment">/* IP type */</span></span><br><span class="line">    <span class="string">"\x00"</span></span><br><span class="line">    <span class="string">"\x00\x28"</span>      <span class="comment">/* total length = 40 bytes */</span></span><br><span class="line">    <span class="string">"\x00\x00"</span>      <span class="comment">/* identification */</span></span><br><span class="line">    <span class="string">"\x00\x00"</span>      <span class="comment">/* fragmentation flags */</span></span><br><span class="line">    <span class="string">"\xFF\x06"</span>      <span class="comment">/* TTL=255, proto=TCP */</span></span><br><span class="line">    <span class="string">"\xFF\xFF"</span>      <span class="comment">/* checksum */</span></span><br><span class="line">    <span class="string">"\0\0\0\0"</span>      <span class="comment">/* source address */</span></span><br><span class="line">    <span class="string">"\0\0\0\0"</span>      <span class="comment">/* destination address */</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"\0\0"</span>          <span class="comment">/* source port */</span></span><br><span class="line">    <span class="string">"\0\0"</span>          <span class="comment">/* destination port */</span></span><br><span class="line">    <span class="string">"\0\0\0\0"</span>      <span class="comment">/* sequence number */</span></span><br><span class="line">    <span class="string">"\0\0\0\0"</span>      <span class="comment">/* ack number */</span></span><br><span class="line">    <span class="string">"\x50"</span>          <span class="comment">/* header length */</span></span><br><span class="line">    <span class="string">"\x02"</span>          <span class="comment">/* SYN */</span></span><br><span class="line">    <span class="string">"\x04\x0"</span>        <span class="comment">/* window fixed to 1024 */</span></span><br><span class="line">    <span class="string">"\xFF\xFF"</span>      <span class="comment">/* checksum */</span></span><br><span class="line">    <span class="string">"\x00\x00"</span>      <span class="comment">/* urgent pointer */</span></span><br><span class="line">    <span class="string">"\x02\x04\x05\xb4"</span>  <span class="comment">/* added options [mss 1460] */</span></span><br><span class="line">;</span><br></pre></td></tr></tbody></table></figure>
 
-        <h2 id="Demo-设计与实现"   >
-          <a href="#Demo-设计与实现" class="heading-link"><i class="fas fa-link"></i></a><a href="#Demo-设计与实现" class="headerlink" title="Demo 设计与实现"></a>Demo 设计与实现</h2>
-      <p>经过抓包分析和源码分析后，可以总结三个扫描器的特征如下表所示。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044988.png#vwid=1524&vhei=877" >
-      </p>
+<h2 id="Demo-设计与实现"><a href="#Demo-设计与实现" class="headerlink" title="Demo 设计与实现"></a>Demo 设计与实现</h2><p>经过抓包分析和源码分析后，可以总结三个扫描器的特征如下表所示。</p>
+<p><img data-src="https://img.seriouszyx.com/202109011044988.png#vwid=1524&amp;vhei=877"></p>
 <p>总体来看，三个扫描器工具都是基于单包的头部信息进行识别，且经过源码确认，属于强特征。那么识别的具体设计也就很容易了，对 pcap 文件的每个数据包进行分类，判断其是否满足上述三个指纹，核心识别流程图如下图所示。</p>
-<p>
-        <img   class="lazyload lazyload-gif"
-          src="/images/loading.svg" data-src="https://img.seriouszyx.com/202109011044015.png#vwid=622&vhei=624" >
-      </p>
+<p><img data-src="https://img.seriouszyx.com/202109011044015.png#vwid=622&amp;vhei=624"></p>
 <p>具体实现使用 Python 的 Scrapy 包解析 pcap，进行相关操作，代码很短，核心部分如下。</p>
-<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> data <span class="keyword">in</span> packets:</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;TCP&#x27;</span> <span class="keyword">in</span> data:</span><br><span class="line">        <span class="comment"># 识别 Zmap</span></span><br><span class="line">        <span class="keyword">if</span> (data[<span class="string">&#x27;TCP&#x27;</span>].window == <span class="number">65535</span>) <span class="keyword">and</span> (data[<span class="string">&#x27;IP&#x27;</span>].<span class="built_in">id</span> == <span class="number">54321</span>):</span><br><span class="line">            isZmap = <span class="literal">True</span></span><br><span class="line">        <span class="comment"># 识别 Masscan</span></span><br><span class="line">        <span class="keyword">if</span> data[<span class="string">&#x27;TCP&#x27;</span>].window == <span class="number">1024</span> <span class="keyword">and</span> data[<span class="string">&#x27;TCP&#x27;</span>].ack == <span class="number">0</span> \</span><br><span class="line">                <span class="keyword">and</span> data[<span class="string">&#x27;IP&#x27;</span>].ttl == <span class="number">255</span> <span class="keyword">and</span> data[<span class="string">&#x27;IP&#x27;</span>].<span class="built_in">len</span> == <span class="number">40</span>:</span><br><span class="line">            isMasscan = <span class="literal">True</span></span><br><span class="line">    <span class="comment"># 识别 Angry IP Scanner</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;ICMP&#x27;</span> <span class="keyword">in</span> data:</span><br><span class="line">        <span class="keyword">if</span> <span class="string">&#x27;Raw&#x27;</span> <span class="keyword">in</span> data:</span><br><span class="line">            items = processStr(data[<span class="string">&#x27;Raw&#x27;</span>].load)</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(data[<span class="string">&#x27;Raw&#x27;</span>]) == <span class="number">32</span> <span class="keyword">and</span> items == ANGRYIP_FLAG:</span><br><span class="line">                isAngryip = <span class="literal">True</span></span><br></pre></td></tr></table></div></figure>
-<p>代码放置于 <span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/seriouszyx/ScannerRecognition" >GitHub</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span>。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> data <span class="keyword">in</span> packets:</span><br><span class="line">    <span class="keyword">if</span> <span class="string">'TCP'</span> <span class="keyword">in</span> data:</span><br><span class="line">        <span class="comment"># 识别 Zmap</span></span><br><span class="line">        <span class="keyword">if</span> (data[<span class="string">'TCP'</span>].window == <span class="number">65535</span>) <span class="keyword">and</span> (data[<span class="string">'IP'</span>].<span class="built_in">id</span> == <span class="number">54321</span>):</span><br><span class="line">            isZmap = <span class="literal">True</span></span><br><span class="line">        <span class="comment"># 识别 Masscan</span></span><br><span class="line">        <span class="keyword">if</span> data[<span class="string">'TCP'</span>].window == <span class="number">1024</span> <span class="keyword">and</span> data[<span class="string">'TCP'</span>].ack == <span class="number">0</span> \</span><br><span class="line">                <span class="keyword">and</span> data[<span class="string">'IP'</span>].ttl == <span class="number">255</span> <span class="keyword">and</span> data[<span class="string">'IP'</span>].<span class="built_in">len</span> == <span class="number">40</span>:</span><br><span class="line">            isMasscan = <span class="literal">True</span></span><br><span class="line">    <span class="comment"># 识别 Angry IP Scanner</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">'ICMP'</span> <span class="keyword">in</span> data:</span><br><span class="line">        <span class="keyword">if</span> <span class="string">'Raw'</span> <span class="keyword">in</span> data:</span><br><span class="line">            items = processStr(data[<span class="string">'Raw'</span>].load)</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(data[<span class="string">'Raw'</span>]) == <span class="number">32</span> <span class="keyword">and</span> items == ANGRYIP_FLAG:</span><br><span class="line">                isAngryip = <span class="literal">True</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>代码放置于 <a target="_blank" rel="noopener" href="https://github.com/seriouszyx/ScannerRecognition">GitHub</a>。</p>
 <hr>
 <p>参考：</p>
-<p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://linux.cn/article-5860-1.html" >互联网扫描器 ZMap 完全手册</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
-<p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://nanshihui.github.io/2017/03/29/zmap%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB%E4%B9%8Bzmap%E6%89%AB%E6%8F%8F%E5%BF%AB%E7%9A%84%E5%8E%9F%E5%9B%A0/" >zmap 源码解读之 zmap 扫描快的原因</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
-<p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/al0ne/Nmap_Bypass_IDS" >Nmap_Bypass_IDS</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
-<p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44288604/article/details/115656891" >入侵检测——masscan(扫描篇)</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
-</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://seriouszyx.github.io">Yixiang Zhao</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://seriouszyx.github.io/2021/09/01/scanner-analysis-and-detect/">https://seriouszyx.github.io/2021/09/01/scanner-analysis-and-detect/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-reward reward"><div class="reward-button">请我喝杯咖啡~</div><div class="reward-qrcode"><span class="reward-qrcode-alipay"><img class="reward-qrcode-alipay__img" src="/assets/others/alipay.png"><div class="reward-qrcode-alipay__text">支付宝打赏</div></span><span class="reward-qrcode-wechat"><img class="reward-qrcode-wechat__img" src="/assets/others/wechat.png"><div class="reward-qrcode-wechat__text">微信打赏</div></span></div></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2021/10/16/publish-to-maven/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">如何发布 Java 包到 Maven 中央仓库</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2021/07/14/deploy-typecho-blog/"><span class="paginator-prev__text">CentOS 基于 Docker 搭建 Typecho 博客系统</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div><div class="comments" id="comments"><div id="valine-container"></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%AB%E6%8F%8F%E6%8E%A2%E6%B5%8B%E5%B7%A5%E5%85%B7%E8%AF%86%E5%88%AB"><span class="toc-number">1.</span> <span class="toc-text">
-          扫描探测工具识别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Zmap"><span class="toc-number">2.</span> <span class="toc-text">
-          Zmap</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90"><span class="toc-number">2.1.</span> <span class="toc-text">
-          抓包分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">2.2.</span> <span class="toc-text">
-          源码分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Angry-IP-Scanner"><span class="toc-number">3.</span> <span class="toc-text">
-          Angry IP Scanner</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90-1"><span class="toc-number">3.1.</span> <span class="toc-text">
-          抓包分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-1"><span class="toc-number">3.2.</span> <span class="toc-text">
-          源码分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Masscan"><span class="toc-number">4.</span> <span class="toc-text">
-          Masscan</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90-2"><span class="toc-number">4.1.</span> <span class="toc-text">
-          抓包分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-2"><span class="toc-number">4.2.</span> <span class="toc-text">
-          源码分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Demo-%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-number">5.</span> <span class="toc-text">
-          Demo 设计与实现</span></a></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="https://i.loli.net/2021/01/17/NUEISxoqirzvPBf.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">Yixiang Zhao</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/seriouszyx" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="https://weibo.com/u/5865669785" target="_blank" rel="noopener" data-popover="微博" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-weibo"></i></span></a><a class="sidebar-ov-social-item" href="https://www.zhihu.com/people/pie-yi" target="_blank" rel="noopener" data-popover="知乎" data-popover-pos="up"><span class="sidebar-ov-social-item__icon">知</span></a></div><div class="sidebar-ov-feed"><span class="sidebar-ov-feed-rss"><a class="sidebar-ov-feed-rss__link" href="/atom.xml" target="_blank" rel="noopener"><span class="sidebar-ov-feed-rss__icon"><i class="fas fa-rss"></i></span><span>RSS 订阅</span></a></span></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">8</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">0</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">2</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span><a href="https://github.com/seriouszyx" rel="noopener" target="_blank">seriouszyx</a></span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.3.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.6.2</span></div><div class="busuanzi"><span class="busuanzi-siteuv"><span class="busuanzi-siteuv__icon"><i class="fas fa-user"></i></span><span class="busuanzi-siteuv__info">访问人数</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_uv"></span></span><span class="busuanzi-sitepv"><span class="busuanzi-siteuv__icon"><i class="fas fa-eye"></i></span><span class="busuanzi-siteuv__info">浏览总量</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_pv"></span></span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/ribbon.js@latest/dist/ribbon.min.js" size="120" alpha="0.6" zIndex="-1"></script><script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script>function initSearch() {
-  var isXML = true;
-  var search_path = 'search.json';
+<p><a target="_blank" rel="noopener" href="https://linux.cn/article-5860-1.html">互联网扫描器 ZMap 完全手册</a></p>
+<p><a target="_blank" rel="noopener" href="https://nanshihui.github.io/2017/03/29/zmap%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB%E4%B9%8Bzmap%E6%89%AB%E6%8F%8F%E5%BF%AB%E7%9A%84%E5%8E%9F%E5%9B%A0/">zmap 源码解读之 zmap 扫描快的原因</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/al0ne/Nmap_Bypass_IDS">Nmap_Bypass_IDS</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44288604/article/details/115656891">入侵检测 ——masscan (扫描篇)</a></p>
 
-  if (!search_path) {
-    search_path = 'search.xml';
-  } else if (/json$/i.test(search_path)) {
-    isXML = false;
-  }
+    </div>
 
-  var path = '/' + search_path;
-  $.ajax({
-    url: path,
-    dataType: isXML ? 'xml' : 'json',
-    async: true,
-    success: function (res) {
-      var datas = isXML ? $('entry', res).map(function () {
-        // 将 XML 转为 JSON
-        return {
-          title: $('title', this).text(),
-          content: $('content', this).text(),
-          url: $('url', this).text()
-        };
-      }).get() : res;
-      var $input = $('.search-input input');
-      var $result = $('.search-results');
-      // 搜索对象（标题、内容）的权重，影响显示顺序
-      var WEIGHT = { title: 100, content: 1 };
-      var searchPost = function () {
-        var searchText = $input.val().toLowerCase().trim();
-        // 根据空白字符分隔关键字
-        var keywords = searchText.split(/[\s]+/);
-        // 搜索结果
-        var matchPosts = [];
+    
+    
+    
 
-        // 有多个关键字时，将原文字整个保存下来
-        if (keywords.length > 1) {
-          keywords.push(searchText);
-        }
-        // 防止未输入字符时搜索
-        if (searchText.length > 0) {
-          datas.forEach(function (data) {
-            var isMatch  = false;
-            // 没有标题的文章使用预设的 i18n 变量代替
-            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
-            var titleLower = title && title.toLowerCase();
-            // 删除 HTML 标签 和 所有空白字符
-            var content = data.content && data.content.replace(/<[^>]+>/g, '');
-            var contentLower = content && content.toLowerCase();
-            // 删除重复的 /
-            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
-            // 标题中匹配到的关键词
-            var titleHitSlice = [];
-            // 内容中匹配到的关键词
-            var contentHitSlice = [];
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div></div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/assets/others/wechat.png" alt="seriouszyx 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/assets/others/alipay.png" alt="seriouszyx 支付宝">
+        <span>支付宝</span>
+      </div>
 
-            keywords.forEach(function (keyword) {
-              /**
-              * 获取匹配的关键词的索引
-              * @param {String} keyword 要匹配的关键字
-              * @param {String} text 原文字
-              * @param {Boolean} caseSensitive 是否区分大小写
-              * @param {Number} weight 匹配对象的权重。权重大的优先显示
-              * @return {Array}
-              */
-              function getIndexByword (word, text, caseSensitive, weight) {
-                if (!word || !text) {
-                  return [];
-                };
+  </div>
+</div>
 
-                var startIndex = 0; // 每次匹配的开始索引
-                var index = -1;     // 匹配到的索引值
-                var result = [];    // 匹配结果
+          
 
-                if (!caseSensitive) {
-                  word = word.toLowerCase();
-                  text = text.toLowerCase();
-                }
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>seriouszyx
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://seriouszyx.com/2021/09/01/scanner-analysis-and-detect/" title="网络扫描探测工具的分析与识别">https://seriouszyx.com/2021/09/01/scanner-analysis-and-detect/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
 
-                while((index = text.indexOf(word, startIndex)) !== -1) {
-                  var hasMatch = false;
-                  // 索引位置相同的关键词，保留长度较长的
-                  titleHitSlice.forEach(function (hit) {
-                    if (hit.index === index && hit.word.length < word.length) {
-                      hit.word = word;
-                      hasMatch = true;
-                    }
-                  });
-                  startIndex = index + word.length;
-                  !hasMatch && result.push({ index: index, word: word, weight: weight });
-                }
-                return result;
-              }
-              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
-              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
-            });
 
-            var hitTitle = titleHitSlice.length;
-            var hitContent = contentHitSlice.length;
+        
+  <div class="post-widgets">
+    <div class="wpac-rating-container">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
 
-            if (hitTitle > 0 || hitContent > 0) {
-              isMatch = true;
-            }
-            if (isMatch) {
-              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
-                // 按照匹配文字的索引的递增顺序排序
-                hit.sort(function (left, right) {
-                  return left.index - right.index;
-                });
-              });
-              /**
-              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
-              * @param {String} text 原文本
-              * @param {Array} hitSlice 匹配项的索引信息
-              * @param {Number} start 开始索引
-              * @param {Number} end 结束索引
-              * @return {String}
-              */
-              function highlightKeyword (text, hitSlice, start, end) {
-                if (!text || !hitSlice || !hitSlice.length) {
-                  return;
-                }
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/07/14/deploy-typecho-blog/" rel="prev" title="CentOS 基于 Docker 搭建 Typecho 博客系统">
+                  <i class="fa fa-chevron-left"></i> CentOS 基于 Docker 搭建 Typecho 博客系统
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/10/16/publish-to-maven/" rel="next" title="如何发布 Java 包到 Maven 中央仓库">
+                  如何发布 Java 包到 Maven 中央仓库 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
 
-                var result = '';
-                var startIndex = start;
-                var endIndex = end;
-                hitSlice.forEach(function (hit) {
-                  if (hit.index < startIndex) {
-                    return;
-                  }
 
-                  var hitWordEnd = hit.index + hit.word.length;
-                  result += text.slice(startIndex, hit.index);
-                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
-                  startIndex = hitWordEnd;
-                });
-                result += text.slice(startIndex, endIndex);
-                return result;
-              }
 
-              var postData = {};
-              // 文章总的搜索权重
-              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
-              // 标记匹配关键词后的标题
-              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
-              // 标记匹配关键词后的内容
-              var postContent;
-              // 显示内容的长度
-              var SHOW_WORD_LENGTH = 200;
-              // 命中关键词前的字符显示长度
-              var SHOW_WORD_FRONT_LENGTH = 20;
-              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
 
-              // 截取匹配的第一个字符，前后共 200 个字符来显示
-              if (contentHitSlice.length > 0) {
-                var firstIndex = contentHitSlice[0].index;
-                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
-                var end = firstIndex + SHOW_WORD_END_LENGTH;
-                postContent = highlightKeyword(content, contentHitSlice, start, end);
-              } else { // 未匹配到内容，直接截取前 200 个字符来显示
-                postContent = content.slice(0, SHOW_WORD_LENGTH);
-              }
-              postData.title = postTitle;
-              postData.content = postContent;
-              postData.url = postURL;
-              postData.weight = postWeight;
-              matchPosts.push(postData);
-            }
-          });
-        }
 
-        var resultInnerHtml = '';
-        if (matchPosts.length) {
-          // 按权重递增的顺序排序，使权重大的优先显示
-          matchPosts.sort(function (left, right) {
-            return right.weight - left.weight;
-          });
-          resultInnerHtml += '<ul>';
-          matchPosts.forEach(function (post) {
-            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
-            resultInnerHtml += post.title;
-            resultInnerHtml += '</a><div class="search-results-content">';
-            resultInnerHtml += post.content;
-            resultInnerHtml += '</div></li>';
-          });
-          resultInnerHtml += '</ul>';
-        } else {
-          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
-        }
-        $result.html(resultInnerHtml);
-      };
-      $input.on('input', searchPost);
-      $input.on('keyup', function (e) {
-        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
-          searchPost();
-        }
-      });
-    }
-  });
-}
 
-function closeSearch () {
-  $('body').css({ overflow: 'auto' });
-  $('.search-popup').css({ display: 'none' });
-  $('.search-mask').css({ display: 'none' });
-}
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
 
-window.addEventListener('DOMContentLoaded', function () {
-  Stun.utils.pjaxReloadLocalSearch = function () {
-    $('.header-nav-search').on('click', function (e) {
-      e.stopPropagation();
-      $('body').css('overflow', 'hidden');
-      $('.search-popup')
-        .velocity('stop')
-        .velocity('transition.expandIn', {
-          duration: 300,
-          complete: function () {
-            $('.search-popup input').focus();
-          }
-        });
-      $('.search-mask')
-        .velocity('stop')
-        .velocity('transition.fadeIn', {
-          duration: 300
-        });
+  <footer class="footer">
+    <div class="footer-inner">
 
-      initSearch();
-    });
-    $('.search-mask, .search-close').on('click', function () {
-      closeSearch();
-    });
-    $(document).on('keydown', function (e) {
-      // Escape <=> 27
-      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
-        closeSearch();
-      }
-    });
-  };
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">辽ICP备19014015号 </a>
+  </div>
 
-  Stun.utils.pjaxReloadLocalSearch();
-}, false);
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yixiang Zhao</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
-function safeOpenUrl(url) {
-  var newTab = window.open();
-  newTab.opener = null;
-  newTab.location = url;
-}
+    </div>
+  </footer>
 
-function extSearch(engine) {
-  var engines = {
-    google: 'https://www.google.com/search?q=',
-    bing: 'https://cn.bing.com/search?q=',
-    baidu: 'https://www.baidu.com/s?ie=UTF-8&wd=',
-  };
-  var host = window.location.host;
-  var query = $('.search-input input').val().toLowerCase().trim();
-  var uri = engines[engine] + query + ' site:' + host;
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
 
-  if (query) {
-    safeOpenUrl(uri);
-  } else {
-    Stun.utils.popAlert('warning', 'Please enter characters');
-  }
-}
+  
+  <script src="https://embed.widgetpack.com/widget.js" async></script>
+  <script class="next-config" data-name="rating" type="application/json">{"enable":true,"id":33881,"color":"#fc6423"}</script>
+  <script src="/js/third-party/rating.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.12.1/dist/algoliasearch-lite.umd.js" integrity="sha256-gOvJ6W+j+t/cgnnl9iUU3cb6F1WFQGDdtTXhfPjU4bc=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.38.0/dist/instantsearch.production.min.js" integrity="sha256-KSgT2gZhRG/3zPNvK4asby8mNGnIDpUJbebF8DDWyss=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
 
-var assistSearchList = window.CONFIG.assistSearch;
 
-if (Array.isArray(assistSearchList)) {
-  assistSearchList.forEach(function (name) {
-    document.querySelector('.search-btns-item--' + name).addEventListener('click', function () {
-      extSearch(name);
-    }, false);
-  });
-}</script><script src="https://cdn.jsdelivr.net/gh/sukkaw/busuanzi@latest/bsz.pure.mini.js" async></script><script src="https://cdn.jsdelivr.net/npm/leancloud-storage@latest/dist/av-min.js"></script><script src="https://cdn.jsdelivr.net/npm/valine@latest/dist/Valine.min.js"></script><script>function loadValine () {
-  var GUEST_INFO = ['nick', 'mail', 'link'];
-  var guest_info = 'nick,mail,link';
 
-  guest_info = guest_info.split(',').filter(function(item) {
-    return GUEST_INFO.indexOf(item) > -1;
-  });
-  new Valine({
-    el: '#valine-container',
-    appId: '5LClFOVFGRKS3hJmQRaMv2Os-gzGzoHsz',
-    appKey: 'zlWsxvIXdOlOnnG0X4KlWKUs',
-    notify: true,
-    verify: true,
-    placeholder: '别急，慢慢说...',
-    avatar: 'mp',
-    meta: guest_info,
-    pageSize: '10' || 10,
-    visitor: true,
-    recordIP: true,
-    lang: 'zh-cn' || 'zh-cn',
-    path: window.location.pathname
-  });
-}
 
-if (false) {
-  loadValine();
-} else {
-  window.addEventListener('DOMContentLoaded', loadValine, false);
-}</script><script src="/js/utils.js?v=2.6.2"></script><script src="/js/stun-boot.js?v=2.6.2"></script><script src="/js/scroll.js?v=2.6.2"></script><script src="/js/header.js?v=2.6.2"></script><script src="/js/sidebar.js?v=2.6.2"></script><script type="application/json" src="/search.json"></script></body></html>
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://seriouszyx.com/2021/09/01/scanner-analysis-and-detect/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/disqusjs@1.3.0/dist/disqusjs.css" integrity="sha256-GxdCIOyfxQ1OBfS99qAIJDoGK1ADuBsxhMTqXG82fAY=" crossorigin="anonymous">
+
+<script class="next-config" data-name="disqusjs" type="application/json">{"enable":true,"api":"https://disqus.skk.moe/disqus/","apikey":"4WEdSizmLoG5tJsYvtPBNIFgFTHYkNQCG9OFzikxiev79edeoa3BciI4tyeuQkGV","shortname":"seriouszyx","js":{"url":"https://cdn.jsdelivr.net/npm/disqusjs@1.3.0/dist/disqus.js","integrity":"sha256-LVaMHPQ2zLqOc5rXSAfr4d1PIkEGNLyyUTDNPZmTtUw="}}</script>
+<script src="/js/third-party/comments/disqusjs.js"></script>
+
+</body>
+</html>
