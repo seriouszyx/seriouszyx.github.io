@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="9xsNXs6L7nuMa2Xm38zRjEg7Ed3qU7GD5CVI6Dbc_f0">
+  <meta name="baidu-site-verification" content="code-bykGufpoRh">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"seriouszyx.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.10.0","exturl":true,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":true,"comments":{"style":"buttons","active":"disqusjs","storage":true,"lazyload":false,"nav":null,"activeClass":"disqusjs"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeIn","post_body":"fadeIn","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="我搜索着 CS61B 的国内生态，这门完全公开、享誉世界的数据结构神课，虽在知乎、一亩三分地等处推荐强烈，但实际高质量完成的人数稀少。这要归因于语言和网络的阻碍，机翻字幕味同嚼蜡，YouTube 的访问也劝退了一大批初学者。于是我便有了方向，我决意用自己闲暇的时光，化身一个人的字幕组，翻译出这门课的所有视频资料，并搬运到 B 站。这两天，我调研了相关的工具，考虑了一些取舍，这期间实为不易，总结出一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个人的字幕组">
+<meta property="og:url" content="https://seriouszyx.com/tech/subtitle-group-for-one-person/index.html">
+<meta property="og:site_name" content="隐秀">
+<meta property="og:description" content="我搜索着 CS61B 的国内生态，这门完全公开、享誉世界的数据结构神课，虽在知乎、一亩三分地等处推荐强烈，但实际高质量完成的人数稀少。这要归因于语言和网络的阻碍，机翻字幕味同嚼蜡，YouTube 的访问也劝退了一大批初学者。于是我便有了方向，我决意用自己闲暇的时光，化身一个人的字幕组，翻译出这门课的所有视频资料，并搬运到 B 站。这两天，我调研了相关的工具，考虑了一些取舍，这期间实为不易，总结出一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://seriouszyx.com/assets/posts/subtitle-group-for-one-person/1.png">
+<meta property="og:image" content="https://seriouszyx.com/assets/posts/subtitle-group-for-one-person/2.png">
+<meta property="og:image" content="https://seriouszyx.com/assets/posts/subtitle-group-for-one-person/3.png">
+<meta property="og:image" content="https://seriouszyx.com/assets/posts/subtitle-group-for-one-person/4.png">
+<meta property="og:image" content="https://seriouszyx.com/assets/posts/subtitle-group-for-one-person/5.png">
+<meta property="og:image" content="https://seriouszyx.com/assets/posts/subtitle-group-for-one-person/6.png">
+<meta property="og:image" content="https://seriouszyx.com/assets/posts/subtitle-group-for-one-person/7.png">
+<meta property="article:published_time" content="2021-02-04T06:36:11.000Z">
+<meta property="article:modified_time" content="2022-02-12T02:32:04.956Z">
+<meta property="article:author" content="seriouszyx">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://seriouszyx.com/assets/posts/subtitle-group-for-one-person/1.png">
+
+
+<link rel="canonical" href="https://seriouszyx.com/tech/subtitle-group-for-one-person/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://seriouszyx.com/tech/subtitle-group-for-one-person/","path":"tech/subtitle-group-for-one-person/","title":"一个人的字幕组"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>一个人的字幕组 | 隐秀</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135559540-1"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"UA-135559540-1","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?e2160ff518b5a935969dfd0e761cc62a"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">隐秀</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">seriouszyx</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B9%9F%E6%83%B3%E6%88%90%E4%B8%BA%E5%AD%97%E5%B9%95%E7%BB%84"><span class="nav-number">1.</span> <span class="nav-text">也想成为字幕组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="nav-number">2.</span> <span class="nav-text">工作流</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%87%E6%BA%90"><span class="nav-number">2.1.</span> <span class="nav-text">片源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%93%E8%BD%B4"><span class="nav-number">2.2.</span> <span class="nav-text">打轴</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E7%BF%BB"><span class="nav-number">2.3.</span> <span class="nav-text">初翻</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BF%BB%E8%AF%91"><span class="nav-number">2.4.</span> <span class="nav-text">翻译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A1%E7%89%87"><span class="nav-number">2.5.</span> <span class="nav-text">审片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%8B%E5%88%B6"><span class="nav-number">2.6.</span> <span class="nav-text">压制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E8%AF%BE%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">关于课程</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="seriouszyx"
+      src="/assets/others/avatar.png">
+  <p class="site-author-name" itemprop="name">seriouszyx</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3NlcmlvdXN6eXg=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;seriouszyx"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpo"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://seriouszyx.com/tech/subtitle-group-for-one-person/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/others/avatar.png">
+      <meta itemprop="name" content="seriouszyx">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="隐秀">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一个人的字幕组
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-02-04 14:36:11" itemprop="dateCreated datePublished" datetime="2021-02-04T14:36:11+08:00">2021-02-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-02-12 10:32:04" itemprop="dateModified" datetime="2022-02-12T10:32:04+08:00">2022-02-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">技术</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/tech/subtitle-group-for-one-person/" class="post-meta-item leancloud_visitors" data-flag-title="一个人的字幕组" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="leancloud-visitors-count"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="也想成为字幕组"><a href="#也想成为字幕组" class="headerlink" title="也想成为字幕组"></a>也想成为字幕组</h1><p>我不是很懂当代流量的导向，人们到底乐意为怎样的内容驻足，是我很困惑的问题，就像我的 CSDN 最高互动量是一篇很简单的 VMware 安装教程，我的 GitHub 最高 star 数是只进行了几周的 CS61B 课程实验。它们算不上我心目中内容产出最高的两位，却被大众普遍接受，唯一的共同点可能是门槛较低、需求较广。然而，对于这些可能是互联网上占比最大的群体，现有的资源鱼龙混杂，多少内容靠着标题吸引流量，看完后才发现是贩卖焦虑、治标不治本。所以，我想为这种情况的改变做出点贡献。</p>
+<p>我搜索着 CS61B 的国内生态，这门完全公开、享誉世界的数据结构神课，虽在知乎、一亩三分地等处推荐强烈，但实际高质量完成的人数稀少。这要归因于语言和网络的阻碍，机翻字幕味同嚼蜡，YouTube 的访问也劝退了一大批初学者。于是我便有了方向，我决意用自己闲暇的时光，化身一个人的字幕组，翻译出这门课的所有视频资料，并搬运到 B 站。</p>
+<p>这两天，我调研了相关的工具，考虑了一些取舍，这期间实为不易，总结出一套满意的工作流，记录于此。</p>
+<h1 id="工作流"><a href="#工作流" class="headerlink" title="工作流"></a>工作流</h1><h2 id="片源"><a href="#片源" class="headerlink" title="片源"></a>片源</h2><p>视频源在 Josh Hug 的<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vY2hhbm5lbC9VQzdGelRNTzRyS3ZscUl5VTV2d3pGS1EvcGxheWxpc3Rz">播放列表</span>中，他把每周的视频整理成一个列表，下载最高画质我比较喜欢用 <span class="exturl" data-url="aHR0cHM6Ly93d3cueTJtYXRlLmNvbS8=">y2mate</span>，甚至可以提取出音频文件。字幕提取 <span class="exturl" data-url="aHR0cHM6Ly9kb3duc3ViLmNvbS8=">downsub</span> 挺不错的，直接下载 srt 格式，CS61B 2018 Spring 这个版本的视频有自带的 CC 字幕，但是时间轴还是有点奇怪，需要自己调整一下。如果有字幕文件格式转换的需求，我一般使用 <span class="exturl" data-url="aHR0cHM6Ly9nb3RyYW5zY3JpcHQuY29tL3N1YnRpdGxlLWNvbnZlcnRlcg==">subtitle-converter</span>。</p>
+<h2 id="打轴"><a href="#打轴" class="headerlink" title="打轴"></a>打轴</h2><p>这一步就开始麻烦起来了，简单解释起来就是把每一句轴对准。此外还要考虑断句，要简单读一下每句的意思，以便后期翻译。最后，下载的英文字幕可能有出错的地方，发现也要纠正一下。</p>
+<p>具体的操作我参考的<span class="exturl" data-url="aHR0cHM6Ly93d3cuYmlsaWJpbGkuY29tL3ZpZGVvL0JWMXBzNDExYjdhcw==">【Aegisub 教程】快速打轴法</span>。将字幕和对应的视频文件导入 <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL0FlZ2lzdWIvQWVnaXN1Yg==">Aegisub</span>，只显示音频和字幕。左手放置在 SDFG 四个键位上，控制每句话的播放、确认等操作，我还把时间轴合并设置了热键，因为原版断句很多太细碎了。右手操纵鼠标左右键，控制每段时间轴的开始和结束位置，特别注意 Josh Hug 经常有一些语气词，我一般不把它们包含在轴内。</p>
+<p><img data-src="/assets/posts/subtitle-group-for-one-person/1.png" alt="image.png"></p>
+<h2 id="初翻"><a href="#初翻" class="headerlink" title="初翻"></a>初翻</h2><p>我习惯用 <span class="exturl" data-url="aHR0cHM6Ly96aC50ZXJuLjFjNy5tZS8=">Tern</span> 先初次翻译一下，导入单语字幕后会自动机翻并生成双语字幕。因为英文的时间轴已经调整过了，断句肯定要比原版更好，即便是机翻也不会像 YouTube CC 机翻那么生硬。在软件设置里修改一下输出格式，原文译文分成两行，原文全部在前，译文全部在后。</p>
+<p><img data-src="/assets/posts/subtitle-group-for-one-person/2.png" alt="image.png"></p>
+<p>srt 是标准的外轨字幕，没有样式和动画，我倾向设置样式，加重中文的显示效果。Aegisub 有样式管理器，我的样式基于 Crash Course 字幕组的<span class="exturl" data-url="aHR0cHM6Ly8xYzcubWUvb3Blbi1zb3VyY2Utc3VidGl0bGUtZmlsZS8=">公开样式</span>，他们组织的代表作是<span class="exturl" data-url="aHR0cHM6Ly93d3cuYmlsaWJpbGkuY29tL3ZpZGVvL2F2MjEzNzY4Mzkv">计算机速成课</span>，也超过了百万播放量。</p>
+<p><img data-src="/assets/posts/subtitle-group-for-one-person/3.png" alt="image.png"></p>
+<p>分别全选所有中英文字幕，设置中英文样式模板，再把字幕以开始时间排序。保存后字幕文件会自动转换为 ass 格式，之后打开会直接链接视频文件并加载字母样式。</p>
+<p><img data-src="/assets/posts/subtitle-group-for-one-person/4.png" alt="image.png"></p>
+<p>虽然这步的名字我起为 “初翻”，但主要目的是生成中文时间轴，并调整样式，为下面的翻译做准备。事实上，简单的句子机翻表现得还不错，但几乎 90% 的句子都需要重新修改，所以在内容翻译上，这步只是一个辅助作用。</p>
+<h2 id="翻译"><a href="#翻译" class="headerlink" title="翻译"></a>翻译</h2><p>终于到了重头戏，这步难点不在工具的使用，而在于翻译。既要考虑遵于原意，又要让语言易懂，不那么生硬。特别是 Josh Hug 口语化严重，很多细节需要格外考量。另外断句也很繁琐，很多时候把一大段文字翻译完，发现会错意，又要重新逐句更改。<br>还有一些细碎的注意事项，全部加起来让工作量成倍增加，也出乎了我的设想。同时背后的专业能力也要跟上，遇到不懂的地方还要去网上查询资料。但不管怎样，还是以质量为主。</p>
+<p>下面是翻译后的译文，可以将这几段轴与上一张图片机翻的作比较，哪一个过分生硬，哪一个一眼就能明白，显而易见。这还是开篇简单的几句话，涉及到专业的内容，机翻与手翻的差异会更加明显。<br><img data-src="/assets/posts/subtitle-group-for-one-person/5.png" alt="image.png"></p>
+<h2 id="审片"><a href="#审片" class="headerlink" title="审片"></a>审片</h2><p>每一小集视频制作完成后，我都需要再整体带 ass 字幕看几遍视频，检查有没有字幕错误、不同步，时间轴是否有重合，错别字，翻译语句是否不通畅等等小问题。我其实不急于压制，也不急于发布，在制作完几个视频后，再回过头来审阅每个视频，保证错误率降到最低。</p>
+<p><img data-src="/assets/posts/subtitle-group-for-one-person/6.png" alt="image.png"></p>
+<h2 id="压制"><a href="#压制" class="headerlink" title="压制"></a>压制</h2><p>压制即将原视频和制作好的字幕整合在一起，并设置码率等配置在保持一定清晰度的前提下大幅度压缩体积。小丸工具箱是很主流的选择，官网的网盘链接失效了，不过 B 站<span class="exturl" data-url="aHR0cHM6Ly9kbC5oZHNsYi5jb20vdmlkZW8tcHJlc3MveGlhb3dhbnRvb2xzcmV2MTk0LnppcA==">创作中心</span>有提供。</p>
+<p>为了保证视频的质量，x264 和 CRF 等压缩选项都输出最高画质，之后便可以压缩成 MP4 格式，上传到 B 站。</p>
+<p><img data-src="/assets/posts/subtitle-group-for-one-person/7.png" alt="image.png"></p>
+<h1 id="关于课程"><a href="#关于课程" class="headerlink" title="关于课程"></a>关于课程</h1><p>大概是周一萌生了这个想法，周二周三调研相关工具后亲手制作了将近 20 分钟时长的视频，周四写下了这篇记录，所以还有很多不成熟的地方，我会随时修改。</p>
+<p>这件事情本源于我的心血来潮，真正去实践起来，花费的时间要比我预想的多得多。我还没有确定发布的进度，可能凑几周发布一次，也可能全制作好后一起发布，也可能永远搁置了。</p>
+<p>但值得庆幸的是，虽然包含很多重复的工作，我投入起来却干劲十足，甚至有点茶饭不思的激情。审片是整个流程中最开心的时刻，看着原版难以理解的视频，一步一步经过我手变得通俗易懂，我想这种成就感会推动我一直走下去，直至课程尽头。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div></div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/assets/others/wechat.png" alt="seriouszyx 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/assets/others/alipay.png" alt="seriouszyx 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>seriouszyx
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://seriouszyx.com/tech/subtitle-group-for-one-person/" title="一个人的字幕组">https://seriouszyx.com/tech/subtitle-group-for-one-person/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpo"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/tech/expose-local-server/" rel="next" title="服务器内网穿透">
+                  服务器内网穿透 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><span class="exturl" data-url="aHR0cHM6Ly9iZWlhbi5taWl0Lmdvdi5jbg==">辽ICP备19014015号 </span>
+  </div>
+
+<div class="copyright">
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">隐秀（seriouszyx）</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+  <script class="next-config" data-name="leancloud_visitors" type="application/json">{"enable":true,"app_id":"5LClFOVFGRKS3hJmQRaMv2Os-gzGzoHsz","app_key":"zlWsxvIXdOlOnnG0X4KlWKUs","server_url":"https://5lclfovf.lc-cn-n1-shared.com","security":true}</script>
+  <script src="/js/third-party/statistics/lean-analytics.js"></script>
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://seriouszyx.com/tech/subtitle-group-for-one-person/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/disqusjs@1.3.0/dist/disqusjs.css" integrity="sha256-GxdCIOyfxQ1OBfS99qAIJDoGK1ADuBsxhMTqXG82fAY=" crossorigin="anonymous">
+
+<script class="next-config" data-name="disqusjs" type="application/json">{"enable":true,"api":"https://disqus.skk.moe/disqus/","apikey":"4WEdSizmLoG5tJsYvtPBNIFgFTHYkNQCG9OFzikxiev79edeoa3BciI4tyeuQkGV","shortname":"seriouszyx","js":{"url":"https://cdn.jsdelivr.net/npm/disqusjs@1.3.0/dist/disqus.js","integrity":"sha256-LVaMHPQ2zLqOc5rXSAfr4d1PIkEGNLyyUTDNPZmTtUw="}}</script>
+<script src="/js/third-party/comments/disqusjs.js"></script>
+
+</body>
+</html>
