@@ -57,7 +57,8 @@
   <entry>
     <title>如何发布 Java 包到 Maven 中央仓库</title>
     <url>/tech/publish-to-maven/</url>
-    <content><![CDATA[<p>最近参与一些开源项目，涉及到发版相关的问题，没有看到详细又不过时的教程，于是自己调研摸索，总结出了这篇文章。</p>
+    <content><![CDATA[<p><img data-src="https://img.seriouszyx.com/202110161035870.png#vwid=2560&amp;vhei=1381"></p>
+<p>最近参与一些开源项目，涉及到发版相关的问题，没有看到详细又不过时的教程，于是自己调研摸索，总结出了这篇文章。</p>
 <span id="more"></span>
 
 <p>本文主要参考<span class="exturl" data-url="aHR0cHM6Ly9jZW50cmFsLnNvbmF0eXBlLm9yZy9wdWJsaXNoLw==">官方文档</span>进行编写，演示仓库位于 <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3NlcmlvdXN6eXgvbWF2ZW4tcmVsZWFzZS1leGFtcGxl">https://github.com/seriouszyx/maven-release-example</span>。</p>
@@ -159,7 +160,11 @@
   <entry>
     <title>网络扫描探测工具的分析与识别</title>
     <url>/tech/scanner-analysis-and-detect/</url>
-    <content><![CDATA[<h2 id="扫描探测工具识别"><a href="#扫描探测工具识别" class="headerlink" title="扫描探测工具识别"></a>扫描探测工具识别</h2><p>网络扫描探测通常是发起网络入侵的第一步，攻击者可以利用扫描探测工具获取网络中的主机系统、TCP/UDP 端口的开放情况、子域名、网站指纹、WAF、CDN、中间件类别等重要信息，识别出存在安全漏洞的主机或系统，从而发起有针对性的网络入侵行为。此外，一些扫描工具同时具备漏洞利用的能力。因此，对网络扫描探测行为进行识别和研究，有利于及时发现网络攻击的前兆，发现网络攻击行为，快速定位网络服务中存在的漏洞，对网络安全防护工作十分有意义。</p>
+    <content><![CDATA[<p><img data-src="https://img.seriouszyx.com/202109011044955.png#vwid=1999&amp;vhei=694"></p>
+<p>网络扫描探测工具 Zmap | Angry IP Scanner | Masscan 的分析与识别</p>
+<span id="more"></span>
+
+<h2 id="扫描探测工具识别"><a href="#扫描探测工具识别" class="headerlink" title="扫描探测工具识别"></a>扫描探测工具识别</h2><p>网络扫描探测通常是发起网络入侵的第一步，攻击者可以利用扫描探测工具获取网络中的主机系统、TCP/UDP 端口的开放情况、子域名、网站指纹、WAF、CDN、中间件类别等重要信息，识别出存在安全漏洞的主机或系统，从而发起有针对性的网络入侵行为。此外，一些扫描工具同时具备漏洞利用的能力。因此，对网络扫描探测行为进行识别和研究，有利于及时发现网络攻击的前兆，发现网络攻击行为，快速定位网络服务中存在的漏洞，对网络安全防护工作十分有意义。</p>
 <p>本文以下列三个常见扫描器为代表，探究扫描器的特有指纹信息，编写 Demo 进行扫描器的识别。</p>
 <p><img data-src="https://img.seriouszyx.com/202109011044955.png#vwid=1999&amp;vhei=694"></p>
 <h2 id="Zmap"><a href="#Zmap" class="headerlink" title="Zmap"></a>Zmap</h2><h3 id="抓包分析"><a href="#抓包分析" class="headerlink" title="抓包分析"></a>抓包分析</h3><p>ZMap 被设计用来针对整个 IPv4 地址空间或其中的大部分实施综合扫描的工具。</p>
@@ -261,7 +266,7 @@
   <entry>
     <title>CentOS 基于 Docker 搭建 Typecho 博客系统</title>
     <url>/tech/deploy-typecho-blog/</url>
-    <content><![CDATA[<p>首先一般搭建动态博客都会有一个云服务器，国内的话供应商一般是阿里云或者腾讯云，我这里使用的是腾讯云，基本的操作逻辑大同小异。</p>
+    <content><![CDATA[<p><img data-src="https://img.seriouszyx.com/20210714235652.png#vwid=1646&amp;vhei=876"></p>
 <span id="more"></span>
 
 <h1 id="云服务器"><a href="#云服务器" class="headerlink" title="云服务器"></a>云服务器</h1><p>首先一般搭建动态博客都会有一个云服务器，国内的话供应商一般是阿里云或者腾讯云，我这里使用的是腾讯云，基本的操作逻辑大同小异。</p>
@@ -377,7 +382,8 @@
   <entry>
     <title>到底什么才是区块链</title>
     <url>/tech/what-is-blockchain/</url>
-    <content><![CDATA[<p>区块链现在是紧跟着人工智能、大数据的新名词，提起区块链，大多数人首先想到的是炒币，充斥着虚假、浮躁，再加上前几年国家对这种现象的抵制，让很多人对区块链技术望而却步。</p>
+    <content><![CDATA[<p><img data-src="/assets/posts/what-is-blockchain/20.png"></p>
+<p>区块链现在是紧跟着人工智能、大数据的新名词，提起区块链，大多数人首先想到的是炒币，充斥着虚假、浮躁，再加上前几年国家对这种现象的抵制，让很多人对区块链技术望而却步。</p>
 <p>殊不知，比特币只是区块链技术的一个分支，而区块链本身，凝聚了许许多多计算机科学家的智慧，发展突飞猛进，正在脱离实验室，走进人们的生活，未来可期。从 Facebook 的 <span class="exturl" data-url="aHR0cHM6Ly9saWJyYS5vcmcv">libra</span> 到最近<span class="exturl" data-url="aHR0cHM6Ly93d3cuaW5mb3EuY24vYXJ0aWNsZS96Z2xBQ0JnYVNHWEtGSFY4NUYzRw==">中国的重视态度</span>，像 AI 一样，区块链将是未来几年甚至几十年围绕着人们的新技术。</p>
 <p>回过头来看，2008 年末 “中本聪” 提出区块链概念到目前为止不过十多年，现在开始了解区块链，你我都称得上是这项技术的先驱者。</p>
 <p>不过，目前国内介绍区块链的内容还是显得浮躁，鲜有真正踏踏实实介绍其内部技术细节的文章。下面是一篇我翻译的区块链的介绍文章，由 <span class="exturl" data-url="aHR0cHM6Ly9tb2hpdG1hbW9yaWEubWVkaXVtLmNvbS8=">Mohit Mamoria</span> 所作，在 <span class="exturl" data-url="aHR0cHM6Ly9tZWRpdW0uY29tL2hhY2tlcm5vb24vd3RmLWlzLXRoZS1ibG9ja2NoYWluLTFkYTg5YmExOTM0OA==">Medium</span> 上收到了广泛好评。文章比较长，图片很多，但值得耐心读完。无论你对区块链的认知如何，下面的有些内容一定会让你感到吃惊。</p>
@@ -539,7 +545,8 @@
   <entry>
     <title>最新超详细 VMware 的下载与安装</title>
     <url>/tech/vmware-download-and-install/</url>
-    <content><![CDATA[<p>我的 CSDN 站点上破 50w 浏览量的 <span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwOTUwOTU3L2FydGljbGUvZGV0YWlscy84MDQ2NzUxMw==">VMware 安装教程</span>，由于 CSDN 文章中发现写有激活码审核不通过，所以将其放于本独立博客站点。</p>
+    <content><![CDATA[<p><img data-src="/assets/posts/vmware-download-and-install/8.png"></p>
+<p>我的 CSDN 站点上破 70w 浏览量的 <span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwOTUwOTU3L2FydGljbGUvZGV0YWlscy84MDQ2NzUxMw==">VMware 安装教程</span>，由于 CSDN 文章中发现写有激活码审核不通过，所以将其放于本独立博客站点。</p>
 <span id="more"></span>
 
 <h2 id="VMware-下载"><a href="#VMware-下载" class="headerlink" title="VMware 下载"></a>VMware 下载</h2><p>进入官网的 <span class="exturl" data-url="aHR0cHM6Ly93d3cudm13YXJlLmNvbS9jbi9wcm9kdWN0cy93b3Jrc3RhdGlvbi1wcm8uaHRtbA==">VMware Workstation Pro 页面</span>，浏览功能特性、应用场景、系统要求等。下滑页面点击 <code>试用 Workstation 16 Pro</code> 下方的下载链接，跳转至<span class="exturl" data-url="aHR0cHM6Ly93d3cudm13YXJlLmNvbS9wcm9kdWN0cy93b3Jrc3RhdGlvbi1wcm8vd29ya3N0YXRpb24tcHJvLWV2YWx1YXRpb24uaHRtbA==">下载页面</span>。</p>
@@ -581,7 +588,8 @@
   <entry>
     <title>服务器内网穿透</title>
     <url>/tech/expose-local-server/</url>
-    <content><![CDATA[<p>本科 AI 实验室的服务器在内网部署，疫情期间大家都没办法在学校，又需要使用 GPU 完成一些工作。正好老板又添置了一台服务器，派我做一下内网穿透，方便远程使用。</p>
+    <content><![CDATA[<p><img data-src="/assets/posts/expose-local-server/image.png" alt="frp 架构"></p>
+<p>本科 AI 实验室的服务器在内网部署，疫情期间大家都没办法在学校，又需要使用 GPU 完成一些工作。正好老板又添置了一台服务器，派我做一下内网穿透，方便远程使用。</p>
 <span id="more"></span>
 
 <h1 id="服务器配置"><a href="#服务器配置" class="headerlink" title="服务器配置"></a>服务器配置</h1><p>主要想记录一下软件方面的配置，所以怎么安装滑轨、怎么接线这类问题就不赘述了，下面的表格中记录了两台服务器的软硬件配置。</p>
@@ -686,7 +694,11 @@
   <entry>
     <title>一个人的字幕组</title>
     <url>/tech/subtitle-group-for-one-person/</url>
-    <content><![CDATA[<h1 id="也想成为字幕组"><a href="#也想成为字幕组" class="headerlink" title="也想成为字幕组"></a>也想成为字幕组</h1><p>我不是很懂当代流量的导向，人们到底乐意为怎样的内容驻足，是我很困惑的问题，就像我的 CSDN 最高互动量是一篇很简单的 VMware 安装教程，我的 GitHub 最高 star 数是只进行了几周的 CS61B 课程实验。它们算不上我心目中内容产出最高的两位，却被大众普遍接受，唯一的共同点可能是门槛较低、需求较广。然而，对于这些可能是互联网上占比最大的群体，现有的资源鱼龙混杂，多少内容靠着标题吸引流量，看完后才发现是贩卖焦虑、治标不治本。所以，我想为这种情况的改变做出点贡献。</p>
+    <content><![CDATA[<p><img data-src="/assets/posts/subtitle-group-for-one-person/5.png" alt="image.png"></p>
+<p>我搜索着 CS61B 的国内生态，这门完全公开、享誉世界的数据结构神课，虽在知乎、一亩三分地等处推荐强烈，但实际高质量完成的人数稀少。这要归因于语言和网络的阻碍，机翻字幕味同嚼蜡，YouTube 的访问也劝退了一大批初学者。于是我便有了方向，我决意用自己闲暇的时光，化身一个人的字幕组，翻译出这门课的所有视频资料，并搬运到 B 站。<br><br>这两天，我调研了相关的工具，考虑了一些取舍，这期间实为不易，总结出一套满意的工作流，记录于此。</p>
+<span id="more"></span>
+
+<h1 id="也想成为字幕组"><a href="#也想成为字幕组" class="headerlink" title="也想成为字幕组"></a>也想成为字幕组</h1><p>我不是很懂当代流量的导向，人们到底乐意为怎样的内容驻足，是我很困惑的问题，就像我的 CSDN 最高互动量是一篇很简单的 VMware 安装教程，我的 GitHub 最高 star 数是只进行了几周的 CS61B 课程实验。它们算不上我心目中内容产出最高的两位，却被大众普遍接受，唯一的共同点可能是门槛较低、需求较广。然而，对于这些可能是互联网上占比最大的群体，现有的资源鱼龙混杂，多少内容靠着标题吸引流量，看完后才发现是贩卖焦虑、治标不治本。所以，我想为这种情况的改变做出点贡献。</p>
 <p>我搜索着 CS61B 的国内生态，这门完全公开、享誉世界的数据结构神课，虽在知乎、一亩三分地等处推荐强烈，但实际高质量完成的人数稀少。这要归因于语言和网络的阻碍，机翻字幕味同嚼蜡，YouTube 的访问也劝退了一大批初学者。于是我便有了方向，我决意用自己闲暇的时光，化身一个人的字幕组，翻译出这门课的所有视频资料，并搬运到 B 站。</p>
 <p>这两天，我调研了相关的工具，考虑了一些取舍，这期间实为不易，总结出一套满意的工作流，记录于此。</p>
 <h1 id="工作流"><a href="#工作流" class="headerlink" title="工作流"></a>工作流</h1><h2 id="片源"><a href="#片源" class="headerlink" title="片源"></a>片源</h2><p>视频源在 Josh Hug 的<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vY2hhbm5lbC9VQzdGelRNTzRyS3ZscUl5VTV2d3pGS1EvcGxheWxpc3Rz">播放列表</span>中，他把每周的视频整理成一个列表，下载最高画质我比较喜欢用 <span class="exturl" data-url="aHR0cHM6Ly93d3cueTJtYXRlLmNvbS8=">y2mate</span>，甚至可以提取出音频文件。字幕提取 <span class="exturl" data-url="aHR0cHM6Ly9kb3duc3ViLmNvbS8=">downsub</span> 挺不错的，直接下载 srt 格式，CS61B 2018 Spring 这个版本的视频有自带的 CC 字幕，但是时间轴还是有点奇怪，需要自己调整一下。如果有字幕文件格式转换的需求，我一般使用 <span class="exturl" data-url="aHR0cHM6Ly9nb3RyYW5zY3JpcHQuY29tL3N1YnRpdGxlLWNvbnZlcnRlcg==">subtitle-converter</span>。</p>
@@ -700,8 +712,10 @@
 <p>分别全选所有中英文字幕，设置中英文样式模板，再把字幕以开始时间排序。保存后字幕文件会自动转换为 ass 格式，之后打开会直接链接视频文件并加载字母样式。</p>
 <p><img data-src="/assets/posts/subtitle-group-for-one-person/4.png" alt="image.png"></p>
 <p>虽然这步的名字我起为 “初翻”，但主要目的是生成中文时间轴，并调整样式，为下面的翻译做准备。事实上，简单的句子机翻表现得还不错，但几乎 90% 的句子都需要重新修改，所以在内容翻译上，这步只是一个辅助作用。</p>
-<h2 id="翻译"><a href="#翻译" class="headerlink" title="翻译"></a>翻译</h2><p>终于到了重头戏，这步难点不在工具的使用，而在于翻译。既要考虑遵于原意，又要让语言易懂，不那么生硬。特别是 Josh Hug 口语化严重，很多细节需要格外考量。另外断句也很繁琐，很多时候把一大段文字翻译完，发现会错意，又要重新逐句更改。<br>还有一些细碎的注意事项，全部加起来让工作量成倍增加，也出乎了我的设想。同时背后的专业能力也要跟上，遇到不懂的地方还要去网上查询资料。但不管怎样，还是以质量为主。</p>
-<p>下面是翻译后的译文，可以将这几段轴与上一张图片机翻的作比较，哪一个过分生硬，哪一个一眼就能明白，显而易见。这还是开篇简单的几句话，涉及到专业的内容，机翻与手翻的差异会更加明显。<br><img data-src="/assets/posts/subtitle-group-for-one-person/5.png" alt="image.png"></p>
+<h2 id="翻译"><a href="#翻译" class="headerlink" title="翻译"></a>翻译</h2><p>终于到了重头戏，这步难点不在工具的使用，而在于翻译。既要考虑遵于原意，又要让语言易懂，不那么生硬。特别是 Josh Hug 口语化严重，很多细节需要格外考量。另外断句也很繁琐，很多时候把一大段文字翻译完，发现会错意，又要重新逐句更改。</p>
+<p>还有一些细碎的注意事项，全部加起来让工作量成倍增加，也出乎了我的设想。同时背后的专业能力也要跟上，遇到不懂的地方还要去网上查询资料。但不管怎样，还是以质量为主。</p>
+<p>下面是翻译后的译文，可以将这几段轴与上一张图片机翻的作比较，哪一个过分生硬，哪一个一眼就能明白，显而易见。这还是开篇简单的几句话，涉及到专业的内容，机翻与手翻的差异会更加明显。</p>
+<p><img data-src="/assets/posts/subtitle-group-for-one-person/5.png" alt="image.png"></p>
 <h2 id="审片"><a href="#审片" class="headerlink" title="审片"></a>审片</h2><p>每一小集视频制作完成后，我都需要再整体带 ass 字幕看几遍视频，检查有没有字幕错误、不同步，时间轴是否有重合，错别字，翻译语句是否不通畅等等小问题。我其实不急于压制，也不急于发布，在制作完几个视频后，再回过头来审阅每个视频，保证错误率降到最低。</p>
 <p><img data-src="/assets/posts/subtitle-group-for-one-person/6.png" alt="image.png"></p>
 <h2 id="压制"><a href="#压制" class="headerlink" title="压制"></a>压制</h2><p>压制即将原视频和制作好的字幕整合在一起，并设置码率等配置在保持一定清晰度的前提下大幅度压缩体积。小丸工具箱是很主流的选择，官网的网盘链接失效了，不过 B 站<span class="exturl" data-url="aHR0cHM6Ly9kbC5oZHNsYi5jb20vdmlkZW8tcHJlc3MveGlhb3dhbnRvb2xzcmV2MTk0LnppcA==">创作中心</span>有提供。</p>
