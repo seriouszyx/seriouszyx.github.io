@@ -17,12 +17,12 @@
 
 
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"seriouszyx.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.10.0","exturl":true,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":true,"comments":{"style":"buttons","active":"disqusjs","storage":true,"lazyload":false,"nav":null,"activeClass":"disqusjs"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeIn","post_body":"fadeIn","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"seriouszyx.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.10.1","exturl":true,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":true,"comments":{"style":"buttons","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeIn","post_body":"fadeIn","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="“如何发布 Java 包到 Maven 中央仓库” 讲解了本地将 Java 包发布到 Maven 中央库的全过程。但在开源项目中，一般通过 GitHub 进行代码托管，并在 GitHub 的 Release 中进行发版并写明更新日志，还可能在 README 中添加 Maven 中央库的徽章。这一过程固定又繁琐，本文通过 maven-semantic-release 和 GitHub Actions">
+    <meta name="description" content="“如何发布 Java 包到 Maven 中央仓库” 讲解了本地将 Java 包发布到 Maven 中央库的全过程。但在开源项目中，一般通过 GitHub 进行代码托管，并在 GitHub 的 Release 中进行发版并写明更新日志，还可能在 README 中添加 Maven 中央库的徽章。这一过程固定又繁琐，本文通过 maven-semantic-release 和 GitHub Actions">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用 maven-semantic-release 实现自动化发版">
 <meta property="og:url" content="https://seriouszyx.com/tech/maven-semantic-release/index.html">
@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://img.seriouszyx.com/202110161622009.png#vwid=2560&amp;vhei=1378">
 <meta property="og:image" content="https://img.seriouszyx.com/202110161622266.png#vwid=1960&amp;vhei=1261">
 <meta property="article:published_time" content="2021-10-16T06:41:20.000Z">
-<meta property="article:modified_time" content="2022-03-07T06:27:35.547Z">
+<meta property="article:modified_time" content="2022-03-13T10:21:57.296Z">
 <meta property="article:author" content="seriouszyx">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://img.seriouszyx.com/202110161622009.png#vwid=2560&amp;vhei=1378">
@@ -236,11 +236,16 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/others/avatar.png">
       <meta itemprop="name" content="seriouszyx">
-      <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="隐秀">
+      <meta itemprop="description" content="">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="使用 maven-semantic-release 实现自动化发版 | 隐秀">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -262,7 +267,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-03-07 14:27:35" itemprop="dateModified" datetime="2022-03-07T14:27:35+08:00">2022-03-07</time>
+      <time title="修改时间：2022-03-13 18:21:57" itemprop="dateModified" datetime="2022-03-13T18:21:57+08:00">2022-03-13</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -401,11 +406,7 @@
 
 
 
-    
-  <div class="comments" id="disqus_thread">
-    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
-  </div>
-  
+    <div class="comments utterances-container"></div>
 </div>
   </main>
 
@@ -478,10 +479,8 @@
   <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
   <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://seriouszyx.com/tech/maven-semantic-release/"}</script>
   <script src="/js/third-party/quicklink.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/disqusjs@1.3.0/dist/disqusjs.css" integrity="sha256-GxdCIOyfxQ1OBfS99qAIJDoGK1ADuBsxhMTqXG82fAY=" crossorigin="anonymous">
-
-<script class="next-config" data-name="disqusjs" type="application/json">{"enable":true,"api":"https://disqus.skk.moe/disqus/","apikey":"4WEdSizmLoG5tJsYvtPBNIFgFTHYkNQCG9OFzikxiev79edeoa3BciI4tyeuQkGV","shortname":"seriouszyx","js":{"url":"https://cdn.jsdelivr.net/npm/disqusjs@1.3.0/dist/disqus.js","integrity":"sha256-LVaMHPQ2zLqOc5rXSAfr4d1PIkEGNLyyUTDNPZmTtUw="}}</script>
-<script src="/js/third-party/comments/disqusjs.js"></script>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"seriouszyx/seriouszyx.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
 
 </body>
 </html>
