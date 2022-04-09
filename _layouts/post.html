@@ -1,0 +1,85 @@
+---
+layout: default
+---
+
+<article
+  class="post h-entry"
+  id="post"
+  itemscope
+  itemtype="http://schema.org/BlogPosting"
+>
+  <head>
+    <title>{{ page.title }}</title>
+  </head>
+  <header class="post-header">
+    <div class="post-back">
+      <a class="black-link" href="{{ site.url | relative_url }}">
+        ← {{ site.moving.back_to }}
+      </a>
+    </div>
+
+    <h1 class="post-title p-name" itemprop="name headline">
+      {{ page.title | escape }}
+    </h1>
+    <p class="post-meta">
+      <time
+        class="dt-published"
+        datetime="{{ page.date | date_to_xmlschema }}"
+        itemprop="datePublished"
+      >
+        {%- assign date_format = "%b %-d, %Y" -%} {{ page.date | date:
+        date_format }}
+      </time>
+      {%- if page.author -%} •
+      <span itemprop="author" itemscope itemtype="http://schema.org/Person"
+        ><span class="p-author h-card" itemprop="name"
+          >{{ page.author | escape }}</span
+        ></span
+      >
+      {%- endif -%}
+      <span class="busuanzi_container_page">
+        <span id="busuanzi_container_page_pv">
+          •
+          <span id="busuanzi_value_page_pv"></span> View
+        </span>
+      </span>
+    </p>
+  {%- if page.last_modified_at -%}
+  <div class="ant-alert">
+    {{ "上次更新时间：" | append: page.last_modified_at }}
+  </div>
+    <!-- {{ "```
+上次更新时间：" | append: page.last_modified_at | append: "
+  ```" | markdownify }} -->
+  {%- endif %}
+  </header>
+
+  {% include toc.html html=content %}
+
+  <div class="post-content e-content" itemprop="articleBody">
+    {{ content }}
+  </div>
+
+  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+</article>
+
+<div class="ant-alert mb-0">
+  <ul>
+    <li>版权声明：本文采用<a target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">知识共享 3.0 许可证</a> (<strong>保持署名</strong>-自由转载-非商用-非衍生)</li>
+    <li>
+      {%- assign date_format_line = "%Y-%m-%d" -%}
+      发表于 {{ page.date | date: date_format_line }}{%- if page.last_modified_at -%}，更新于 {{ page.last_modified_at | date: date_format_line }}{%- endif %}
+    </li>
+  </ul>
+  
+</div>
+
+<div class="page-navigation">
+  {% if page.next.url %}
+  <a class="prev" href="{{page.next.url}}">&laquo; 上一篇</a>
+  {% endif %} {% if page.previous.url %}
+  <a class="next" href="{{page.previous.url}}">下一篇 &raquo;</a>
+  {% endif %}
+</div>
+
+{%- include gitalk.html -%}

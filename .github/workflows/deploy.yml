@@ -1,0 +1,35 @@
+name: "deploy"
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  jekyll:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    # Use GitHub Actions' cache to shorten build times and decrease load on servers
+    - uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
+
+    # Standard usage
+    - uses:  helaili/jekyll-action@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Deploy blog to github pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        publish_dir: /github/jekyll_build
+        publish_branch: test
+        external_repository: seriouszyx/seriouszyx.github.io
+        personal_token: ${{ secrets.MY_PERSONAL_TOKEN }}
+        commit_message: build and update blog (by ci)
