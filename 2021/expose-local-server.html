@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.0.1" />
+<meta property="og:title" content="💻【环境搭建】服务器内网穿透" />
+<meta name="author" content="隐秀" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="本科 AI 实验室的服务器在内网部署，疫情期间大家都没办法在学校，又需要使用 GPU 完成一些工作。正好老板又添置了一台服务器，派我做一下内网穿透，方便远程使用。" />
+<meta property="og:description" content="本科 AI 实验室的服务器在内网部署，疫情期间大家都没办法在学校，又需要使用 GPU 完成一些工作。正好老板又添置了一台服务器，派我做一下内网穿透，方便远程使用。" />
+<link rel="canonical" href="https://blog.seriouszyx.com/2021/expose-local-server.html" />
+<meta property="og:url" content="https://blog.seriouszyx.com/2021/expose-local-server.html" />
+<meta property="og:site_name" content="seriouszyx’ Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-02-14T13:40:49+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="💻【环境搭建】服务器内网穿透" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"隐秀"},"dateModified":"2021-02-14T13:40:49+00:00","datePublished":"2021-02-14T13:40:49+00:00","description":"本科 AI 实验室的服务器在内网部署，疫情期间大家都没办法在学校，又需要使用 GPU 完成一些工作。正好老板又添置了一台服务器，派我做一下内网穿透，方便远程使用。","headline":"💻【环境搭建】服务器内网穿透","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.seriouszyx.com/2021/expose-local-server.html"},"url":"https://blog.seriouszyx.com/2021/expose-local-server.html"}</script>
+<!-- End Jekyll SEO tag -->
+<!-- local css -->
+  <link rel="stylesheet" href="https://blog.seriouszyx.com/assets/css/main.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/./favicon.ico" />
+  <link rel="stylesheet" href="https://blog.seriouszyx.com/assets/css/grayscale.css" />
+  <!-- docsearch -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+  <!-- utils -->
+  <link href="https://unpkg.com/tailwindcss@^2/dist/utilities.min.css" rel="stylesheet">
+</head>
+<body>
+    <main class="page-content" aria-label="Content">
+        <div class="wrapper">
+            <article
+  class="post h-entry"
+  id="post"
+  itemscope
+  itemtype="http://schema.org/BlogPosting"
+>
+  <head>
+    <title>💻【环境搭建】服务器内网穿透</title>
+  </head>
+  <header class="post-header">
+    <div class="post-back">
+      <a class="black-link" href="https://blog.seriouszyx.com">
+        ← Home
+      </a>
+    </div>
+
+    <h1 class="post-title p-name" itemprop="name headline">
+      💻【环境搭建】服务器内网穿透
+    </h1>
+    <p class="post-meta">
+      <time
+        class="dt-published"
+        datetime="2021-02-14T13:40:49+00:00"
+        itemprop="datePublished"
+      >Feb 14, 2021
+      </time><span class="busuanzi_container_page">
+        <span id="busuanzi_container_page_pv">
+          •
+          <span id="busuanzi_value_page_pv"></span> View
+        </span>
+      </span>
+    </p>
+  </header>
+
+  
+
+
+
+<ul>
+  <li><a href="#服务器配置">服务器配置</a></li>
+  <li><a href="#内网穿透">内网穿透</a>
+    <ul>
+      <li><a href="#服务端设置">服务端设置</a></li>
+      <li><a href="#客户端配置">客户端配置</a></li>
+    </ul>
+  </li>
+  <li><a href="#服务链架构">服务链架构</a></li>
+</ul>
+
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>本科 AI 实验室的服务器在内网部署，疫情期间大家都没办法在学校，又需要使用 GPU 完成一些工作。正好老板又添置了一台服务器，派我做一下内网穿透，方便远程使用。</p>
+
+<h2 id="服务器配置">服务器配置</h2>
+
+<p>主要想记录一下软件方面的配置，所以怎么安装滑轨、怎么接线这类问题就不赘述了，下面的表格中记录了两台服务器的软硬件配置。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>server1</th>
+      <th>server2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GPU</td>
+      <td>Tesla V100 16G×2</td>
+      <td>Quadro RTX 6000 24G×2</td>
+    </tr>
+    <tr>
+      <td>CPU</td>
+      <td>Intel Xeon Gold 5117 @ 2.00GHz</td>
+      <td>Intel Xeon Gold 6240R @ 2.40GHz</td>
+    </tr>
+    <tr>
+      <td>内存</td>
+      <td>128G</td>
+      <td>128G</td>
+    </tr>
+    <tr>
+      <td>硬盘</td>
+      <td>20TB</td>
+      <td>24TB</td>
+    </tr>
+    <tr>
+      <td>操作系统</td>
+      <td>Ubuntu 18.04 LTS</td>
+      <td>Ubuntu 18.04 LTS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="内网穿透">内网穿透</h2>
+
+<p>上述两台服务器都在学院机房里，此局域网的限制很大，甚至学校提供的 VPN 都无法访问，必须要在学院内部的网络才能访问。当用户在宿舍或者校外，是没有官方提供的代理工具来连接服务器的，所以就需要一台公网服务器做转发，用户通过公网 ip 来访问内网的服务器，这就需要内网穿透技术。</p>
+
+<p>市面上有一些成熟的内网穿透软件，如花生壳、蒲公英等，但免费版本大多有带宽限制，且速度极慢，无法正常使用。然而这些软件底层或多或少都依赖 <a href="https://github.com/fatedier/frp">frp</a>，一款专注于内网穿透的高性能反向代理应用，支持多种协议，可以安全的将内网服务通过公网 ip 节点的中转暴露到公网。</p>
+
+<p>经调研后发现，frp 原生支持端口复用，也就是多个服务通过同一个服务端端口暴露。这样可以使用一台公网服务器同时代理两台内网服务，通过不同外网端口访问不同的内网服务。</p>
+
+<p>frp 的安装包在 <a href="https://github.com/fatedier/frp/releases">GitHub </a>上，值得注意的是，要想使 frp 正常工作，必须在不同服务器上下载相同版本的 frp 包。</p>
+
+<h3 id="服务端设置">服务端设置</h3>
+
+<blockquote>
+  <p>frp 的服务端是进行中转的公网服务器，具有独立的公网 ip。</p>
+</blockquote>
+
+<p>下载解压 frp 包，我一般放置在 <code class="highlighter-rouge">/usr/local/frp/</code> 目录下，编辑服务端配置文件 <code class="highlighter-rouge">frps.ini</code> 。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>common]
+bind_port <span class="o">=</span> 7000
+vhost_http_port <span class="o">=</span> 8899
+</code></pre></div></div>
+
+<p>其中：</p>
+
+<ul>
+  <li>“bind_port”表示用于客户端和服务端连接的端口，这个端口号我们之后在配置客户端的时候要用到。</li>
+  <li>“vhost_http_port”和“vhost_https_port”用于反向代理 HTTP 主机时使用，本文不涉及 HTTP 协议，因而照抄或者删除这条均可。</li>
+</ul>
+
+<p>编辑完成后即可保存，运行服务端应用。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./frps <span class="nt">-c</span> frps.ini
+</code></pre></div></div>
+
+<p>此时的服务端仅运行在前台，如果 <code class="highlighter-rouge">Ctrl+C</code> 停止或者关闭 SSH 窗口后，frps 均会停止运行，因而我们使用 <a href="https://www.runoob.com/linux/linux-comm-nohup.html">nohup 命令</a>将其运行在后台。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">nohup</span> ./frps <span class="nt">-c</span> frps.ini &amp;
+</code></pre></div></div>
+
+<p>至此，服务端即设置完成，你可以关闭SSH窗口了。</p>
+
+<h3 id="客户端配置">客户端配置</h3>
+
+<blockquote>
+  <p>frp 的客户端是真正想要访问的内网服务器。</p>
+</blockquote>
+
+<p>同样下载解压好 frp 软件，注意版本的统一，编辑两台客户端配置文件 <code class="highlighter-rouge">frpc.ini</code>。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>common]
+server_addr <span class="o">=</span> 39.106.21.214
+server_port <span class="o">=</span> 7000
+ 
+<span class="o">[</span>ssh]
+<span class="nb">type</span> <span class="o">=</span> tcp
+local_ip <span class="o">=</span> 172.10.1.185
+local_port <span class="o">=</span> 22
+remote_port <span class="o">=</span> 6666
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>common]
+server_addr <span class="o">=</span> 39.106.21.214
+server_port <span class="o">=</span> 7000
+
+<span class="o">[</span>ssh1]
+<span class="nb">type</span> <span class="o">=</span> tcp
+local_ip <span class="o">=</span> 172.10.1.184
+local_port <span class="o">=</span> 22
+remote_port <span class="o">=</span> 6667
+</code></pre></div></div>
+
+<p>其中：</p>
+
+<ul>
+  <li>“server_addr”为服务端 ip 地址，填入即可。</li>
+  <li>“server_port”为服务器端口，填入你设置的端口号即可，如果未改变就是7000。</li>
+  <li>“[xxx]”表示一个规则名称，自己定义，便于查询即可。</li>
+  <li>“type”表示转发的协议类型，有 TCP 和 UDP 等选项可以选择，如有需要请自行查询 frp 手册。</li>
+  <li>“local_port”是本地应用的端口号，按照实际应用工作在本机的端口号填写即可。</li>
+  <li>“remote_port”是该条规则在服务端开放的端口号，自己填写并记录即可。</li>
+</ul>
+
+<p>配置好后可以使用同样的方法后台运行客户端程序。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">nohup</span> ./frpc <span class="nt">-c</span> frpc.ini &amp;
+</code></pre></div></div>
+
+<h2 id="服务链架构">服务链架构</h2>
+
+<p>下面是整个 frp 服务链的架构（图中 ip 及端口号皆为模拟值）：</p>
+
+<p><img src="/assets/posts/expose-local-server/image.png" alt="frp 架构" /></p>
+
+<p>实线代表直接网络连接，虚线代表虚拟网络连接。在内网服务器（frpc）中配置的 <code class="highlighter-rouge">remote_port</code> 将在启动后向公网服务器（frps）发送（通过7000端口）注册信息，发送成功后，公网服务器开始监听6666和6667两个端口。</p>
+
+<p>在实际访问时，直接在 SSH 客户端输入公网服务器的 ip 地址，通过6666和6667两个端口号控制访问两台内网服务器，而其中的 <code class="highlighter-rouge">server_port</code> 、 <code class="highlighter-rouge">server_addr</code> 、 <code class="highlighter-rouge">local_ip</code> 和 <code class="highlighter-rouge">local_port</code> 等信息对用户透明，简单方便。</p>
+
+<blockquote>
+  <p>参考：</p>
+  <ul>
+    <li><a href="https://sspai.com/post/52523">使用frp进行内网穿透</a></li>
+    <li><a href="https://github.com/fatedier/frp/issues/174">frp issues 174</a></li>
+  </ul>
+</blockquote>
+
+  </div>
+
+  <a class="u-url" href="/2021/expose-local-server.html" hidden></a>
+</article>
+
+<div class="ant-alert mb-0">
+  <ul>
+    <li>版权声明：本文采用<a target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">知识共享 3.0 许可证</a> (<strong>保持署名</strong>-自由转载-非商用-非衍生)</li>
+    <li>发表于 2021-02-14
+    </li>
+  </ul>
+  
+</div>
+
+<div class="page-navigation">
+  
+  <a class="prev" href="/2021/vmware-download-and-install.html">&laquo; 上一篇</a>
+   
+  <a class="next" href="/2021/subtitle-group-for-one-person.html">下一篇 &raquo;</a>
+  
+</div><div id="gitalk-container">
+</div>
+<script>
+    var gitalk = new Gitalk({
+        clientID: '',
+        clientSecret: '',
+        repo: 'blog',
+        owner: 'imageslr',
+        admin: ['imageslr'],
+        id: md5(location.pathname),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false,  // Facebook-like distraction free mode
+        createIssueManually: true,
+        pagerDirection: "first",
+        perPage: 25,
+    })
+    gitalk.render('gitalk-container')
+</script>
+        </div>
+    </main><footer class="site-footer h-card">
+    <data class="u-url" href="/"></data>
+    <div class="wrapper">
+      <div class="footer-col-wrapper">
+        <div class="footer-col">
+          <ul class="contact-list">
+            <li class="p-name"><a class="black-link" href="https://blog.seriouszyx.com/about.html">
+                  隐秀 
+                </a></li><li>
+              <a class="u-email black-link" href="mailto:seriouszyx@gmail.com">seriouszyx@gmail.com</a></li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="text-center">
+      <a class="text-gray-300 text-sm" href="https://beian.miit.gov.cn">辽ICP备19014015号</a>
+    </div>
+  </footer>
+
+  <!-- highlight js -->
+  <script src="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-chtml.js"></script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } });
+  </script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        processEscapes: true
+      }
+    });
+  </script><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><!-- gitalk --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+  <script src="/assets/js/md5.min.js"></script><!-- viewerjs -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/viewerjs@1.10.4/dist/viewer.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/viewerjs@1.10.4/dist/viewer.min.js"></script>
+  <script>
+    var el = document.getElementById('post');
+    if (el) new Viewer(el);
+  </script>
+
+  
+  <!-- google analytics --><link type="application/atom+xml" rel="alternate" href="https://blog.seriouszyx.com/feed.xml" title="seriouszyx' Blog" /><script>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script></body>
+</html>

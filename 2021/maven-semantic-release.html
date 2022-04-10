@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.0.1" />
+<meta property="og:title" content="🪜【CI/CD】使用 maven-semantic-release 自动化发版" />
+<meta name="author" content="隐秀" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="前言" />
+<meta property="og:description" content="前言" />
+<link rel="canonical" href="https://blog.seriouszyx.com/2021/maven-semantic-release.html" />
+<meta property="og:url" content="https://blog.seriouszyx.com/2021/maven-semantic-release.html" />
+<meta property="og:site_name" content="seriouszyx’ Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-10-16T14:41:20+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="🪜【CI/CD】使用 maven-semantic-release 自动化发版" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"隐秀"},"dateModified":"2021-10-16T14:41:20+00:00","datePublished":"2021-10-16T14:41:20+00:00","description":"前言","headline":"🪜【CI/CD】使用 maven-semantic-release 自动化发版","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.seriouszyx.com/2021/maven-semantic-release.html"},"url":"https://blog.seriouszyx.com/2021/maven-semantic-release.html"}</script>
+<!-- End Jekyll SEO tag -->
+<!-- local css -->
+  <link rel="stylesheet" href="https://blog.seriouszyx.com/assets/css/main.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/./favicon.ico" />
+  <link rel="stylesheet" href="https://blog.seriouszyx.com/assets/css/grayscale.css" />
+  <!-- docsearch -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+  <!-- utils -->
+  <link href="https://unpkg.com/tailwindcss@^2/dist/utilities.min.css" rel="stylesheet">
+</head>
+<body>
+    <main class="page-content" aria-label="Content">
+        <div class="wrapper">
+            <article
+  class="post h-entry"
+  id="post"
+  itemscope
+  itemtype="http://schema.org/BlogPosting"
+>
+  <head>
+    <title>🪜【CI/CD】使用 maven-semantic-release 自动化发版</title>
+  </head>
+  <header class="post-header">
+    <div class="post-back">
+      <a class="black-link" href="https://blog.seriouszyx.com">
+        ← Home
+      </a>
+    </div>
+
+    <h1 class="post-title p-name" itemprop="name headline">
+      🪜【CI/CD】使用 maven-semantic-release 自动化发版
+    </h1>
+    <p class="post-meta">
+      <time
+        class="dt-published"
+        datetime="2021-10-16T14:41:20+00:00"
+        itemprop="datePublished"
+      >Oct 16, 2021
+      </time><span class="busuanzi_container_page">
+        <span id="busuanzi_container_page_pv">
+          •
+          <span id="busuanzi_value_page_pv"></span> View
+        </span>
+      </span>
+    </p>
+  </header>
+
+  
+
+
+
+<ul>
+  <li><a href="#前言">前言</a></li>
+  <li><a href="#github-actions">GitHub Actions</a></li>
+  <li><a href="#maven-semantic-release">maven-semantic-release</a></li>
+</ul>
+
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="前言">前言</h2>
+
+<p><a href="/2021/publish-to-maven.html">“如何发布 Java 包到 Maven 中央仓库”</a> 讲解了本地将 Java 包发布到 Maven 中央库的全过程。但在开源项目中，一般通过 GitHub 进行代码托管，并在 GitHub 的 Release 中进行发版并写明更新日志，还可能在 README 中添加 Maven 中央库的徽章。这一过程固定又繁琐，本文通过 maven-semantic-release 和 GitHub Actions 进行自动化操作，完成上述的整套流程。</p>
+
+<p>演示仓库位于 <a href="https://github.com/seriouszyx/maven-release-example">https://github.com/seriouszyx/maven-release-example</a>。</p>
+
+<h2 id="github-actions">GitHub Actions</h2>
+
+<p>GitHub 提供了一个 Maven 工作流的<a href="https://github.com/actions/starter-workflows/blob/main/ci/maven.yml">模板</a>，在项目根目录创建 <code class="highlighter-rouge">.github/workflows/maven-ci.yml</code> 文件，添加工作流的配置文件。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Java CI</span>
+
+<span class="na">on</span><span class="pi">:</span>
+  <span class="na">push</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">master</span><span class="pi">]</span>
+  <span class="na">pull_request</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">master</span><span class="pi">]</span>
+
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">build</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Checkout</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Set up JDK </span><span class="m">1.8</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/setup-java@v1</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">java-version</span><span class="pi">:</span> <span class="m">1.8</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Build with Maven</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">mvn clean test</span>
+</code></pre></div></div>
+
+<p>工作流执行了下面几步。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">checkout</code> 将存储库的副本下载到运行的服务器上</li>
+  <li><code class="highlighter-rouge">setup-java</code> 配置了 JDK11</li>
+  <li><code class="highlighter-rouge">Build with Maven</code> 进行构建和测试</li>
+</ul>
+
+<p>为 <code class="highlighter-rouge">maven-gpg-plugin</code> 添加 configuration，用于 GPG 非交互式密码输入。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>maven-gpg-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.5<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;id&gt;</span>sign-artifacts<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;phase&gt;</span>verify<span class="nt">&lt;/phase&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>sign<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;configuration&gt;</span>
+        <span class="c">&lt;!-- Prevent gpg from using pinentry programs --&gt;</span>
+        <span class="nt">&lt;gpgArguments&gt;</span>
+            <span class="nt">&lt;arg&gt;</span>--pinentry-mode<span class="nt">&lt;/arg&gt;</span>
+            <span class="nt">&lt;arg&gt;</span>loopback<span class="nt">&lt;/arg&gt;</span>
+        <span class="nt">&lt;/gpgArguments&gt;</span>
+    <span class="nt">&lt;/configuration&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</code></pre></div></div>
+
+<h2 id="maven-semantic-release">maven-semantic-release</h2>
+
+<p><a href="https://semantic-release.gitbook.io/semantic-release/">semantic-release</a> 会根据规范化的 commit 信息生成发布日志，默认使用 angular 规则，其他规则可以配置插件完成。</p>
+
+<p>semantic-release 大致的工作流如下:</p>
+
+<ul>
+  <li>提交到特定的分支触发 release 流程</li>
+  <li>验证 commit 信息，生成 release note，打 git tag</li>
+  <li>其他后续流程，如生成 <code class="highlighter-rouge">CHANGELOG.md</code>，<code class="highlighter-rouge">npm publish</code> 等等（通过插件完成）</li>
+</ul>
+
+<p><a href="https://github.com/conveyal/maven-semantic-release">maven-semantic-release</a> 是官方文档列出的针对 Maven 的第三方工具，它将部署一个 Maven 项目到 Maven 中央库，而 semantic-release 则是部署一个 node.js 项目到 npm。</p>
+
+<p>前文中 JIRA 和 GPG 的配置信息全都存放在本地，可以将其配置在 GitHub Secrets 中，以供 GitHub Actions 自动构建过程中使用。</p>
+
+<p>需要提前准备好的是 JIRA 的用户名（OSSRH_JIRA_USERNAME）和密码（OSSRH_JIRA_PASSWORD），GPG 的 key 名（GPG_KEY_NAME）、私钥（GPG_PRIVATE_KEY）和生成键值对时输入的密码（GPG_PASSPHRASE）。</p>
+
+<p>其中，GPG 的 key 名可以通过以下命令获得，我的是 <code class="highlighter-rouge">89985FBD3651A87B</code> 。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C:<span class="se">\U</span>sers<span class="se">\Y</span>ixiang Zhao&gt;gpg <span class="nt">--list-secret-keys</span> <span class="nt">--keyid-format</span> LONG
+C:/Users/Yixiang Zhao/AppData/Roaming/gnupg/pubring.kbx
+<span class="nt">-------------------------------------------------------</span>
+sec   rsa3072/89985FBD3651A87B 2021-10-14 <span class="o">[</span>SC] <span class="o">[</span>expires: 2023-10-14]
+      444D548E4E29746B4E2C89FC89985FBD3651A87B
+uid                 <span class="o">[</span>ultimate] Yixiang Zhao &lt;seriouszyx@gmail.com&gt;
+ssb   rsa3072/1613CEA56E822D62 2021-10-14 <span class="o">[</span>E] <span class="o">[</span>expires: 2023-10-14]
+</code></pre></div></div>
+
+<p>GPG 的私钥可以通过 <code class="highlighter-rouge">gpg --armo --export-secret-keys 89985FBD3651A87B</code> 命令获得，最后的参数是 key 名。注意私钥是从 <code class="highlighter-rouge">-----BEGIN PGP PRIVATE KEY BLOCK-----</code> 一直到 <code class="highlighter-rouge">-----END PGP PRIVATE KEY BLOCK-----</code>，而不是仅仅是中间这一段文本。</p>
+
+<p>将这些配置信息添加到 Settings-&gt;Secrets-&gt;Repository secrets 中。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161622009.png#vwid=2560&amp;vhei=1378" alt="" /></p>
+
+<p>补充 <code class="highlighter-rouge">maven-ci.yml</code> 文件，添加 maven-semantic-release 配置。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Java CI</span>
+
+<span class="na">on</span><span class="pi">:</span>
+  <span class="na">push</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">master</span><span class="pi">]</span>
+  <span class="na">pull_request</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">master</span><span class="pi">]</span>
+
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">build</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Checkout</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Set up JDK </span><span class="m">1.8</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/setup-java@v1</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">java-version</span><span class="pi">:</span> <span class="m">1.8</span>
+          <span class="na">server-username</span><span class="pi">:</span> <span class="s">OSSRH_JIRA_USERNAME</span>
+          <span class="na">server-password</span><span class="pi">:</span> <span class="s">OSSRH_JIRA_PASSWORD</span>
+          <span class="na">gpg-private-key</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">gpg-passphrase</span><span class="pi">:</span> <span class="s">GPG_PASSPHRASE</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Build with Maven</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">mvn clean test</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Set up Node.js</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/setup-node@v2</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">node-version</span><span class="pi">:</span> <span class="m">16</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Sematic Release</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">npm install -g @conveyal/maven-semantic-release semantic-release</span>
+          <span class="s">semantic-release --prepare @conveyal/maven-semantic-release --publish @semantic-release/github,@conveyal/maven-semantic-release --verify-conditions @semantic-release/github,@conveyal/maven-semantic-release --verify-release @conveyal/maven-semantic-release</span>
+        <span class="na">env</span><span class="pi">:</span>
+          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">GPG_KEY_NAME</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">GPG_PASSPHRASE</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">OSSRH_JIRA_USERNAME</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">OSSRH_JIRA_PASSWORD</span><span class="pi">:</span> <span class="s">$</span>
+
+</code></pre></div></div>
+
+<p>前文在本地 maven 的 <code class="highlighter-rouge">settings.xml</code> 文件中配置的信息，转移到项目根目录下的 <code class="highlighter-rouge">maven-settings.xml</code> 中。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;settings&gt;</span>
+    <span class="nt">&lt;servers&gt;</span>
+        <span class="nt">&lt;server&gt;</span>
+            <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;username&gt;</span>${OSSRH_JIRA_USERNAME}<span class="nt">&lt;/username&gt;</span>
+            <span class="nt">&lt;password&gt;</span>${OSSRH_JIRA_PASSWORD}<span class="nt">&lt;/password&gt;</span>
+        <span class="nt">&lt;/server&gt;</span>
+    <span class="nt">&lt;/servers&gt;</span>
+    <span class="nt">&lt;profiles&gt;</span>
+        <span class="nt">&lt;profile&gt;</span>
+            <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;activation&gt;</span>
+                <span class="nt">&lt;activeByDefault&gt;</span>true<span class="nt">&lt;/activeByDefault&gt;</span>
+            <span class="nt">&lt;/activation&gt;</span>
+            <span class="nt">&lt;properties&gt;</span>
+                <span class="nt">&lt;gpg.executable&gt;</span>gpg<span class="nt">&lt;/gpg.executable&gt;</span>
+                <span class="nt">&lt;gpg.keyname&gt;</span>${GPG_KEY_NAME}<span class="nt">&lt;/gpg.keyname&gt;</span>
+                <span class="nt">&lt;gpg.passphrase&gt;</span>${GPG_PASSPHRASE}<span class="nt">&lt;/gpg.passphrase&gt;</span>
+            <span class="nt">&lt;/properties&gt;</span>
+        <span class="nt">&lt;/profile&gt;</span>
+    <span class="nt">&lt;/profiles&gt;</span>
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre></div></div>
+
+<p>配置好后，每次 push 或 pull request 到 master 分支时，都会出发 GitHub Actions 自动化构建、测试，并通过 maven-semantic-release 将 jar 上传到 Maven 中央库，并在项目的 GitHub Release 中自动生成更新日志。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161622266.png#vwid=1960&amp;vhei=1261" alt="" /></p>
+
+<hr />
+
+<ol>
+  <li><a href="https://semantic-release.gitbook.io/semantic-release/">semantic-release</a></li>
+  <li><a href="https://juejin.cn/post/6892965219791093773">通过 GitHub Action 自动部署 Maven 项目</a></li>
+  <li><a href="https://blog.dteam.top/posts/2020-05/semantic-release.html">团队敏捷实践 —— 使用 semantic-release 自动管理发布版本</a></li>
+</ol>
+
+  </div>
+
+  <a class="u-url" href="/2021/maven-semantic-release.html" hidden></a>
+</article>
+
+<div class="ant-alert mb-0">
+  <ul>
+    <li>版权声明：本文采用<a target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">知识共享 3.0 许可证</a> (<strong>保持署名</strong>-自由转载-非商用-非衍生)</li>
+    <li>发表于 2021-10-16
+    </li>
+  </ul>
+  
+</div>
+
+<div class="page-navigation">
+   
+  <a class="next" href="/2021/publish-to-maven.html">下一篇 &raquo;</a>
+  
+</div><div id="gitalk-container">
+</div>
+<script>
+    var gitalk = new Gitalk({
+        clientID: '',
+        clientSecret: '',
+        repo: 'blog',
+        owner: 'imageslr',
+        admin: ['imageslr'],
+        id: md5(location.pathname),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false,  // Facebook-like distraction free mode
+        createIssueManually: true,
+        pagerDirection: "first",
+        perPage: 25,
+    })
+    gitalk.render('gitalk-container')
+</script>
+        </div>
+    </main><footer class="site-footer h-card">
+    <data class="u-url" href="/"></data>
+    <div class="wrapper">
+      <div class="footer-col-wrapper">
+        <div class="footer-col">
+          <ul class="contact-list">
+            <li class="p-name"><a class="black-link" href="https://blog.seriouszyx.com/about.html">
+                  隐秀 
+                </a></li><li>
+              <a class="u-email black-link" href="mailto:seriouszyx@gmail.com">seriouszyx@gmail.com</a></li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="text-center">
+      <a class="text-gray-300 text-sm" href="https://beian.miit.gov.cn">辽ICP备19014015号</a>
+    </div>
+  </footer>
+
+  <!-- highlight js -->
+  <script src="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-chtml.js"></script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } });
+  </script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        processEscapes: true
+      }
+    });
+  </script><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><!-- gitalk --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+  <script src="/assets/js/md5.min.js"></script><!-- viewerjs -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/viewerjs@1.10.4/dist/viewer.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/viewerjs@1.10.4/dist/viewer.min.js"></script>
+  <script>
+    var el = document.getElementById('post');
+    if (el) new Viewer(el);
+  </script>
+
+  
+  <!-- google analytics --><link type="application/atom+xml" rel="alternate" href="https://blog.seriouszyx.com/feed.xml" title="seriouszyx' Blog" /><script>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script></body>
+</html>

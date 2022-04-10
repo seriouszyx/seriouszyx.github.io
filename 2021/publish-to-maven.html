@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.0.1" />
+<meta property="og:title" content="🪜【CI/CD】如何发布 Java 包到 Maven 中央仓库" />
+<meta name="author" content="隐秀" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="前言" />
+<meta property="og:description" content="前言" />
+<link rel="canonical" href="https://blog.seriouszyx.com/2021/publish-to-maven.html" />
+<meta property="og:url" content="https://blog.seriouszyx.com/2021/publish-to-maven.html" />
+<meta property="og:site_name" content="seriouszyx’ Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-10-16T14:39:08+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="🪜【CI/CD】如何发布 Java 包到 Maven 中央仓库" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"隐秀"},"dateModified":"2021-10-16T14:39:08+00:00","datePublished":"2021-10-16T14:39:08+00:00","description":"前言","headline":"🪜【CI/CD】如何发布 Java 包到 Maven 中央仓库","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.seriouszyx.com/2021/publish-to-maven.html"},"url":"https://blog.seriouszyx.com/2021/publish-to-maven.html"}</script>
+<!-- End Jekyll SEO tag -->
+<!-- local css -->
+  <link rel="stylesheet" href="https://blog.seriouszyx.com/assets/css/main.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/./favicon.ico" />
+  <link rel="stylesheet" href="https://blog.seriouszyx.com/assets/css/grayscale.css" />
+  <!-- docsearch -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+  <!-- utils -->
+  <link href="https://unpkg.com/tailwindcss@^2/dist/utilities.min.css" rel="stylesheet">
+</head>
+<body>
+    <main class="page-content" aria-label="Content">
+        <div class="wrapper">
+            <article
+  class="post h-entry"
+  id="post"
+  itemscope
+  itemtype="http://schema.org/BlogPosting"
+>
+  <head>
+    <title>🪜【CI/CD】如何发布 Java 包到 Maven 中央仓库</title>
+  </head>
+  <header class="post-header">
+    <div class="post-back">
+      <a class="black-link" href="https://blog.seriouszyx.com">
+        ← Home
+      </a>
+    </div>
+
+    <h1 class="post-title p-name" itemprop="name headline">
+      🪜【CI/CD】如何发布 Java 包到 Maven 中央仓库
+    </h1>
+    <p class="post-meta">
+      <time
+        class="dt-published"
+        datetime="2021-10-16T14:39:08+00:00"
+        itemprop="datePublished"
+      >Oct 16, 2021
+      </time><span class="busuanzi_container_page">
+        <span id="busuanzi_container_page_pv">
+          •
+          <span id="busuanzi_value_page_pv"></span> View
+        </span>
+      </span>
+    </p>
+  </header>
+
+  
+
+
+
+<ul>
+  <li><a href="#前言">前言</a></li>
+  <li><a href="#准备工作">准备工作</a>
+    <ul>
+      <li><a href="#coordinates">Coordinates</a></li>
+      <li><a href="#gpg">GPG</a></li>
+    </ul>
+  </li>
+  <li><a href="#在-sonatype-创建-issue">在 Sonatype 创建 Issue</a></li>
+  <li><a href="#配置发布信息">配置发布信息</a>
+    <ul>
+      <li><a href="#分发管理和认证">分发管理和认证</a></li>
+      <li><a href="#javadoc-和源代码">Javadoc 和源代码</a></li>
+      <li><a href="#gpg-签名组件">GPG 签名组件</a></li>
+    </ul>
+  </li>
+  <li><a href="#发布">发布</a></li>
+</ul>
+
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="前言">前言</h2>
+
+<p>最近参与一些开源项目，涉及到发版相关的问题，没有看到详细又不过时的教程，于是自己调研摸索，总结出了这篇文章。</p>
+
+<p>本文主要参考<a href="https://central.sonatype.org/publish/">官方文档</a>进行编写，演示仓库位于 <a href="https://github.com/seriouszyx/maven-release-example">https://github.com/seriouszyx/maven-release-example</a>。</p>
+
+<h2 id="准备工作">准备工作</h2>
+
+<h3 id="coordinates">Coordinates</h3>
+
+<p>Maven 用 <strong>groupid</strong> 来标识项目空间，用域名逆序的方式命名。下面是两种命名的例子，如果有自己的域名，直接使用就可以；如果没有，可以使用 github 等代码托管服务的域名。</p>
+
+<ul>
+  <li>www.seriouszyx.com -&gt; com.seriouszyx</li>
+  <li>github.com/seriouszyx -&gt; io.github.seriouszyx</li>
+</ul>
+
+<p>下面是支持个人 groupid 的代码托管服务，假设使用 <code class="highlighter-rouge">io.github.myusername</code> ，需要创建一个名为 <strong>OSSRH-TICKETNUMBER</strong> 的公开仓库进行验证（验证成功后可删除）。如果使用自己的域名，也需要添加 TXT 解析，稍后会提到。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>服务</th>
+      <th>groupid</th>
+      <th>相关文档</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GitHub</td>
+      <td>io.github.myusername</td>
+      <td><a href="https://pages.github.com/">https://pages.github.com/</a><br /></td>
+    </tr>
+    <tr>
+      <td>GitLab</td>
+      <td>io.gitlab.myusername</td>
+      <td><a href="https://about.gitlab.com/stages-devops-lifecycle/pages/">https://about.gitlab.com/stages-devops-lifecycle/pages/</a></td>
+    </tr>
+    <tr>
+      <td>Gitee</td>
+      <td>io.gitee.myusername</td>
+      <td><a href="https://gitee.com/help/articles/4136">https://gitee.com/help/articles/4136</a></td>
+    </tr>
+    <tr>
+      <td>Bitbucket</td>
+      <td>io.bitbucket.myusername</td>
+      <td><a href="https://support.atlassian.com/bitbucket-cloud/docs/publishing-a-website-on-bitbucket-cloud/">https://support.atlassian.com/bitbucket-cloud/docs/publishing-a-website-on-bitbucket-cloud/</a></td>
+    </tr>
+    <tr>
+      <td>SourceForge</td>
+      <td>io.sourceforge.myusername</td>
+      <td><a href="https://sourceforge.net/p/forge/documentation/Project%20Web%20Services/">https://sourceforge.net/p/forge/documentation/Project%20Web%20Services/</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>artifactId</strong> 用来标识项目本身，如果项目命名很长，可以使用“-”来进行分隔。</p>
+
+<h3 id="gpg">GPG</h3>
+
+<p>将组件发布到 Maven 中央仓库需要使用 <strong>PGP</strong> 进行签名，GnuPG （又称 GPG） 都是 OpenPGP 的实现，需要先创建你自己的键值对，再上传到服务器以供验证。</p>
+
+<p>从 <a href="https://gnupg.org/download/index.html#sec-1-2">https//www.gnupg.org/download/</a> 下载安装，使用 <code class="highlighter-rouge">--version</code> 标志检查。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gpg <span class="nt">--version</span>
+gpg <span class="o">(</span>GnuPG<span class="o">)</span> 2.2.28
+libgcrypt 1.8.8
+Copyright <span class="o">(</span>C<span class="o">)</span> 2021 g10 Code GmbH
+License GNU GPL-3.0-or-later &lt;https://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Home: C:/Users/Yixiang Zhao/AppData/Roaming/gnupg
+Supported algorithms:
+Pubkey: RSA, ELG, DSA, ECDH, ECDSA, EDDSA
+Cipher: IDEA, 3DES, CAST5, BLOWFISH, AES, AES192, AES256, TWOFISH,
+        CAMELLIA128, CAMELLIA192, CAMELLIA256
+Hash: SHA1, RIPEMD160, SHA256, SHA384, SHA512, SHA224
+Compression: Uncompressed, ZIP, ZLIB, BZIP2
+</code></pre></div></div>
+
+<p>安装成功后产生键值对，过程中需要填写姓名、邮箱和密码，密钥有效期为 2 年，到时候需要使用密码延长有效期，可以看到我的公钥 id 是 <code class="highlighter-rouge">444D548E4E29746B4E2C89FC89985FBD3651A87B</code> 。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gpg <span class="nt">--gen-key</span>
+gpg <span class="o">(</span>GnuPG<span class="o">)</span> 2.2.28<span class="p">;</span> Copyright <span class="o">(</span>C<span class="o">)</span> 2021 g10 Code GmbH
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Note: Use <span class="s2">"gpg --full-generate-key"</span> <span class="k">for </span>a full featured key generation dialog.
+
+GnuPG needs to construct a user ID to identify your key.
+
+Real name: Yixiang Zhao
+Email address: seriouszyx@gmail.com
+You selected this USER-ID:
+    <span class="s2">"Yixiang Zhao &lt;seriouszyx@gmail.com&gt;"</span>
+
+Change <span class="o">(</span>N<span class="o">)</span>ame, <span class="o">(</span>E<span class="o">)</span>mail, or <span class="o">(</span>O<span class="o">)</span>kay/<span class="o">(</span>Q<span class="o">)</span>uit? O
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action <span class="o">(</span><span class="nb">type </span>on the keyboard, move the mouse, utilize the
+disks<span class="o">)</span> during the prime generation<span class="p">;</span> this gives the random number
+generator a better chance to gain enough entropy.
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action <span class="o">(</span><span class="nb">type </span>on the keyboard, move the mouse, utilize the
+disks<span class="o">)</span> during the prime generation<span class="p">;</span> this gives the random number
+generator a better chance to gain enough entropy.
+gpg: key 89985FBD3651A87B marked as ultimately trusted
+gpg: directory <span class="s1">'C:/Users/Yixiang Zhao/AppData/Roaming/gnupg/openpgp-revocs.d'</span> created
+gpg: revocation certificate stored as <span class="s1">'C:/Users/Yixiang Zhao/AppData/Roaming/gnupg/openpgp-revocs.d\444D548E4E29746B4E2C89FC89985FBD3651A87B.rev'</span>
+public and secret key created and signed.
+
+pub   rsa3072 2021-10-14 <span class="o">[</span>SC] <span class="o">[</span>expires: 2023-10-14]
+      444D548E4E29746B4E2C89FC89985FBD3651A87B
+uid                      Yixiang Zhao &lt;seriouszyx@gmail.com&gt;
+sub   rsa3072 2021-10-14 <span class="o">[</span>E] <span class="o">[</span>expires: 2023-10-14]
+</code></pre></div></div>
+
+<p>后续步骤需要通过你的公钥来进行验证，所以把它上传到服务器中，注意 <code class="highlighter-rouge">--send-keys</code> 后面是你自己的公钥。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gpg <span class="nt">--keyserver</span> keyserver.ubuntu.com <span class="nt">--send-keys</span> 444D548E4E29746B4E2C89FC89985FBD3651A87B
+gpg: sending key 89985FBD3651A87B to hkp://keyserver.ubuntu.com
+</code></pre></div></div>
+
+<p>等大概十几分钟，验证公钥是否发布成功。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gpg <span class="nt">--keyserver</span> keyserver.ubuntu.com <span class="nt">--recv-keys</span> 444D548E4E29746B4E2C89FC89985FBD3651A87B
+gpg: key 89985FBD3651A87B: <span class="s2">"Yixiang Zhao &lt;seriouszyx@gmail.com&gt;"</span> not changed
+gpg: Total number processed: 1
+gpg:              unchanged: 1
+</code></pre></div></div>
+
+<h2 id="在-sonatype-创建-issue">在 Sonatype 创建 Issue</h2>
+
+<p>开发者要想将组件发布至 Maven 中央仓库，需要借助于 Sonatype 的开源软件存储库托管（Open Source Software Repository Hosting, OSSRH）服务。Sonatype 使用 JIRA 来管理请求，所以需要先<a href="https://issues.sonatype.org/secure/Signup!default.jspa">注册账号</a>。</p>
+
+<p>注册好之后，就可以<a href="https://issues.sonatype.org/secure/CreateIssue.jspa?issuetype=21&amp;pid=10134">创建一个新的 Issue</a>（文档中又称 Project ticket），可以参考我创建的测试 Issue <a href="https://issues.sonatype.org/browse/OSSRH-74121">OSSRH-74121</a>。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161035158.png#vwid=1949&amp;vhei=895" alt="" /></p>
+
+<p>这时需要进行人工审核，将分配的编号 <code class="highlighter-rouge">OSSRH-74121</code> 添加到域名的 TXT 解析，或者在 GitHub 等托管服务中创建一个名为 <code class="highlighter-rouge">OSSRH-74121</code> 的公开库。我等了大概一两个小时，就通过了审核，Status 变成了 <code class="highlighter-rouge">RESOLVED</code> 。</p>
+
+<h2 id="配置发布信息">配置发布信息</h2>
+
+<p>本文使用 Maven 为例发布自己的 Java 包，如果使用 Gradle、Ant 等工具，可以参照官方文档。</p>
+
+<h3 id="分发管理和认证">分发管理和认证</h3>
+
+<p>在 <code class="highlighter-rouge">pom.xml</code> 中添加以下配置，使得可以使用 Nexus Staging Maven plugin 插件向 OSSRH Nexus Repository Manager 发布。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;distributionManagement&gt;</span>
+  <span class="nt">&lt;snapshotRepository&gt;</span>
+    <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+    <span class="nt">&lt;url&gt;</span>https://s01.oss.sonatype.org/content/repositories/snapshots<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;/snapshotRepository&gt;</span>
+  <span class="nt">&lt;repository&gt;</span>
+    <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+    <span class="nt">&lt;url&gt;</span>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;/repository&gt;</span>
+<span class="nt">&lt;/distributionManagement&gt;</span>
+<span class="nt">&lt;build&gt;</span>
+  <span class="nt">&lt;plugins&gt;</span>
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.sonatype.plugins<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>nexus-staging-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>1.6.8<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;extensions&gt;</span>true<span class="nt">&lt;/extensions&gt;</span>
+      <span class="nt">&lt;configuration&gt;</span>
+        <span class="nt">&lt;serverId&gt;</span>ossrh<span class="nt">&lt;/serverId&gt;</span>
+        <span class="nt">&lt;nexusUrl&gt;</span>https://s01.oss.sonatype.org/<span class="nt">&lt;/nexusUrl&gt;</span>
+        <span class="nt">&lt;autoReleaseAfterClose&gt;</span>true<span class="nt">&lt;/autoReleaseAfterClose&gt;</span>
+      <span class="nt">&lt;/configuration&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+    ...
+  <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</code></pre></div></div>
+
+<p>下面是发布所需的 JIRA 账户信息，写入到 Maven 的 <code class="highlighter-rouge">setting.xml</code> 文件中（通常位于 <code class="highlighter-rouge">~/.m2</code>）。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;settings&gt;</span>
+  <span class="nt">&lt;servers&gt;</span>
+    <span class="nt">&lt;server&gt;</span>
+      <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+      <span class="nt">&lt;username&gt;</span>your-jira-id<span class="nt">&lt;/username&gt;</span>
+      <span class="nt">&lt;password&gt;</span>your-jira-pwd<span class="nt">&lt;/password&gt;</span>
+    <span class="nt">&lt;/server&gt;</span>
+  <span class="nt">&lt;/servers&gt;</span>
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre></div></div>
+
+<p>注意这里的 id 和 <code class="highlighter-rouge">snapshotRepository</code> /<code class="highlighter-rouge">repository</code> 中的 id，以及 <code class="highlighter-rouge">plugin</code> 中的 id 都是相同的，都为 <strong>ossrh</strong>。</p>
+
+<h3 id="javadoc-和源代码">Javadoc 和源代码</h3>
+
+<p>为了生成 Javadoc 和源 jar 文件，需要在 <code class="highlighter-rouge">pom.xml</code> 中添加以下配置。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;build&gt;</span>
+  <span class="nt">&lt;plugins&gt;</span>
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>maven-source-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>2.2.1<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+          <span class="nt">&lt;id&gt;</span>attach-sources<span class="nt">&lt;/id&gt;</span>
+          <span class="nt">&lt;goals&gt;</span>
+            <span class="nt">&lt;goal&gt;</span>jar-no-fork<span class="nt">&lt;/goal&gt;</span>
+          <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+      <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>maven-javadoc-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>2.9.1<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+          <span class="nt">&lt;id&gt;</span>attach-javadocs<span class="nt">&lt;/id&gt;</span>
+          <span class="nt">&lt;goals&gt;</span>
+            <span class="nt">&lt;goal&gt;</span>jar<span class="nt">&lt;/goal&gt;</span>
+          <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+      <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+  <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</code></pre></div></div>
+
+<h3 id="gpg-签名组件">GPG 签名组件</h3>
+
+<p>Maven GPG 插件使用以下配置为组件进行签名。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;build&gt;</span>
+  <span class="nt">&lt;plugins&gt;</span>
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>maven-gpg-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>1.5<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+          <span class="nt">&lt;id&gt;</span>sign-artifacts<span class="nt">&lt;/id&gt;</span>
+          <span class="nt">&lt;phase&gt;</span>verify<span class="nt">&lt;/phase&gt;</span>
+          <span class="nt">&lt;goals&gt;</span>
+            <span class="nt">&lt;goal&gt;</span>sign<span class="nt">&lt;/goal&gt;</span>
+          <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+      <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+  <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</code></pre></div></div>
+
+<p>并在 <code class="highlighter-rouge">setting.xml</code> 中配置 gpg 的运行文件和密码。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;settings&gt;</span>
+  <span class="nt">&lt;profiles&gt;</span>
+    <span class="nt">&lt;profile&gt;</span>
+      <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+      <span class="nt">&lt;activation&gt;</span>
+        <span class="nt">&lt;activeByDefault&gt;</span>true<span class="nt">&lt;/activeByDefault&gt;</span>
+      <span class="nt">&lt;/activation&gt;</span>
+      <span class="nt">&lt;properties&gt;</span>
+        <span class="nt">&lt;gpg.executable&gt;</span>D:/Work/GnuPG/bin/gpg.exe<span class="nt">&lt;/gpg.executable&gt;</span>
+        <span class="nt">&lt;gpg.passphrase&gt;</span>the_pass_phrase<span class="nt">&lt;/gpg.passphrase&gt;</span>
+      <span class="nt">&lt;/properties&gt;</span>
+    <span class="nt">&lt;/profile&gt;</span>
+  <span class="nt">&lt;/profiles&gt;</span>
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre></div></div>
+
+<p>如果想要发布正式版本，还需要在 <code class="highlighter-rouge">pom.xml</code> 中配置项目名、描述、开发者等信息。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;name&gt;</span>maven-release-example<span class="nt">&lt;/name&gt;</span>
+<span class="nt">&lt;description&gt;</span>Example project to deploy maven projects.<span class="nt">&lt;/description&gt;</span>
+<span class="nt">&lt;url&gt;</span>https://github.com/seriouszyx/maven-release-example<span class="nt">&lt;/url&gt;</span>
+<span class="nt">&lt;licenses&gt;</span>
+    <span class="nt">&lt;license&gt;</span>
+        <span class="nt">&lt;name&gt;</span>MIT<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;url&gt;</span>https://opensource.org/licenses/MIT<span class="nt">&lt;/url&gt;</span>
+    <span class="nt">&lt;/license&gt;</span>
+<span class="nt">&lt;/licenses&gt;</span>
+<span class="nt">&lt;developers&gt;</span>
+    <span class="nt">&lt;developer&gt;</span>
+        <span class="nt">&lt;name&gt;</span>Yixiang Zhao<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;email&gt;</span>seriouszyx@gmail.com<span class="nt">&lt;/email&gt;</span>
+        <span class="nt">&lt;organization&gt;</span>seriouszyx<span class="nt">&lt;/organization&gt;</span>
+        <span class="nt">&lt;organizationUrl&gt;</span>https://seriouszyx.com/<span class="nt">&lt;/organizationUrl&gt;</span>
+    <span class="nt">&lt;/developer&gt;</span>
+<span class="nt">&lt;/developers&gt;</span>
+<span class="nt">&lt;scm&gt;</span>
+    <span class="nt">&lt;connection&gt;</span>scm:git:https://github.com/seriouszyx/maven-release-example.git<span class="nt">&lt;/connection&gt;</span>
+    <span class="nt">&lt;developerConnection&gt;</span>scm:git:https://github.com/seriouszyx/maven-release-example.git<span class="nt">&lt;/developerConnection&gt;</span>
+    <span class="nt">&lt;url&gt;</span>https://github.com/seriouszyx/maven-release-example<span class="nt">&lt;/url&gt;</span>
+<span class="nt">&lt;/scm&gt;</span>
+</code></pre></div></div>
+
+<h2 id="发布">发布</h2>
+
+<p>更改 <code class="highlighter-rouge">pom.xml</code> 中的版本号为 <code class="highlighter-rouge">1.0.0</code> ， 在项目根目录运行 <code class="highlighter-rouge">mvn clean deploy</code> 即可发布，发布成功后组件会存储到一个临时存储库中，只对团队成员开放，可以在 <a href="https://s01.oss.sonatype.org/">https://s01.oss.sonatype.org/</a> 访问，点击右上角登录 JIRA 的账号，搜索刚发布的组件，即可查询到相关信息。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161035870.png#vwid=2560&amp;vhei=1381" alt="" /></p>
+
+<p>因为之前在 maven 插件 nexus-staging-maven-plugin 中的 <code class="highlighter-rouge">autoReleaseAfterClose</code> 属性设置为 true 了，所以自动上传到 staging repository ，并且自动执行了 close-&gt;release-&gt;drop 三步曲，等待两小时后就可以在 <a href="https://search.maven.org/">https://search.maven.org</a> 查到了。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161035404.png#vwid=2069&amp;vhei=393" alt="" /></p>
+
+<p>在新建工程的 <code class="highlighter-rouge">pom.xml</code> 种添加依赖，即可使用 jar 包中的方法。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.seriouszyx<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>maven-release-example<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<hr />
+
+<ol>
+  <li><a href="https://central.sonatype.org/publish/">The Central Repository Documentation</a></li>
+  <li><a href="https://blog.csdn.net/qiaojialin/article/details/77659200">发布项目到中央库的一些常见问题</a></li>
+</ol>
+
+  </div>
+
+  <a class="u-url" href="/2021/publish-to-maven.html" hidden></a>
+</article>
+
+<div class="ant-alert mb-0">
+  <ul>
+    <li>版权声明：本文采用<a target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">知识共享 3.0 许可证</a> (<strong>保持署名</strong>-自由转载-非商用-非衍生)</li>
+    <li>发表于 2021-10-16
+    </li>
+  </ul>
+  
+</div>
+
+<div class="page-navigation">
+  
+  <a class="prev" href="/2021/maven-semantic-release.html">&laquo; 上一篇</a>
+   
+  <a class="next" href="/2021/scanner-analysis-and-detect.html">下一篇 &raquo;</a>
+  
+</div><div id="gitalk-container">
+</div>
+<script>
+    var gitalk = new Gitalk({
+        clientID: '',
+        clientSecret: '',
+        repo: 'blog',
+        owner: 'imageslr',
+        admin: ['imageslr'],
+        id: md5(location.pathname),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false,  // Facebook-like distraction free mode
+        createIssueManually: true,
+        pagerDirection: "first",
+        perPage: 25,
+    })
+    gitalk.render('gitalk-container')
+</script>
+        </div>
+    </main><footer class="site-footer h-card">
+    <data class="u-url" href="/"></data>
+    <div class="wrapper">
+      <div class="footer-col-wrapper">
+        <div class="footer-col">
+          <ul class="contact-list">
+            <li class="p-name"><a class="black-link" href="https://blog.seriouszyx.com/about.html">
+                  隐秀 
+                </a></li><li>
+              <a class="u-email black-link" href="mailto:seriouszyx@gmail.com">seriouszyx@gmail.com</a></li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="text-center">
+      <a class="text-gray-300 text-sm" href="https://beian.miit.gov.cn">辽ICP备19014015号</a>
+    </div>
+  </footer>
+
+  <!-- highlight js -->
+  <script src="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-chtml.js"></script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } });
+  </script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        processEscapes: true
+      }
+    });
+  </script><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><!-- gitalk --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+  <script src="/assets/js/md5.min.js"></script><!-- viewerjs -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/viewerjs@1.10.4/dist/viewer.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/viewerjs@1.10.4/dist/viewer.min.js"></script>
+  <script>
+    var el = document.getElementById('post');
+    if (el) new Viewer(el);
+  </script>
+
+  
+  <!-- google analytics --><link type="application/atom+xml" rel="alternate" href="https://blog.seriouszyx.com/feed.xml" title="seriouszyx' Blog" /><script>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script></body>
+</html>

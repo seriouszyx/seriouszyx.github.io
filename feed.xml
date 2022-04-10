@@ -1,0 +1,1704 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.seriouszyx.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://blog.seriouszyx.com/" rel="alternate" type="text/html" /><updated>2022-04-10T05:04:06+00:00</updated><id>https://blog.seriouszyx.com/feed.xml</id><title type="html">seriouszyx’ Blog</title><subtitle>欢迎你啊
+</subtitle><author><name>隐秀</name></author><entry><title type="html">🪜【CI/CD】使用 maven-semantic-release 自动化发版</title><link href="https://blog.seriouszyx.com/2021/maven-semantic-release.html" rel="alternate" type="text/html" title="🪜【CI/CD】使用 maven-semantic-release 自动化发版" /><published>2021-10-16T14:41:20+00:00</published><updated>2021-10-16T14:41:20+00:00</updated><id>https://blog.seriouszyx.com/2021/maven-semantic-release</id><content type="html" xml:base="https://blog.seriouszyx.com/2021/maven-semantic-release.html"><![CDATA[<h2 id="前言">前言</h2>
+
+<p><a href="/2021/publish-to-maven.html">“如何发布 Java 包到 Maven 中央仓库”</a> 讲解了本地将 Java 包发布到 Maven 中央库的全过程。但在开源项目中，一般通过 GitHub 进行代码托管，并在 GitHub 的 Release 中进行发版并写明更新日志，还可能在 README 中添加 Maven 中央库的徽章。这一过程固定又繁琐，本文通过 maven-semantic-release 和 GitHub Actions 进行自动化操作，完成上述的整套流程。</p>
+
+<p>演示仓库位于 <a href="https://github.com/seriouszyx/maven-release-example">https://github.com/seriouszyx/maven-release-example</a>。</p>
+
+<h2 id="github-actions">GitHub Actions</h2>
+
+<p>GitHub 提供了一个 Maven 工作流的<a href="https://github.com/actions/starter-workflows/blob/main/ci/maven.yml">模板</a>，在项目根目录创建 <code class="highlighter-rouge">.github/workflows/maven-ci.yml</code> 文件，添加工作流的配置文件。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Java CI</span>
+
+<span class="na">on</span><span class="pi">:</span>
+  <span class="na">push</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">master</span><span class="pi">]</span>
+  <span class="na">pull_request</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">master</span><span class="pi">]</span>
+
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">build</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Checkout</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Set up JDK </span><span class="m">1.8</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/setup-java@v1</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">java-version</span><span class="pi">:</span> <span class="m">1.8</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Build with Maven</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">mvn clean test</span>
+</code></pre></div></div>
+
+<p>工作流执行了下面几步。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">checkout</code> 将存储库的副本下载到运行的服务器上</li>
+  <li><code class="highlighter-rouge">setup-java</code> 配置了 JDK11</li>
+  <li><code class="highlighter-rouge">Build with Maven</code> 进行构建和测试</li>
+</ul>
+
+<p>为 <code class="highlighter-rouge">maven-gpg-plugin</code> 添加 configuration，用于 GPG 非交互式密码输入。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>maven-gpg-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.5<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;id&gt;</span>sign-artifacts<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;phase&gt;</span>verify<span class="nt">&lt;/phase&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>sign<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;configuration&gt;</span>
+        <span class="c">&lt;!-- Prevent gpg from using pinentry programs --&gt;</span>
+        <span class="nt">&lt;gpgArguments&gt;</span>
+            <span class="nt">&lt;arg&gt;</span>--pinentry-mode<span class="nt">&lt;/arg&gt;</span>
+            <span class="nt">&lt;arg&gt;</span>loopback<span class="nt">&lt;/arg&gt;</span>
+        <span class="nt">&lt;/gpgArguments&gt;</span>
+    <span class="nt">&lt;/configuration&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</code></pre></div></div>
+
+<h2 id="maven-semantic-release">maven-semantic-release</h2>
+
+<p><a href="https://semantic-release.gitbook.io/semantic-release/">semantic-release</a> 会根据规范化的 commit 信息生成发布日志，默认使用 angular 规则，其他规则可以配置插件完成。</p>
+
+<p>semantic-release 大致的工作流如下:</p>
+
+<ul>
+  <li>提交到特定的分支触发 release 流程</li>
+  <li>验证 commit 信息，生成 release note，打 git tag</li>
+  <li>其他后续流程，如生成 <code class="highlighter-rouge">CHANGELOG.md</code>，<code class="highlighter-rouge">npm publish</code> 等等（通过插件完成）</li>
+</ul>
+
+<p><a href="https://github.com/conveyal/maven-semantic-release">maven-semantic-release</a> 是官方文档列出的针对 Maven 的第三方工具，它将部署一个 Maven 项目到 Maven 中央库，而 semantic-release 则是部署一个 node.js 项目到 npm。</p>
+
+<p>前文中 JIRA 和 GPG 的配置信息全都存放在本地，可以将其配置在 GitHub Secrets 中，以供 GitHub Actions 自动构建过程中使用。</p>
+
+<p>需要提前准备好的是 JIRA 的用户名（OSSRH_JIRA_USERNAME）和密码（OSSRH_JIRA_PASSWORD），GPG 的 key 名（GPG_KEY_NAME）、私钥（GPG_PRIVATE_KEY）和生成键值对时输入的密码（GPG_PASSPHRASE）。</p>
+
+<p>其中，GPG 的 key 名可以通过以下命令获得，我的是 <code class="highlighter-rouge">89985FBD3651A87B</code> 。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C:<span class="se">\U</span>sers<span class="se">\Y</span>ixiang Zhao&gt;gpg <span class="nt">--list-secret-keys</span> <span class="nt">--keyid-format</span> LONG
+C:/Users/Yixiang Zhao/AppData/Roaming/gnupg/pubring.kbx
+<span class="nt">-------------------------------------------------------</span>
+sec   rsa3072/89985FBD3651A87B 2021-10-14 <span class="o">[</span>SC] <span class="o">[</span>expires: 2023-10-14]
+      444D548E4E29746B4E2C89FC89985FBD3651A87B
+uid                 <span class="o">[</span>ultimate] Yixiang Zhao &lt;seriouszyx@gmail.com&gt;
+ssb   rsa3072/1613CEA56E822D62 2021-10-14 <span class="o">[</span>E] <span class="o">[</span>expires: 2023-10-14]
+</code></pre></div></div>
+
+<p>GPG 的私钥可以通过 <code class="highlighter-rouge">gpg --armo --export-secret-keys 89985FBD3651A87B</code> 命令获得，最后的参数是 key 名。注意私钥是从 <code class="highlighter-rouge">-----BEGIN PGP PRIVATE KEY BLOCK-----</code> 一直到 <code class="highlighter-rouge">-----END PGP PRIVATE KEY BLOCK-----</code>，而不是仅仅是中间这一段文本。</p>
+
+<p>将这些配置信息添加到 Settings-&gt;Secrets-&gt;Repository secrets 中。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161622009.png#vwid=2560&amp;vhei=1378" alt="" /></p>
+
+<p>补充 <code class="highlighter-rouge">maven-ci.yml</code> 文件，添加 maven-semantic-release 配置。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Java CI</span>
+
+<span class="na">on</span><span class="pi">:</span>
+  <span class="na">push</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">master</span><span class="pi">]</span>
+  <span class="na">pull_request</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">master</span><span class="pi">]</span>
+
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">build</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Checkout</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Set up JDK </span><span class="m">1.8</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/setup-java@v1</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">java-version</span><span class="pi">:</span> <span class="m">1.8</span>
+          <span class="na">server-username</span><span class="pi">:</span> <span class="s">OSSRH_JIRA_USERNAME</span>
+          <span class="na">server-password</span><span class="pi">:</span> <span class="s">OSSRH_JIRA_PASSWORD</span>
+          <span class="na">gpg-private-key</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">gpg-passphrase</span><span class="pi">:</span> <span class="s">GPG_PASSPHRASE</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Build with Maven</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">mvn clean test</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Set up Node.js</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/setup-node@v2</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">node-version</span><span class="pi">:</span> <span class="m">16</span>
+
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Sematic Release</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">npm install -g @conveyal/maven-semantic-release semantic-release</span>
+          <span class="s">semantic-release --prepare @conveyal/maven-semantic-release --publish @semantic-release/github,@conveyal/maven-semantic-release --verify-conditions @semantic-release/github,@conveyal/maven-semantic-release --verify-release @conveyal/maven-semantic-release</span>
+        <span class="na">env</span><span class="pi">:</span>
+          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">GPG_KEY_NAME</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">GPG_PASSPHRASE</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">OSSRH_JIRA_USERNAME</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">OSSRH_JIRA_PASSWORD</span><span class="pi">:</span> <span class="s">$</span>
+
+</code></pre></div></div>
+
+<p>前文在本地 maven 的 <code class="highlighter-rouge">settings.xml</code> 文件中配置的信息，转移到项目根目录下的 <code class="highlighter-rouge">maven-settings.xml</code> 中。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;settings&gt;</span>
+    <span class="nt">&lt;servers&gt;</span>
+        <span class="nt">&lt;server&gt;</span>
+            <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;username&gt;</span>${OSSRH_JIRA_USERNAME}<span class="nt">&lt;/username&gt;</span>
+            <span class="nt">&lt;password&gt;</span>${OSSRH_JIRA_PASSWORD}<span class="nt">&lt;/password&gt;</span>
+        <span class="nt">&lt;/server&gt;</span>
+    <span class="nt">&lt;/servers&gt;</span>
+    <span class="nt">&lt;profiles&gt;</span>
+        <span class="nt">&lt;profile&gt;</span>
+            <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;activation&gt;</span>
+                <span class="nt">&lt;activeByDefault&gt;</span>true<span class="nt">&lt;/activeByDefault&gt;</span>
+            <span class="nt">&lt;/activation&gt;</span>
+            <span class="nt">&lt;properties&gt;</span>
+                <span class="nt">&lt;gpg.executable&gt;</span>gpg<span class="nt">&lt;/gpg.executable&gt;</span>
+                <span class="nt">&lt;gpg.keyname&gt;</span>${GPG_KEY_NAME}<span class="nt">&lt;/gpg.keyname&gt;</span>
+                <span class="nt">&lt;gpg.passphrase&gt;</span>${GPG_PASSPHRASE}<span class="nt">&lt;/gpg.passphrase&gt;</span>
+            <span class="nt">&lt;/properties&gt;</span>
+        <span class="nt">&lt;/profile&gt;</span>
+    <span class="nt">&lt;/profiles&gt;</span>
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre></div></div>
+
+<p>配置好后，每次 push 或 pull request 到 master 分支时，都会出发 GitHub Actions 自动化构建、测试，并通过 maven-semantic-release 将 jar 上传到 Maven 中央库，并在项目的 GitHub Release 中自动生成更新日志。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161622266.png#vwid=1960&amp;vhei=1261" alt="" /></p>
+
+<hr />
+
+<ol>
+  <li><a href="https://semantic-release.gitbook.io/semantic-release/">semantic-release</a></li>
+  <li><a href="https://juejin.cn/post/6892965219791093773">通过 GitHub Action 自动部署 Maven 项目</a></li>
+  <li><a href="https://blog.dteam.top/posts/2020-05/semantic-release.html">团队敏捷实践 —— 使用 semantic-release 自动管理发布版本</a></li>
+</ol>]]></content><author><name>隐秀</name></author><summary type="html"><![CDATA[前言]]></summary></entry><entry><title type="html">🪜【CI/CD】如何发布 Java 包到 Maven 中央仓库</title><link href="https://blog.seriouszyx.com/2021/publish-to-maven.html" rel="alternate" type="text/html" title="🪜【CI/CD】如何发布 Java 包到 Maven 中央仓库" /><published>2021-10-16T14:39:08+00:00</published><updated>2021-10-16T14:39:08+00:00</updated><id>https://blog.seriouszyx.com/2021/publish-to-maven</id><content type="html" xml:base="https://blog.seriouszyx.com/2021/publish-to-maven.html"><![CDATA[<h2 id="前言">前言</h2>
+
+<p>最近参与一些开源项目，涉及到发版相关的问题，没有看到详细又不过时的教程，于是自己调研摸索，总结出了这篇文章。</p>
+
+<p>本文主要参考<a href="https://central.sonatype.org/publish/">官方文档</a>进行编写，演示仓库位于 <a href="https://github.com/seriouszyx/maven-release-example">https://github.com/seriouszyx/maven-release-example</a>。</p>
+
+<h2 id="准备工作">准备工作</h2>
+
+<h3 id="coordinates">Coordinates</h3>
+
+<p>Maven 用 <strong>groupid</strong> 来标识项目空间，用域名逆序的方式命名。下面是两种命名的例子，如果有自己的域名，直接使用就可以；如果没有，可以使用 github 等代码托管服务的域名。</p>
+
+<ul>
+  <li>www.seriouszyx.com -&gt; com.seriouszyx</li>
+  <li>github.com/seriouszyx -&gt; io.github.seriouszyx</li>
+</ul>
+
+<p>下面是支持个人 groupid 的代码托管服务，假设使用 <code class="highlighter-rouge">io.github.myusername</code> ，需要创建一个名为 <strong>OSSRH-TICKETNUMBER</strong> 的公开仓库进行验证（验证成功后可删除）。如果使用自己的域名，也需要添加 TXT 解析，稍后会提到。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>服务</th>
+      <th>groupid</th>
+      <th>相关文档</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GitHub</td>
+      <td>io.github.myusername</td>
+      <td><a href="https://pages.github.com/">https://pages.github.com/</a><br /></td>
+    </tr>
+    <tr>
+      <td>GitLab</td>
+      <td>io.gitlab.myusername</td>
+      <td><a href="https://about.gitlab.com/stages-devops-lifecycle/pages/">https://about.gitlab.com/stages-devops-lifecycle/pages/</a></td>
+    </tr>
+    <tr>
+      <td>Gitee</td>
+      <td>io.gitee.myusername</td>
+      <td><a href="https://gitee.com/help/articles/4136">https://gitee.com/help/articles/4136</a></td>
+    </tr>
+    <tr>
+      <td>Bitbucket</td>
+      <td>io.bitbucket.myusername</td>
+      <td><a href="https://support.atlassian.com/bitbucket-cloud/docs/publishing-a-website-on-bitbucket-cloud/">https://support.atlassian.com/bitbucket-cloud/docs/publishing-a-website-on-bitbucket-cloud/</a></td>
+    </tr>
+    <tr>
+      <td>SourceForge</td>
+      <td>io.sourceforge.myusername</td>
+      <td><a href="https://sourceforge.net/p/forge/documentation/Project%20Web%20Services/">https://sourceforge.net/p/forge/documentation/Project%20Web%20Services/</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>artifactId</strong> 用来标识项目本身，如果项目命名很长，可以使用“-”来进行分隔。</p>
+
+<h3 id="gpg">GPG</h3>
+
+<p>将组件发布到 Maven 中央仓库需要使用 <strong>PGP</strong> 进行签名，GnuPG （又称 GPG） 都是 OpenPGP 的实现，需要先创建你自己的键值对，再上传到服务器以供验证。</p>
+
+<p>从 <a href="https://gnupg.org/download/index.html#sec-1-2">https//www.gnupg.org/download/</a> 下载安装，使用 <code class="highlighter-rouge">--version</code> 标志检查。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gpg <span class="nt">--version</span>
+gpg <span class="o">(</span>GnuPG<span class="o">)</span> 2.2.28
+libgcrypt 1.8.8
+Copyright <span class="o">(</span>C<span class="o">)</span> 2021 g10 Code GmbH
+License GNU GPL-3.0-or-later &lt;https://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Home: C:/Users/Yixiang Zhao/AppData/Roaming/gnupg
+Supported algorithms:
+Pubkey: RSA, ELG, DSA, ECDH, ECDSA, EDDSA
+Cipher: IDEA, 3DES, CAST5, BLOWFISH, AES, AES192, AES256, TWOFISH,
+        CAMELLIA128, CAMELLIA192, CAMELLIA256
+Hash: SHA1, RIPEMD160, SHA256, SHA384, SHA512, SHA224
+Compression: Uncompressed, ZIP, ZLIB, BZIP2
+</code></pre></div></div>
+
+<p>安装成功后产生键值对，过程中需要填写姓名、邮箱和密码，密钥有效期为 2 年，到时候需要使用密码延长有效期，可以看到我的公钥 id 是 <code class="highlighter-rouge">444D548E4E29746B4E2C89FC89985FBD3651A87B</code> 。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gpg <span class="nt">--gen-key</span>
+gpg <span class="o">(</span>GnuPG<span class="o">)</span> 2.2.28<span class="p">;</span> Copyright <span class="o">(</span>C<span class="o">)</span> 2021 g10 Code GmbH
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Note: Use <span class="s2">"gpg --full-generate-key"</span> <span class="k">for </span>a full featured key generation dialog.
+
+GnuPG needs to construct a user ID to identify your key.
+
+Real name: Yixiang Zhao
+Email address: seriouszyx@gmail.com
+You selected this USER-ID:
+    <span class="s2">"Yixiang Zhao &lt;seriouszyx@gmail.com&gt;"</span>
+
+Change <span class="o">(</span>N<span class="o">)</span>ame, <span class="o">(</span>E<span class="o">)</span>mail, or <span class="o">(</span>O<span class="o">)</span>kay/<span class="o">(</span>Q<span class="o">)</span>uit? O
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action <span class="o">(</span><span class="nb">type </span>on the keyboard, move the mouse, utilize the
+disks<span class="o">)</span> during the prime generation<span class="p">;</span> this gives the random number
+generator a better chance to gain enough entropy.
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action <span class="o">(</span><span class="nb">type </span>on the keyboard, move the mouse, utilize the
+disks<span class="o">)</span> during the prime generation<span class="p">;</span> this gives the random number
+generator a better chance to gain enough entropy.
+gpg: key 89985FBD3651A87B marked as ultimately trusted
+gpg: directory <span class="s1">'C:/Users/Yixiang Zhao/AppData/Roaming/gnupg/openpgp-revocs.d'</span> created
+gpg: revocation certificate stored as <span class="s1">'C:/Users/Yixiang Zhao/AppData/Roaming/gnupg/openpgp-revocs.d\444D548E4E29746B4E2C89FC89985FBD3651A87B.rev'</span>
+public and secret key created and signed.
+
+pub   rsa3072 2021-10-14 <span class="o">[</span>SC] <span class="o">[</span>expires: 2023-10-14]
+      444D548E4E29746B4E2C89FC89985FBD3651A87B
+uid                      Yixiang Zhao &lt;seriouszyx@gmail.com&gt;
+sub   rsa3072 2021-10-14 <span class="o">[</span>E] <span class="o">[</span>expires: 2023-10-14]
+</code></pre></div></div>
+
+<p>后续步骤需要通过你的公钥来进行验证，所以把它上传到服务器中，注意 <code class="highlighter-rouge">--send-keys</code> 后面是你自己的公钥。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gpg <span class="nt">--keyserver</span> keyserver.ubuntu.com <span class="nt">--send-keys</span> 444D548E4E29746B4E2C89FC89985FBD3651A87B
+gpg: sending key 89985FBD3651A87B to hkp://keyserver.ubuntu.com
+</code></pre></div></div>
+
+<p>等大概十几分钟，验证公钥是否发布成功。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gpg <span class="nt">--keyserver</span> keyserver.ubuntu.com <span class="nt">--recv-keys</span> 444D548E4E29746B4E2C89FC89985FBD3651A87B
+gpg: key 89985FBD3651A87B: <span class="s2">"Yixiang Zhao &lt;seriouszyx@gmail.com&gt;"</span> not changed
+gpg: Total number processed: 1
+gpg:              unchanged: 1
+</code></pre></div></div>
+
+<h2 id="在-sonatype-创建-issue">在 Sonatype 创建 Issue</h2>
+
+<p>开发者要想将组件发布至 Maven 中央仓库，需要借助于 Sonatype 的开源软件存储库托管（Open Source Software Repository Hosting, OSSRH）服务。Sonatype 使用 JIRA 来管理请求，所以需要先<a href="https://issues.sonatype.org/secure/Signup!default.jspa">注册账号</a>。</p>
+
+<p>注册好之后，就可以<a href="https://issues.sonatype.org/secure/CreateIssue.jspa?issuetype=21&amp;pid=10134">创建一个新的 Issue</a>（文档中又称 Project ticket），可以参考我创建的测试 Issue <a href="https://issues.sonatype.org/browse/OSSRH-74121">OSSRH-74121</a>。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161035158.png#vwid=1949&amp;vhei=895" alt="" /></p>
+
+<p>这时需要进行人工审核，将分配的编号 <code class="highlighter-rouge">OSSRH-74121</code> 添加到域名的 TXT 解析，或者在 GitHub 等托管服务中创建一个名为 <code class="highlighter-rouge">OSSRH-74121</code> 的公开库。我等了大概一两个小时，就通过了审核，Status 变成了 <code class="highlighter-rouge">RESOLVED</code> 。</p>
+
+<h2 id="配置发布信息">配置发布信息</h2>
+
+<p>本文使用 Maven 为例发布自己的 Java 包，如果使用 Gradle、Ant 等工具，可以参照官方文档。</p>
+
+<h3 id="分发管理和认证">分发管理和认证</h3>
+
+<p>在 <code class="highlighter-rouge">pom.xml</code> 中添加以下配置，使得可以使用 Nexus Staging Maven plugin 插件向 OSSRH Nexus Repository Manager 发布。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;distributionManagement&gt;</span>
+  <span class="nt">&lt;snapshotRepository&gt;</span>
+    <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+    <span class="nt">&lt;url&gt;</span>https://s01.oss.sonatype.org/content/repositories/snapshots<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;/snapshotRepository&gt;</span>
+  <span class="nt">&lt;repository&gt;</span>
+    <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+    <span class="nt">&lt;url&gt;</span>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;/repository&gt;</span>
+<span class="nt">&lt;/distributionManagement&gt;</span>
+<span class="nt">&lt;build&gt;</span>
+  <span class="nt">&lt;plugins&gt;</span>
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.sonatype.plugins<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>nexus-staging-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>1.6.8<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;extensions&gt;</span>true<span class="nt">&lt;/extensions&gt;</span>
+      <span class="nt">&lt;configuration&gt;</span>
+        <span class="nt">&lt;serverId&gt;</span>ossrh<span class="nt">&lt;/serverId&gt;</span>
+        <span class="nt">&lt;nexusUrl&gt;</span>https://s01.oss.sonatype.org/<span class="nt">&lt;/nexusUrl&gt;</span>
+        <span class="nt">&lt;autoReleaseAfterClose&gt;</span>true<span class="nt">&lt;/autoReleaseAfterClose&gt;</span>
+      <span class="nt">&lt;/configuration&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+    ...
+  <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</code></pre></div></div>
+
+<p>下面是发布所需的 JIRA 账户信息，写入到 Maven 的 <code class="highlighter-rouge">setting.xml</code> 文件中（通常位于 <code class="highlighter-rouge">~/.m2</code>）。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;settings&gt;</span>
+  <span class="nt">&lt;servers&gt;</span>
+    <span class="nt">&lt;server&gt;</span>
+      <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+      <span class="nt">&lt;username&gt;</span>your-jira-id<span class="nt">&lt;/username&gt;</span>
+      <span class="nt">&lt;password&gt;</span>your-jira-pwd<span class="nt">&lt;/password&gt;</span>
+    <span class="nt">&lt;/server&gt;</span>
+  <span class="nt">&lt;/servers&gt;</span>
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre></div></div>
+
+<p>注意这里的 id 和 <code class="highlighter-rouge">snapshotRepository</code> /<code class="highlighter-rouge">repository</code> 中的 id，以及 <code class="highlighter-rouge">plugin</code> 中的 id 都是相同的，都为 <strong>ossrh</strong>。</p>
+
+<h3 id="javadoc-和源代码">Javadoc 和源代码</h3>
+
+<p>为了生成 Javadoc 和源 jar 文件，需要在 <code class="highlighter-rouge">pom.xml</code> 中添加以下配置。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;build&gt;</span>
+  <span class="nt">&lt;plugins&gt;</span>
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>maven-source-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>2.2.1<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+          <span class="nt">&lt;id&gt;</span>attach-sources<span class="nt">&lt;/id&gt;</span>
+          <span class="nt">&lt;goals&gt;</span>
+            <span class="nt">&lt;goal&gt;</span>jar-no-fork<span class="nt">&lt;/goal&gt;</span>
+          <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+      <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>maven-javadoc-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>2.9.1<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+          <span class="nt">&lt;id&gt;</span>attach-javadocs<span class="nt">&lt;/id&gt;</span>
+          <span class="nt">&lt;goals&gt;</span>
+            <span class="nt">&lt;goal&gt;</span>jar<span class="nt">&lt;/goal&gt;</span>
+          <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+      <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+  <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</code></pre></div></div>
+
+<h3 id="gpg-签名组件">GPG 签名组件</h3>
+
+<p>Maven GPG 插件使用以下配置为组件进行签名。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;build&gt;</span>
+  <span class="nt">&lt;plugins&gt;</span>
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>maven-gpg-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>1.5<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+          <span class="nt">&lt;id&gt;</span>sign-artifacts<span class="nt">&lt;/id&gt;</span>
+          <span class="nt">&lt;phase&gt;</span>verify<span class="nt">&lt;/phase&gt;</span>
+          <span class="nt">&lt;goals&gt;</span>
+            <span class="nt">&lt;goal&gt;</span>sign<span class="nt">&lt;/goal&gt;</span>
+          <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+      <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+  <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</code></pre></div></div>
+
+<p>并在 <code class="highlighter-rouge">setting.xml</code> 中配置 gpg 的运行文件和密码。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;settings&gt;</span>
+  <span class="nt">&lt;profiles&gt;</span>
+    <span class="nt">&lt;profile&gt;</span>
+      <span class="nt">&lt;id&gt;</span>ossrh<span class="nt">&lt;/id&gt;</span>
+      <span class="nt">&lt;activation&gt;</span>
+        <span class="nt">&lt;activeByDefault&gt;</span>true<span class="nt">&lt;/activeByDefault&gt;</span>
+      <span class="nt">&lt;/activation&gt;</span>
+      <span class="nt">&lt;properties&gt;</span>
+        <span class="nt">&lt;gpg.executable&gt;</span>D:/Work/GnuPG/bin/gpg.exe<span class="nt">&lt;/gpg.executable&gt;</span>
+        <span class="nt">&lt;gpg.passphrase&gt;</span>the_pass_phrase<span class="nt">&lt;/gpg.passphrase&gt;</span>
+      <span class="nt">&lt;/properties&gt;</span>
+    <span class="nt">&lt;/profile&gt;</span>
+  <span class="nt">&lt;/profiles&gt;</span>
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre></div></div>
+
+<p>如果想要发布正式版本，还需要在 <code class="highlighter-rouge">pom.xml</code> 中配置项目名、描述、开发者等信息。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;name&gt;</span>maven-release-example<span class="nt">&lt;/name&gt;</span>
+<span class="nt">&lt;description&gt;</span>Example project to deploy maven projects.<span class="nt">&lt;/description&gt;</span>
+<span class="nt">&lt;url&gt;</span>https://github.com/seriouszyx/maven-release-example<span class="nt">&lt;/url&gt;</span>
+<span class="nt">&lt;licenses&gt;</span>
+    <span class="nt">&lt;license&gt;</span>
+        <span class="nt">&lt;name&gt;</span>MIT<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;url&gt;</span>https://opensource.org/licenses/MIT<span class="nt">&lt;/url&gt;</span>
+    <span class="nt">&lt;/license&gt;</span>
+<span class="nt">&lt;/licenses&gt;</span>
+<span class="nt">&lt;developers&gt;</span>
+    <span class="nt">&lt;developer&gt;</span>
+        <span class="nt">&lt;name&gt;</span>Yixiang Zhao<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;email&gt;</span>seriouszyx@gmail.com<span class="nt">&lt;/email&gt;</span>
+        <span class="nt">&lt;organization&gt;</span>seriouszyx<span class="nt">&lt;/organization&gt;</span>
+        <span class="nt">&lt;organizationUrl&gt;</span>https://seriouszyx.com/<span class="nt">&lt;/organizationUrl&gt;</span>
+    <span class="nt">&lt;/developer&gt;</span>
+<span class="nt">&lt;/developers&gt;</span>
+<span class="nt">&lt;scm&gt;</span>
+    <span class="nt">&lt;connection&gt;</span>scm:git:https://github.com/seriouszyx/maven-release-example.git<span class="nt">&lt;/connection&gt;</span>
+    <span class="nt">&lt;developerConnection&gt;</span>scm:git:https://github.com/seriouszyx/maven-release-example.git<span class="nt">&lt;/developerConnection&gt;</span>
+    <span class="nt">&lt;url&gt;</span>https://github.com/seriouszyx/maven-release-example<span class="nt">&lt;/url&gt;</span>
+<span class="nt">&lt;/scm&gt;</span>
+</code></pre></div></div>
+
+<h2 id="发布">发布</h2>
+
+<p>更改 <code class="highlighter-rouge">pom.xml</code> 中的版本号为 <code class="highlighter-rouge">1.0.0</code> ， 在项目根目录运行 <code class="highlighter-rouge">mvn clean deploy</code> 即可发布，发布成功后组件会存储到一个临时存储库中，只对团队成员开放，可以在 <a href="https://s01.oss.sonatype.org/">https://s01.oss.sonatype.org/</a> 访问，点击右上角登录 JIRA 的账号，搜索刚发布的组件，即可查询到相关信息。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161035870.png#vwid=2560&amp;vhei=1381" alt="" /></p>
+
+<p>因为之前在 maven 插件 nexus-staging-maven-plugin 中的 <code class="highlighter-rouge">autoReleaseAfterClose</code> 属性设置为 true 了，所以自动上传到 staging repository ，并且自动执行了 close-&gt;release-&gt;drop 三步曲，等待两小时后就可以在 <a href="https://search.maven.org/">https://search.maven.org</a> 查到了。</p>
+
+<p><img src="https://img.seriouszyx.com/202110161035404.png#vwid=2069&amp;vhei=393" alt="" /></p>
+
+<p>在新建工程的 <code class="highlighter-rouge">pom.xml</code> 种添加依赖，即可使用 jar 包中的方法。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.seriouszyx<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>maven-release-example<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<hr />
+
+<ol>
+  <li><a href="https://central.sonatype.org/publish/">The Central Repository Documentation</a></li>
+  <li><a href="https://blog.csdn.net/qiaojialin/article/details/77659200">发布项目到中央库的一些常见问题</a></li>
+</ol>]]></content><author><name>隐秀</name></author><summary type="html"><![CDATA[前言]]></summary></entry><entry><title type="html">🛡️【攻击检测】网络扫描探测工具的分析与识别</title><link href="https://blog.seriouszyx.com/2021/scanner-analysis-and-detect.html" rel="alternate" type="text/html" title="🛡️【攻击检测】网络扫描探测工具的分析与识别" /><published>2021-09-01T14:30:24+00:00</published><updated>2021-09-01T14:30:24+00:00</updated><id>https://blog.seriouszyx.com/2021/scanner-analysis-and-detect</id><content type="html" xml:base="https://blog.seriouszyx.com/2021/scanner-analysis-and-detect.html"><![CDATA[<h2 id="扫描探测工具识别">扫描探测工具识别</h2>
+
+<p>网络扫描探测通常是发起网络入侵的第一步，攻击者可以利用扫描探测工具获取网络中的主机系统、TCP/UDP 端口的开放情况、子域名、网站指纹、WAF、CDN、中间件类别等重要信息，识别出存在安全漏洞的主机或系统，从而发起有针对性的网络入侵行为。此外，一些扫描工具同时具备漏洞利用的能力。因此，对网络扫描探测行为进行识别和研究，有利于及时发现网络攻击的前兆，发现网络攻击行为，快速定位网络服务中存在的漏洞，对网络安全防护工作十分有意义。</p>
+
+<p>本文以下列三个常见扫描器为代表，探究扫描器的特有指纹信息，编写 Demo 进行扫描器的识别。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044955.png#vwid=1999&amp;vhei=694" alt="" /></p>
+
+<h2 id="zmap">Zmap</h2>
+
+<h3 id="抓包分析">抓包分析</h3>
+
+<p>ZMap 被设计用来针对整个 IPv4 地址空间或其中的大部分实施综合扫描的工具。</p>
+
+<p>默认情况下，ZMap 会对于指定端口实施尽可能大速率的 TCP SYN 扫描。如下图所示，客户端在发送一个 SYN 包的时候，如果对方端口开放，就会发送一个 SYN-ACK，那么就表明这个端口开放，这时候我们发送 RST 包，防止占用对方资源；如果对方端口不开放，那么我们就会收到对方主机的 RST 包。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044047.png#vwid=2652&amp;vhei=1128" alt="" /></p>
+
+<p>较为保守的情况下，对 10,000 个随机的地址的 80 端口以 10Mbps 的速度扫描，如下所示：</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044067.png#vwid=2225&amp;vhei=653" alt="" /></p>
+
+<p>在生成的 csv 结果文件中，以下 IP 地址的 80 端口开放：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>47.243.139.246
+20.205.204.152
+121.36.193.65
+156.245.39.71
+13.238.233.150
+142.234.31.240
+68.183.75.244
+185.48.122.237
+52.25.116.123
+104.127.1.181
+185.248.102.245
+95.217.201.8
+3.125.24.134
+23.15.117.202
+</code></pre></div></div>
+
+<p>抓包结果如下所示，Zmap 向随机的 10,000 个 IP 的 80 端口发送 SYN 数据包。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044558.png#vwid=2560&amp;vhei=908" alt="" /></p>
+
+<p>如果 IP 的 80 端口开放，以 47.243.139.246 为例，筛选出的数据包如下图所示，具体解释为：</p>
+
+<ol>
+  <li>向 47.243.139.246 的 80 端口发送 SYN 数据包</li>
+  <li>接收到 47.243.139.246 的 80 端口的 SYN/ACK 包，证明该 IP 的 80 端口可用</li>
+  <li>向 47.243.139.246 的 80 端口发送 RST 数据包，防止占用对方资源</li>
+</ol>
+
+<p><img src="https://img.seriouszyx.com/202109011044591.png#vwid=2560&amp;vhei=371" alt="" /></p>
+
+<p>如果 IP 的 80 端口不开放，以 44.102.170.124 为例，筛选出的数据包如下图所示。Zmap 向其发送 SYN 请求后没有得到应答，故判断该 IP 的 80 端口不可用。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044623.png#vwid=2560&amp;vhei=235" alt="" /></p>
+
+<p>查看 Zmap 向哪些 IP 发送了 RST 数据包，则证明这些 IP 的 80 端口可用。筛选结果如下图所示，目的地址与上述的 csv 结果文件一致。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044663.png#vwid=2560&amp;vhei=798" alt="" /></p>
+
+<h3 id="源码分析">源码分析</h3>
+
+<p>Zmap 整体函数调用图如下所示。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044692.png#vwid=942&amp;vhei=522" alt="" /></p>
+
+<p>通过图我们可以直观的看到整个程序调用的过程。Zmap 在启动时候，先获取环境信息，如 IP、网关等。然后读取配置文件选择使用哪种扫描方式，然后在 Probe_modules 切换到对应的模块，然后启动。</p>
+
+<p>下面侧重分析 SYN 扫描这个模块，整个执行的过程中，会有一个线程专门负责发送，另外有一个使用 libpcap 组件抓包，发送和接收就独立开来。</p>
+
+<p><a href="https://github.com/zmap/zmap/blob/main/src/probe_modules/module_tcp_synscan.c">zmap/src/probe_modules/module_tcp_synscan.c</a> 是用于执行 TCP SYN 扫描的探测模块，在初始化阶段的 synscan_init_perthread 函数中，依次调用 make_ip_header 函数和 make_tcp_header 函数进行数据包 header 的封装。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">int</span> <span class="nf">synscan_init_perthread</span><span class="p">(</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="n">macaddr_t</span> <span class="o">*</span><span class="n">src</span><span class="p">,</span> <span class="n">macaddr_t</span> <span class="o">*</span><span class="n">gw</span><span class="p">,</span>
+    <span class="n">port_h_t</span> <span class="n">dst_port</span><span class="p">,</span>
+    <span class="n">UNUSED</span> <span class="kt">void</span> <span class="o">**</span><span class="n">arg_ptr</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">ether_header</span> <span class="o">*</span><span class="n">eth_header</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ether_header</span> <span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="p">;</span>
+    <span class="n">make_eth_header</span><span class="p">(</span><span class="n">eth_header</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">gw</span><span class="p">);</span>
+    <span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">ip_header</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="p">)(</span><span class="o">&amp;</span><span class="n">eth_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="kt">uint16_t</span> <span class="n">len</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">ip</span><span class="p">)</span> <span class="o">+</span> <span class="n">ZMAP_TCP_SYNSCAN_TCP_HEADER_LEN</span><span class="p">);</span>
+    <span class="n">make_ip_header</span><span class="p">(</span><span class="n">ip_header</span><span class="p">,</span> <span class="n">IPPROTO_TCP</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+    <span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_header</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="p">)(</span><span class="o">&amp;</span><span class="n">ip_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="n">make_tcp_header</span><span class="p">(</span><span class="n">tcp_header</span><span class="p">,</span> <span class="n">dst_port</span><span class="p">,</span> <span class="n">TH_SYN</span><span class="p">);</span>
+    <span class="n">set_mss_option</span><span class="p">(</span><span class="n">tcp_header</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">EXIT_SUCCESS</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这两个函数编写于 <a href="https://github.com/zmap/zmap/blob/main/src/probe_modules/packet.c">zmap/src/probe_modules/packet.c</a> 中。分析 make_ip_header 函数可知，在下示第 7 行，IP 的 identification number 被设置为固定的 54321。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">make_ip_header</span><span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">iph</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">protocol</span><span class="p">,</span> <span class="kt">uint16_t</span> <span class="n">len</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_hl</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>  <span class="c1">// Internet Header Length</span>
+    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_v</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>   <span class="c1">// IPv4</span>
+    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_tos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// Type of Service</span>
+    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_len</span> <span class="o">=</span> <span class="n">len</span><span class="p">;</span>
+    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_id</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="mi">54321</span><span class="p">);</span> <span class="c1">// identification number</span>
+    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_off</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>	   <span class="c1">// fragmentation flag</span>
+    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_ttl</span> <span class="o">=</span> <span class="n">MAXTTL</span><span class="p">;</span>      <span class="c1">// time to live (TTL)</span>
+    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_p</span> <span class="o">=</span> <span class="n">protocol</span><span class="p">;</span>      <span class="c1">// upper layer protocol =&gt; TCP</span>
+    <span class="c1">// we set the checksum = 0 for now because that's</span>
+    <span class="c1">// what it needs to be when we run the IP checksum</span>
+    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>分析 make_tcp_header 函数可知，在下示第 10 行，TCP 的 window 被设置为固定的 65535。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">make_tcp_header</span><span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_header</span><span class="p">,</span> <span class="n">port_h_t</span> <span class="n">dest_port</span><span class="p">,</span>
+		     <span class="kt">uint16_t</span> <span class="n">th_flags</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_seq</span> <span class="o">=</span> <span class="n">random</span><span class="p">();</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_ack</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_x2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_off</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span> <span class="c1">// data offset</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_flags</span> <span class="o">|=</span> <span class="n">th_flags</span><span class="p">;</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_win</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="mi">65535</span><span class="p">);</span> <span class="c1">// largest possible window</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_urp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_dport</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">dest_port</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>查看抓取的 SYN 数据包，如下图所示，IP 的 ID 和 TCP 的 window 确实为 54321 和 65535，所以这两个固定值可作为扫描器特征。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044714.png#vwid=2560&amp;vhei=1275" alt="" /></p>
+
+<h2 id="angry-ip-scanner">Angry IP Scanner</h2>
+
+<h3 id="抓包分析-1">抓包分析</h3>
+
+<p>Angry IP Scanner（简称 angryip） 是一款开源跨平台的网络扫描器，主要用于扫描 IP 地址和端口。</p>
+
+<p>angryip 默认使用 Windows ICMP 方法扫描各个 ip 地址，扫描每个 IP 的 80、443 和 8080 端口。以 IP 范围 123.56.104.200~123.56.104.250 为例，扫描结果如下图所示，红色代表 IP 不可用，蓝色代表 IP 可用端口不可用，绿色代表 IP 和端口均可用。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044740.png#vwid=2558&amp;vhei=1534" alt="" /></p>
+
+<p>在捕获的数据包中，以 123.56.104.218 为例，该 IP 被标记为绿色，下面是与它有关的数据包抓取结果。</p>
+
+<p>图中第一个红框处 angryip 与 123.56.104.218 进行了 3 次 ping，且都予以回复，说明该 IP 可用。第二个红框处 angryip 分别测试 123.56.104.218 的 80、443 和 8080 端口，其中 80 和 443 端口予以回复，说明这两个端口可用。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044760.png#vwid=2560&amp;vhei=930" alt="" /></p>
+
+<p>在不可用的 IP 中，以 123.56.104.204 为例，与它相关的数据包抓取结果如下。angryip 向其发送 3 次 ping 请求，都没有得到回复，则判断其 IP 不可用，也没有向其端口发送数据包。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044783.png#vwid=2560&amp;vhei=325" alt="" /></p>
+
+<h3 id="源码分析-1">源码分析</h3>
+
+<p>因为无论 IP 和端口是否可用，angryip 都会先发送 ping 数据包，所以通过 ping 阶段的源码分析其工具的特征。</p>
+
+<p>分析 <a href="https://github.com/angryip/ipscan/blob/64ec7090acdba380a62d5d2e1a6c630cc5302197/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java">ipscan/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java</a> 源码，该测试类调用 pinger.ping()方法 3 次，并计算平均时长。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ICMPSharedPingerTest</span> <span class="o">{</span>
+    <span class="nd">@Test</span> <span class="nd">@Ignore</span><span class="o">(</span><span class="s">"this test works only under root"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testPing</span><span class="o">()</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+	<span class="nc">Pinger</span> <span class="n">pinger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ICMPSharedPinger</span><span class="o">(</span><span class="mi">1000</span><span class="o">);</span>
+	<span class="nc">PingResult</span> <span class="n">result</span> <span class="o">=</span> <span class="n">pinger</span><span class="o">.</span><span class="na">ping</span><span class="o">(</span><span class="k">new</span> <span class="nc">ScanningSubject</span><span class="o">(</span><span class="nc">InetAddress</span><span class="o">.</span><span class="na">getLocalHost</span><span class="o">()),</span> <span class="mi">3</span><span class="o">);</span>
+	<span class="n">assertTrue</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getAverageTime</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">);</span>
+	<span class="n">assertTrue</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getAverageTime</span><span class="o">()</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="o">);</span>
+	<span class="n">assertTrue</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getTTL</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>该方法在 <a href="https://github.com/angryip/ipscan/blob/master/src/net/azib/ipscan/core/net/WindowsPinger.java">ipscan/test/net/azib/ipscan/core/net/WindowsPinger.java</a> 中，源码如下所示，判断 IP 类型，并调用 IPv6 和 IPv4 对应的方法。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="nc">PingResult</span> <span class="nf">ping</span><span class="o">(</span><span class="nc">ScanningSubject</span> <span class="n">subject</span><span class="o">,</span> <span class="kt">int</span> <span class="n">count</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">subject</span><span class="o">.</span><span class="na">isIPv6</span><span class="o">())</span>
+	<span class="k">return</span> <span class="nf">ping6</span><span class="o">(</span><span class="n">subject</span><span class="o">,</span> <span class="n">count</span><span class="o">);</span>
+    <span class="k">else</span>
+	<span class="k">return</span> <span class="nf">ping4</span><span class="o">(</span><span class="n">subject</span><span class="o">,</span> <span class="n">count</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>以 IPv4 为例，方法中定义了数据包的数据大小为 32，即 sendDataSize = 32。后续使用 Memory()方法创建 SendData 对象，并未对其进行赋值，故默认值应全为 0。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="nc">PingResult</span> <span class="nf">ping4</span><span class="o">(</span><span class="nc">ScanningSubject</span> <span class="n">subject</span><span class="o">,</span> <span class="kt">int</span> <span class="n">count</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+    <span class="nc">Pointer</span> <span class="n">handle</span> <span class="o">=</span> <span class="n">dll</span><span class="o">.</span><span class="na">IcmpCreateFile</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">handle</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">IOException</span><span class="o">(</span><span class="s">"Unable to create Windows native ICMP handle"</span><span class="o">);</span>
+
+    <span class="kt">int</span> <span class="n">sendDataSize</span> <span class="o">=</span> <span class="mi">32</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">replyDataSize</span> <span class="o">=</span> <span class="n">sendDataSize</span> <span class="o">+</span> <span class="o">(</span><span class="k">new</span> <span class="nc">IcmpEchoReply</span><span class="o">().</span><span class="na">size</span><span class="o">())</span> <span class="o">+</span> <span class="mi">10</span><span class="o">;</span>
+    <span class="nc">Pointer</span> <span class="n">sendData</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Memory</span><span class="o">(</span><span class="n">sendDataSize</span><span class="o">);</span>
+    <span class="n">sendData</span><span class="o">.</span><span class="na">clear</span><span class="o">(</span><span class="n">sendDataSize</span><span class="o">);</span>
+    <span class="nc">Pointer</span> <span class="n">replyData</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Memory</span><span class="o">(</span><span class="n">replyDataSize</span><span class="o">);</span>
+
+    <span class="nc">PingResult</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PingResult</span><span class="o">(</span><span class="n">subject</span><span class="o">.</span><span class="na">getAddress</span><span class="o">(),</span> <span class="n">count</span><span class="o">);</span>
+    <span class="k">try</span> <span class="o">{</span>
+	<span class="nc">IpAddrByVal</span> <span class="n">ipaddr</span> <span class="o">=</span> <span class="n">toIpAddr</span><span class="o">(</span><span class="n">subject</span><span class="o">.</span><span class="na">getAddress</span><span class="o">());</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">count</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">currentThread</span><span class="o">().</span><span class="na">isInterrupted</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">numReplies</span> <span class="o">=</span> <span class="n">dll</span><span class="o">.</span><span class="na">IcmpSendEcho</span><span class="o">(</span><span class="n">handle</span><span class="o">,</span> <span class="n">ipaddr</span><span class="o">,</span> <span class="n">sendData</span><span class="o">,</span> <span class="o">(</span><span class="kt">short</span><span class="o">)</span> <span class="n">sendDataSize</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">replyData</span><span class="o">,</span> <span class="n">replyDataSize</span><span class="o">,</span> <span class="n">timeout</span><span class="o">);</span>
+	    <span class="nc">IcmpEchoReply</span> <span class="n">echoReply</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">IcmpEchoReply</span><span class="o">(</span><span class="n">replyData</span><span class="o">);</span>
+	    <span class="k">if</span> <span class="o">(</span><span class="n">numReplies</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">echoReply</span><span class="o">.</span><span class="na">status</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">echoReply</span><span class="o">.</span><span class="na">address</span><span class="o">.</span><span class="na">bytes</span><span class="o">,</span> <span class="n">ipaddr</span><span class="o">.</span><span class="na">bytes</span><span class="o">))</span> <span class="o">{</span>
+		<span class="n">result</span><span class="o">.</span><span class="na">addReply</span><span class="o">(</span><span class="n">echoReply</span><span class="o">.</span><span class="na">roundTripTime</span><span class="o">);</span>
+		<span class="n">result</span><span class="o">.</span><span class="na">setTTL</span><span class="o">(</span><span class="n">echoReply</span><span class="o">.</span><span class="na">options</span><span class="o">.</span><span class="na">ttl</span> <span class="o">&amp;</span> <span class="mh">0xFF</span><span class="o">);</span>
+	    <span class="o">}</span>
+	<span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">finally</span> <span class="o">{</span>
+	<span class="n">dll</span><span class="o">.</span><span class="na">IcmpCloseHandle</span><span class="o">(</span><span class="n">handle</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>在实际抓包中，每个发出的 ICMP 请求中，Data 的大小均为 32 字节，且全为 0，所以可将它作为 angryip 的特征。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044806.png#vwid=2560&amp;vhei=1068" alt="" /></p>
+
+<h2 id="masscan">Masscan</h2>
+
+<h3 id="抓包分析-2">抓包分析</h3>
+
+<p>Masscan 默认使用 SYN 扫描，以 IP 123.56.104.218 为例，扫描其 1~600 端口，结果如下所示。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044826.png#vwid=1346&amp;vhei=278" alt="" /></p>
+
+<p>抓包结果如下所示，Masscan 向 123.56.104.218 的 1~600 端口进行随机化扫描，发出 SYN 请求。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044847.png#vwid=2560&amp;vhei=1250" alt="" /></p>
+
+<p>查看 80 端口的数据包，下图可知 80 端口向 Masscan 回复，说明该端口可用。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044871.png#vwid=2560&amp;vhei=277" alt="" /></p>
+
+<p>查看 81 端口的数据包，发现并没有数据包回复，说明该端口不可用。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044891.png#vwid=2560&amp;vhei=162" alt="" /></p>
+
+<p>筛选收到的 SYN/ACK 数据包，得到 22、443 和 80 端口，说明 123.56.104.218 的 1~600 中这 3 个端口可用。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044912.png#vwid=2560&amp;vhei=260" alt="" /></p>
+
+<h3 id="源码分析-2">源码分析</h3>
+
+<p>观察抓包分析中结果可以发现，所有发出的 SYN 请求中，窗口大小都是 1024。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044935.png#vwid=2560&amp;vhei=1250" alt="" /></p>
+
+<p>在 Masscan 的主函数 <a href="https://github.com/robertdavidgraham/masscan/blob/master/src/main.c">masscan/src/main.c</a> 文件中，默认使用以下代码初始化 TCP 数据包的模板。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">template_packet_init</span><span class="p">(</span>
+    <span class="n">parms</span><span class="o">-&gt;</span><span class="n">tmplset</span><span class="p">,</span>
+    <span class="n">parms</span><span class="o">-&gt;</span><span class="n">source_mac</span><span class="p">,</span>
+    <span class="n">parms</span><span class="o">-&gt;</span><span class="n">router_mac_ipv4</span><span class="p">,</span>
+    <span class="n">parms</span><span class="o">-&gt;</span><span class="n">router_mac_ipv6</span><span class="p">,</span>
+    <span class="n">masscan</span><span class="o">-&gt;</span><span class="n">payloads</span><span class="p">.</span><span class="n">udp</span><span class="p">,</span>
+    <span class="n">masscan</span><span class="o">-&gt;</span><span class="n">payloads</span><span class="p">.</span><span class="n">oproto</span><span class="p">,</span>
+    <span class="n">stack_if_datalink</span><span class="p">(</span><span class="n">masscan</span><span class="o">-&gt;</span><span class="n">nic</span><span class="p">[</span><span class="n">index</span><span class="p">].</span><span class="n">adapter</span><span class="p">),</span>
+    <span class="n">masscan</span><span class="o">-&gt;</span><span class="n">seed</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>该函数位于 <a href="https://github.com/robertdavidgraham/masscan/blob/master/src/templ-pkt.c">masscan/src/templ.pkt.c</a> 中，其中对于 TCP 的初始化代码如下所示。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* [TCP] */</span>
+<span class="n">_template_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">templset</span><span class="o">-&gt;</span><span class="n">pkts</span><span class="p">[</span><span class="n">Proto_TCP</span><span class="p">],</span>
+               <span class="n">source_mac</span><span class="p">,</span> <span class="n">router_mac_ipv4</span><span class="p">,</span> <span class="n">router_mac_ipv6</span><span class="p">,</span>
+               <span class="n">default_tcp_template</span><span class="p">,</span>
+               <span class="k">sizeof</span><span class="p">(</span><span class="n">default_tcp_template</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+               <span class="n">data_link</span><span class="p">);</span>
+<span class="n">templset</span><span class="o">-&gt;</span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>其中调用的 default_tcp_template 定义在该文件头部，下述 7 行指定 IP 的 length 为 40，下述 10 行指定 TLL 为 255，下述 18 行指定 ack 为 0，下述 21 行指定 window 的大小为 1024，可以将这些指标视为 Masscan 的特征。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">default_tcp_template</span><span class="p">[]</span> <span class="o">=</span>
+    <span class="s">"</span><span class="se">\0\1\2\3\4\5</span><span class="s">"</span>  <span class="cm">/* Ethernet: destination */</span>
+    <span class="s">"</span><span class="se">\6\7</span><span class="s">\x8\x9\xa\xb"</span>  <span class="cm">/* Ethernet: source */</span>
+    <span class="s">"</span><span class="se">\x08\x00</span><span class="s">"</span>      <span class="cm">/* Ethernet type: IPv4 */</span>
+    <span class="s">"</span><span class="se">\x45</span><span class="s">"</span>          <span class="cm">/* IP type */</span>
+    <span class="s">"</span><span class="se">\x00</span><span class="s">"</span>
+    <span class="s">"</span><span class="se">\x00\x28</span><span class="s">"</span>      <span class="cm">/* total length = 40 bytes */</span>
+    <span class="s">"</span><span class="se">\x00\x00</span><span class="s">"</span>      <span class="cm">/* identification */</span>
+    <span class="s">"</span><span class="se">\x00\x00</span><span class="s">"</span>      <span class="cm">/* fragmentation flags */</span>
+    <span class="s">"</span><span class="se">\xFF\x06</span><span class="s">"</span>      <span class="cm">/* TTL=255, proto=TCP */</span>
+    <span class="s">"</span><span class="se">\xFF\xFF</span><span class="s">"</span>      <span class="cm">/* checksum */</span>
+    <span class="s">"</span><span class="se">\0\0\0\0</span><span class="s">"</span>      <span class="cm">/* source address */</span>
+    <span class="s">"</span><span class="se">\0\0\0\0</span><span class="s">"</span>      <span class="cm">/* destination address */</span>
+
+    <span class="s">"</span><span class="se">\0\0</span><span class="s">"</span>          <span class="cm">/* source port */</span>
+    <span class="s">"</span><span class="se">\0\0</span><span class="s">"</span>          <span class="cm">/* destination port */</span>
+    <span class="s">"</span><span class="se">\0\0\0\0</span><span class="s">"</span>      <span class="cm">/* sequence number */</span>
+    <span class="s">"</span><span class="se">\0\0\0\0</span><span class="s">"</span>      <span class="cm">/* ack number */</span>
+    <span class="s">"</span><span class="se">\x50</span><span class="s">"</span>          <span class="cm">/* header length */</span>
+    <span class="s">"</span><span class="se">\x02</span><span class="s">"</span>          <span class="cm">/* SYN */</span>
+    <span class="s">"</span><span class="se">\x04</span><span class="s">\x0"</span>        <span class="cm">/* window fixed to 1024 */</span>
+    <span class="s">"</span><span class="se">\xFF\xFF</span><span class="s">"</span>      <span class="cm">/* checksum */</span>
+    <span class="s">"</span><span class="se">\x00\x00</span><span class="s">"</span>      <span class="cm">/* urgent pointer */</span>
+    <span class="s">"</span><span class="se">\x02\x04\x05\xb4</span><span class="s">"</span>  <span class="cm">/* added options [mss 1460] */</span>
+<span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="demo-设计与实现">Demo 设计与实现</h2>
+
+<p>经过抓包分析和源码分析后，可以总结三个扫描器的特征如下表所示。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044988.png#vwid=1524&amp;vhei=877" alt="" /></p>
+
+<p>总体来看，三个扫描器工具都是基于单包的头部信息进行识别，且经过源码确认，属于强特征。那么识别的具体设计也就很容易了，对 pcap 文件的每个数据包进行分类，判断其是否满足上述三个指纹，核心识别流程图如下图所示。</p>
+
+<p><img src="https://img.seriouszyx.com/202109011044015.png#vwid=622&amp;vhei=624" alt="" /></p>
+
+<p>具体实现使用 Python 的 Scrapy 包解析 pcap，进行相关操作，代码很短，核心部分如下。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">packets</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s">'TCP'</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="c1"># 识别 Zmap
+</span>        <span class="k">if</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'TCP'</span><span class="p">].</span><span class="n">window</span> <span class="o">==</span> <span class="mi">65535</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'IP'</span><span class="p">].</span><span class="nb">id</span> <span class="o">==</span> <span class="mi">54321</span><span class="p">):</span>
+            <span class="n">isZmap</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c1"># 识别 Masscan
+</span>        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s">'TCP'</span><span class="p">].</span><span class="n">window</span> <span class="o">==</span> <span class="mi">1024</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s">'TCP'</span><span class="p">].</span><span class="n">ack</span> <span class="o">==</span> <span class="mi">0</span> \
+                <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s">'IP'</span><span class="p">].</span><span class="n">ttl</span> <span class="o">==</span> <span class="mi">255</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s">'IP'</span><span class="p">].</span><span class="nb">len</span> <span class="o">==</span> <span class="mi">40</span><span class="p">:</span>
+            <span class="n">isMasscan</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="c1"># 识别 Angry IP Scanner
+</span>    <span class="k">if</span> <span class="s">'ICMP'</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s">'Raw'</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="n">processStr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'Raw'</span><span class="p">].</span><span class="n">load</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'Raw'</span><span class="p">])</span> <span class="o">==</span> <span class="mi">32</span> <span class="ow">and</span> <span class="n">items</span> <span class="o">==</span> <span class="n">ANGRYIP_FLAG</span><span class="p">:</span>
+                <span class="n">isAngryip</span> <span class="o">=</span> <span class="bp">True</span>
+</code></pre></div></div>
+
+<p>代码放置于 <a href="https://github.com/seriouszyx/ScannerRecognition">GitHub</a>。</p>
+
+<hr />
+
+<p>参考：</p>
+
+<p><a href="https://linux.cn/article-5860-1.html">互联网扫描器 ZMap 完全手册</a></p>
+
+<p><a href="https://nanshihui.github.io/2017/03/29/zmap%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB%E4%B9%8Bzmap%E6%89%AB%E6%8F%8F%E5%BF%AB%E7%9A%84%E5%8E%9F%E5%9B%A0/">zmap 源码解读之 zmap 扫描快的原因</a></p>
+
+<p><a href="https://github.com/al0ne/Nmap_Bypass_IDS">Nmap_Bypass_IDS</a></p>
+
+<p><a href="https://blog.csdn.net/weixin_44288604/article/details/115656891">入侵检测——masscan(扫描篇)</a></p>]]></content><author><name>隐秀</name></author><summary type="html"><![CDATA[扫描探测工具识别]]></summary></entry><entry><title type="html">💻【环境搭建】基于 Docker 搭建 Typecho 博客系统</title><link href="https://blog.seriouszyx.com/2021/deploy-typecho-blog.html" rel="alternate" type="text/html" title="💻【环境搭建】基于 Docker 搭建 Typecho 博客系统" /><published>2021-07-14T13:40:49+00:00</published><updated>2021-07-14T13:40:49+00:00</updated><id>https://blog.seriouszyx.com/2021/deploy-typecho-blog</id><content type="html" xml:base="https://blog.seriouszyx.com/2021/deploy-typecho-blog.html"><![CDATA[<h1 id="云服务器">云服务器</h1>
+
+<p>首先一般搭建动态博客都会有一个云服务器，国内的话供应商一般是阿里云或者腾讯云，我这里使用的是腾讯云，基本的操作逻辑大同小异。</p>
+
+<p>下面是我服务器的配置信息。</p>
+
+<p><img src="https://img.seriouszyx.com/20210714235652.png#vwid=1646&amp;vhei=876" alt="" /></p>
+
+<h1 id="安装-docker">安装 Docker</h1>
+
+<h2 id="yum-换源">yum 换源</h2>
+
+<p>首先将 yum 进行换源处理，以获得更快的下载速度。备份 <code class="highlighter-rouge">CentOS-Base.repo</code> 文件，以便更改配置文件出错恢复默认。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mv</span> /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
+</code></pre></div></div>
+
+<p>之后下载新的 <code class="highlighter-rouge">CentOS-Base.repo</code> 到 <code class="highlighter-rouge">/etc/yum.repos.d</code> 。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget <span class="nt">-O</span> /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo
+</code></pre></div></div>
+
+<p>根据自己服务器的版本下载相应的配置文件，比如机器的操作系统是 CentOS7，就把下载链接最后的部分改为 <code class="highlighter-rouge">CentOS-7.repo</code> 。</p>
+
+<p>下载成功后运行 <code class="highlighter-rouge">yum makecache</code> 生成缓存即可，这样使用 yum 下载软件包时访问的就是阿里的镜像，速度会快很多。</p>
+
+<h2 id="安装-docker-1">安装 Docker</h2>
+
+<p>在新主机上首次安装 Docker Engine-Community 之前，需要设置 Docker 仓库，之后就可以从仓库安装和更新 Docker。</p>
+
+<p>先安装所需的软件包，<code class="highlighter-rouge">yum-utils</code> 提供了 yum-config-manager ，并且 device mapper 存储驱动程序需要 <code class="highlighter-rouge">device-mapper-persistent-data</code> 和 <code class="highlighter-rouge">lvm2</code>。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum <span class="nb">install</span> <span class="nt">-y</span> yum-utils device-mapper-persistent-data lvm2
+</code></pre></div></div>
+
+<p>使用以下命令来设置稳定的仓库，国内的阿里源会加快下载速度。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>yum-config-manager <span class="se">\</span>
+    <span class="nt">--add-repo</span> <span class="se">\</span>
+    http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+</code></pre></div></div>
+
+<p>安装最新版本的 <code class="highlighter-rouge">Docker Engine-Community</code> 和 <code class="highlighter-rouge">containerd</code>。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum <span class="nb">install</span> <span class="nt">-y</span> docker-ce docker-ce-cli containerd.io
+</code></pre></div></div>
+
+<p>安装后输入 <code class="highlighter-rouge">serivce docker status</code>  查看 Docker 运行状态，如下所示即正常运行。</p>
+
+<p><img src="https://img.seriouszyx.com/20210714235730.png#vwid=1695&amp;vhei=426" alt="" /></p>
+
+<h2 id="docker-换源">Docker 换源</h2>
+
+<p>修改镜像配置文件。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /etc/docker/daemon.json
+</code></pre></div></div>
+
+<p>添加国内源。</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"registry-mirrors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+       </span><span class="s2">"https://docker.mirrors.ustc.edu.cn"</span><span class="p">,</span><span class="w">
+       </span><span class="s2">"http://hub-mirror.c.163.com"</span><span class="p">,</span><span class="w">
+       </span><span class="s2">"https://registry.docker-cn.com"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>使用 <code class="highlighter-rouge">service docker restart</code> 命令重启 Docker 服务后生效。</p>
+
+<h1 id="安装-typecho-依赖环境">安装 Typecho 依赖环境</h1>
+
+<p>所有容器依赖的一些数据都放在 <code class="highlighter-rouge">/data</code> 目录下，包括数据库、网站源码、Nginx 的 conf 等，目的是为了以后迁移方便，直接将 <code class="highlighter-rouge">/data</code> 拷贝到新服务器就可以。</p>
+
+<h2 id="安装数据库-mysql">安装数据库 MySQL</h2>
+
+<p>使用 Docker 安装 MySQL5.7，注意密码项的自定义修改。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-d</span> <span class="nt">-p</span> 3306:3306 <span class="nt">-e</span> <span class="nv">MYSQL_ROOT_PASSWORD</span><span class="o">=</span>password <span class="nt">--mount</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bind</span>,source<span class="o">=</span>/data/mysql,target<span class="o">=</span>/var/lib/mysql <span class="nt">--restart</span><span class="o">=</span>always <span class="nt">--name</span> mysql5.7 mysql:5.7
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">--mount</code> 命令也可以用 <code class="highlighter-rouge">-v /data/mysql:/var/lib/mysql</code> 代替，官方更推荐使用 <code class="highlighter-rouge">--mount</code>，详情请看<a href="https://docs.docker.com/storage/bind-mounts/">官网</a>。</p>
+
+<p>对于 <code class="highlighter-rouge">docker run</code> 命令的部分参数说明：</p>
+
+<ul>
+  <li>-d 代表 daemon，即后台运行。</li>
+  <li>-p 是映射容器的3306端口到宿主机的3306端口，规则是：<code class="highlighter-rouge">-p IP:host_port:container_port</code> 。</li>
+  <li>-e 是设置 MySQL 的密码。</li>
+  <li>–mount 是让容器的<code class="highlighter-rouge">/var/lib/mysql</code> 映射到宿主机的 <code class="highlighter-rouge">/data/mysql</code> 目录中。</li>
+  <li>–restart=always 是为了在 Docker 重启时，容器能够自动启动。</li>
+</ul>
+
+<h2 id="安装-nginx">安装 Nginx</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-p</span> 80:80 <span class="nt">-p</span> 443:443 <span class="nt">--mount</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bind</span>,source<span class="o">=</span>/data/nginx/conf.d,target<span class="o">=</span>/etc/nginx/conf.d <span class="nt">--mount</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bind</span>,source<span class="o">=</span>/data/solution,target<span class="o">=</span>/data/solution <span class="nt">--restart</span><span class="o">=</span>always <span class="nt">-d</span> <span class="nt">--name</span> nginx nginx
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">--mount type=bind,source=/data/nginx/conf.d,target=/etc/nginx/conf.d</code> 是为了将 Nginx 的配置目录映射到宿主机的目录中，这样当 Nginx 容器被销毁时，依然能保留配置。</li>
+  <li><code class="highlighter-rouge">/data/solution</code> 用于存放网站项目，也是为了数据与容器分离。</li>
+  <li>-d 这里同时映射了80和443端口。</li>
+</ul>
+
+<h2 id="安装-php">安装 PHP</h2>
+
+<p>可以在 PHP 的<a href="https://hub.docker.com/_/php">官方镜像源</a>找到最新版本的 PHP，在实际使用中，我们可能还需要装一些 PHP 的扩展，而官方源中支持已经帮我们安装了一些扩展的 PHP 镜像，如 <code class="highlighter-rouge">php:&lt;version&gt;-fpm</code>，其中的 <code class="highlighter-rouge">&lt;version&gt;</code> 指的是 PHP 版本，具体可以从官方镜像源找到。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">--name</span> php-fpm <span class="nt">-p</span> 9000:9000 <span class="nt">--mount</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bind</span>,source<span class="o">=</span>/data/solution,target<span class="o">=</span>/data/solution <span class="nt">--restart</span><span class="o">=</span>always <span class="nt">-d</span> php:7.4-fpm
+</code></pre></div></div>
+
+<p>这里也将网站根目录 <code class="highlighter-rouge">/data/solution</code> 映射到 PHP 容器中，为了 PHP 能正确读取 Nginx 中的 root 配置项。</p>
+
+<p>由于 Typecho 需要用到 <code class="highlighter-rouge">pdo_mysql</code> 扩展，因此要在 <code class="highlighter-rouge">php-fpm</code> 上安装这个扩展。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 进入到`php-fpm`容器内部</span>
+docker <span class="nb">exec</span> <span class="nt">-it</span> php-fpm bash
+<span class="c"># 安装扩展</span>
+docker-php-ext-install pdo_mysql
+<span class="c"># 查看是否已经成功安装</span>
+php <span class="nt">-m</span>
+<span class="c"># 退出容器</span>
+<span class="nb">exit</span>
+</code></pre></div></div>
+
+<p>安装后重启 <code class="highlighter-rouge">php-fpm</code>，<code class="highlighter-rouge">pdo_mysql</code> 则安装成功。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker restart php-fpm
+</code></pre></div></div>
+
+<h1 id="自定义-bridge-网络">自定义 Bridge 网络</h1>
+
+<p>执行命令看一下，现在机器上已经运行着 Nginx、PHP、MySQL 三个服务，现在需要让它们之间能够相互通信，这里使用自定义 Bridge 网络的方法。</p>
+
+<p><img src="https://img.seriouszyx.com/20210714235804.png#vwid=1377&amp;vhei=99" alt="" /></p>
+
+<p>实际上启动容器时，Docker 会将容器绑定到默认的 Bridge 网络中，使用 <code class="highlighter-rouge">docker network inspect bridge</code> 命令打印此时默认的网络：</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"typecho"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"d9d06a7e7410e75183eb09019bb895a12a01d2f7405f80e09d40811c578ff396"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2021-06-11T13:10:53.453912588+08:00"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"local"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Driver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bridge"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"EnableIPv6"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"IPAM"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"Driver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"default"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Options"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+            </span><span class="nl">"Config"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                </span><span class="p">{</span><span class="w">
+                    </span><span class="nl">"Subnet"</span><span class="p">:</span><span class="w"> </span><span class="s2">"172.18.0.0/16"</span><span class="p">,</span><span class="w">
+                    </span><span class="nl">"Gateway"</span><span class="p">:</span><span class="w"> </span><span class="s2">"172.18.0.1"</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+            </span><span class="p">]</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"Internal"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Attachable"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Ingress"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"ConfigFrom"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"Network"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"ConfigOnly"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Containers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"2d4b9daf908252e40b8cca8e772e9dece8c1c36a467f2846fc0786d4964817cd"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mysql5.7"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"EndpointID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8afe4a42884234acda9c8b996faed20d98015e6c919455edaf0d24f63bc22764"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"MacAddress"</span><span class="p">:</span><span class="w"> </span><span class="s2">"02:42:ac:12:00:02"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"IPv4Address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"172.18.0.2/16"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"IPv6Address"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"8cd032a4eeff30e7a54d81b6f92449160b243c793ba9d1a239cb4587896f2721"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"php-fpm"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"EndpointID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"211aa7e5ab248aee84cc7875b76842037e1c597eb3f5b546b3705ac971c52c0a"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"MacAddress"</span><span class="p">:</span><span class="w"> </span><span class="s2">"02:42:ac:12:00:04"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"IPv4Address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"172.18.0.4/16"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"IPv6Address"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"ff4b411e355f1000552b892601164499a0c077fdd4a8eb22bb8c5e92f0757d83"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nginx"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"EndpointID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e10b908ac0e0f6bd872a0b23d7ff30f58845700b7fe48568325d73ad38ba1747"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"MacAddress"</span><span class="p">:</span><span class="w"> </span><span class="s2">"02:42:ac:12:00:03"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"IPv4Address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"172.18.0.3/16"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"IPv6Address"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"Options"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+        </span><span class="nl">"Labels"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>可以看到 MySQL、php-fpm、Nginx 在默认 Bridge 中的 IP 分别是 <code class="highlighter-rouge">172.18.0.2</code>、<code class="highlighter-rouge">172.18.0.4</code>、<code class="highlighter-rouge">172.18.0.3</code>，  可以通过容器在宿主机中的 IP 来访问对应的服务，比如 php-fpm 想要访问 MySQL，可以在 php-fpm 容器中通过 <code class="highlighter-rouge">172.18.0.2:3306</code> 来访问。</p>
+
+<p>这种方式只能使用 IP 来访问对应的容器的服务，而 IP 可能会变化的，因此是不推荐使用在生产环境的。而用户自定义的 Bridge 网络，不仅支持 IP 访问，还支持直接使用容器名称访问。</p>
+
+<p>创建一个自定义 Bridge 网络，假设名称是 <code class="highlighter-rouge">typecho</code>。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker network create typecho
+</code></pre></div></div>
+
+<p>通过 <code class="highlighter-rouge">docker network connect ${网络名} ${容器名}</code> 来将容器绑定到 <code class="highlighter-rouge">typecho</code> 网络上。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker network connect typecho mysql5.7
+docker network connect typecho php-fpm
+docker network connect typecho nginx
+</code></pre></div></div>
+
+<p>现在三个容器已经绑定到自定义的 Bridge 网络上了。例如，在 Nginx 容器中，就可以直接通过 <code class="highlighter-rouge">php-fpm</code> 的名字来调用 PHP 的服务了。</p>
+
+<h1 id="安装-typecho">安装 Typecho</h1>
+
+<p>进入 MySQL 容器创建数据库 <code class="highlighter-rouge">typecho</code> 。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker <span class="nb">exec</span> <span class="nt">-it</span> mysql5.7 bash
+mysql <span class="nt">-uroot</span> <span class="nt">-p</span> 
+输入密码
+create database typecho<span class="p">;</span>
+</code></pre></div></div>
+
+<p>进入 Typecho 官方<a href="https://typecho.org/download">下载页面</a>，发现分为<code class="highlighter-rouge">稳定版</code>和<code class="highlighter-rouge">开发版</code>两种，按照一般的软件安装思路，当然是选择稳定版，但是 Typecho 的稳定版在2017年后就没有更新了，会遇到许多问题，比如我之前的安装中就遇到了<a href="https://github.com/typecho/typecho/issues/683">此类错误</a> ，随后切换至开发版后问题解决。</p>
+
+<p>复制开发版的下载链接，下载到服务器的 <code class="highlighter-rouge">/data</code> 目录下并解压到 <code class="highlighter-rouge">/solution</code> 目录下。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://nightly.link/typecho/typecho/workflows/Typecho-dev-Ci/master/typecho_build.zip 
+
+unzip typecho_build.zip <span class="nt">-d</span> ./solution/typecho
+</code></pre></div></div>
+
+<p>然后配置 Nginx 使得网站可以正常访问。注意其中 Nginx 要访问 php-fpm，在配置文件中可通过名字访问其 Docker 容器。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>server <span class="o">{</span>
+	listen 80<span class="p">;</span>
+	server_name localhost<span class="p">;</span>
+	root   /data/solution/typecho<span class="p">;</span>   <span class="c"># 这里是网站的存放路径</span>
+  index  index.php<span class="p">;</span>
+
+	<span class="c"># 下面直接照写</span>
+	location / <span class="o">{</span>
+    	try_files <span class="nv">$uri</span> <span class="nv">$uri</span>/ /index.php<span class="nv">$is_args$args</span><span class="p">;</span>
+	<span class="o">}</span>
+	
+	location ~ <span class="se">\.</span>php<span class="nv">$ </span><span class="o">{</span>
+        include fastcgi.conf<span class="p">;</span>
+        include fastcgi_params<span class="p">;</span>
+        fastcgi_pass php-fpm:9000<span class="p">;</span>
+    <span class="o">}</span>
+	
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>配置成功后重启 Nginx 容器，访问服务器的 IP 地址，开始配置 Typecho 博客系统。</p>
+
+<p><img src="https://img.seriouszyx.com/20210714235847.png#vwid=1920&amp;vhei=946" alt="" /></p>
+
+<p>数据库适配器选择安装好的 <code class="highlighter-rouge">pdo-mysql</code> ，因为已经配置了自定义 Bridge 网络，数据库地址填入容器名即可访问数据库。</p>
+
+<p><img src="https://img.seriouszyx.com/20210714235921.png#vwid=1920&amp;vhei=2145" alt="" /></p>
+
+<p>完成配置信息后会显示如下界面，需要复制文本框中的内容，然后创建 <code class="highlighter-rouge">config.inc.php</code> 文件粘贴进去。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /data/solution/typecho/config.inc.php
+</code></pre></div></div>
+
+<p><img src="https://img.seriouszyx.com/20210714235946.png#vwid=1920&amp;vhei=781" alt="" /></p>
+
+<p>最终会显示安装成功页面，并可以查看默认的用户名和密码。</p>
+
+<p><img src="https://img.seriouszyx.com/20210715000019.png#vwid=1920&amp;vhei=944" alt="" /></p>
+
+<p>下面两个链接分别是博客页面和后台控制面板。</p>
+
+<p><img src="https://img.seriouszyx.com/20210715000053.png#vwid=1920&amp;vhei=1015" alt="" /></p>
+
+<p><img src="https://img.seriouszyx.com/20210715000124.png#vwid=1920&amp;vhei=950" alt="" /></p>
+
+<p>Typecho 博客系统至此安装完成。</p>
+
+<hr />
+
+<ol>
+  <li><a href="https://segmentfault.com/a/1190000021390958">Centos8使用docker迁移typecho博客</a></li>
+  <li><a href="https://blog.csdn.net/wudinaniya/article/details/105758739">将CentOS的yum源更换为国内镜像源</a></li>
+  <li><a href="https://www.runoob.com/docker/centos-docker-install.html">CentOS Docker 安装</a></li>
+  <li><a href="https://wiki.dongxing.xin/pages/b1c12d/#php-%E5%AE%89%E8%A3%85">Typecho 环境配置和博客搭建</a></li>
+</ol>]]></content><author><name>隐秀</name></author><summary type="html"><![CDATA[云服务器]]></summary></entry><entry><title type="html">👣【区块链】到底什么才是区块链</title><link href="https://blog.seriouszyx.com/2021/what-is-blockchain.html" rel="alternate" type="text/html" title="👣【区块链】到底什么才是区块链" /><published>2021-06-01T14:40:07+00:00</published><updated>2021-06-01T14:40:07+00:00</updated><id>https://blog.seriouszyx.com/2021/what-is-blockchain</id><content type="html" xml:base="https://blog.seriouszyx.com/2021/what-is-blockchain.html"><![CDATA[<p>区块链现在是紧跟着人工智能、大数据的新名词，提起区块链，大多数人首先想到的是炒币，充斥着虚假、浮躁，再加上前几年国家对这种现象的抵制，让很多人对区块链技术望而却步。</p>
+
+<p>殊不知，比特币只是区块链技术的一个分支，而区块链本身，凝聚了许许多多计算机科学家的智慧，发展突飞猛进，正在脱离实验室，走进人们的生活，未来可期。从 Facebook 的 <a href="https://libra.org/">libra</a> 到最近<a href="https://www.infoq.cn/article/zglACBgaSGXKFHV85F3G">中国的重视态度</a>，像 AI 一样，区块链将是未来几年甚至几十年围绕着人们的新技术。</p>
+
+<p>回过头来看，2008 年末“中本聪”提出区块链概念到目前为止不过十多年，现在开始了解区块链，你我都称得上是这项技术的先驱者。</p>
+
+<p>不过，目前国内介绍区块链的内容还是显得浮躁，鲜有真正踏踏实实介绍其内部技术细节的文章。下面是一篇我翻译的区块链的介绍文章，由 <a href="https://mohitmamoria.medium.com/">Mohit Mamoria</a> 所作，在 <a href="https://medium.com/hackernoon/wtf-is-the-blockchain-1da89ba19348">Medium</a> 上收到了广泛好评。文章比较长，图片很多，但值得耐心读完。无论你对区块链的认知如何，下面的有些内容一定会让你感到吃惊。</p>
+
+<!--more-->
+
+<h2 id="前言">前言</h2>
+
+<p>除非你是个鸵鸟，总是喜欢把脑袋埋进沙子里，否则你一定曾经听说过比特币和区块链这两个名词。毕竟，它们都是当今炙手可热的话题，即使是从未开采过加密货币或是从未了解过加密货币工作原理的人，也都在讨论它。跟很多人一样，我身边谈论它的非专业朋友甚至多于专业朋友。</p>
+
+<p>当这种情况发生，就到了写点东西的时候了，我希望用简单的文字为所有普通的互联网用户指明方向，以免大家在迷雾中没头脑地摸索。</p>
+
+<h2 id="区块链为什么我们需要这么复杂的东西">区块链：为什么我们需要这么复杂的东西？</h2>
+
+<blockquote>
+  <p>“对于每个复杂的问题，都有一个清晰、简单而错误的答案” — H. L. Mencken</p>
+</blockquote>
+
+<p>与互联网上其他的文章不同的是，我们首先不是要定义区块链，而是要理解它所解决的问题。</p>
+
+<p>想象这样一个情景，你叫 Dude，你最好的朋友 Joe 在国外旅行，在他假期的第五天，他打电话给你说：“哥们，能不能借我点钱，我钱都花光了。”</p>
+
+<p>你回复他：“我马上就给你转。”</p>
+
+<p><img src="/media/what-is-blockchain/1.png" alt="" /></p>
+
+<p>然后你给银行经理打电话，让他从你的的账户上转1000美元到 Joe 的账户上。</p>
+
+<p>你的银行经理收到消息后打开登记簿，检查你的账户余额，看看你有没有足够的钱转账。在确认了你有足够的金额后，他在登记簿上做了如下操作：</p>
+
+<p><img src="/media/what-is-blockchain/2.png" alt="" /></p>
+
+<p>你打电话给 Joe，说钱已经汇过去了，下次他去银行就可以把你刚转给他的钱取出来了。</p>
+
+<p><img src="/media/what-is-blockchain/3.png" alt="" /></p>
+
+<p>刚刚发生了什么？你和 Joe 都相信银行来管理你们的资产。钱并没有真正的转移，只是在登记簿上做了一些记录。更准确的讲，你和 Joe 都不能直接控制登记簿上的记录。</p>
+
+<p>这就是当前系统存在的问题。</p>
+
+<p><strong>为了建立彼此之间的信任，我们必须依赖于第三方。</strong></p>
+
+<p>多少年来，我们一直以来这些中间人达到相互信任，可能你会问，依赖他们有什么问题吗？</p>
+
+<p>问题就是他们在数量上是单一的，如果一个人/一个组织有意或无意地走向腐败，那么社会就会混乱。</p>
+
+<ul>
+  <li>如果记录交易的登记簿火灾中被烧毁了怎么办？</li>
+  <li>如果你的银行经理将1000美元误写成了1500美元怎么办？</li>
+  <li>如果他故意这么做怎么办？</li>
+</ul>
+
+<p><strong>多年来，我们总是在一棵树上吊死。</strong></p>
+
+<p>是否有这样一个系统，让我们不需要银行就可以转账？</p>
+
+<p>为了回答这个问题，我们需要进一步细化，问自己一个更好的问题（毕竟更好的问题才能得到更好的答案）。</p>
+
+<p>思考一下，转账这个动作意味着什么?只是在登记簿上记录一下，下面才是更好的问题——</p>
+
+<p><strong>有没有一种方式来维持我们之间的记录，而不是其他人替我们维持？</strong></p>
+
+<p>这是一个值得讨论的问题，不过我想你已经猜到了，<strong>区块链</strong>就是这个问题的答案。</p>
+
+<p>这是一种不需要依靠他人，仅凭我们自己来保持记录的方法。</p>
+
+<p>你应该没有走神吧？很好，因为现在，当这几个问题在你的脑海中开始浮现时，我们将正式介绍这个分布式记录簿是怎样工作的。</p>
+
+<h2 id="告诉我区块链是如何运作的">告诉我，区块链是如何运作的？</h2>
+
+<p>这种方法的前提条件是有足够多不希望依赖于第三方的人，只有这样，这些人才能自己维持记录。</p>
+
+<blockquote>
+  <p>为了防止比特币流行起来，购买一些比特币或许是有意义的，如果有足够的人这样想，那么这将成为一个自我实现的语言。—中本聪（Satoshi Nakamoto），2009年</p>
+</blockquote>
+
+<p>多少个人才足够呢？至少三个，在我们的例子中，假设十个人想要放弃银行或其他第三方。经过大家的同意后，他们会一直保持彼此账户的详细信息，而无需知道别人的身份。</p>
+
+<p><img src="/media/what-is-blockchain/4.png" alt="" /></p>
+
+<p>1.一个空文件夹</p>
+
+<p>每个人都有一个空的文件夹，随着大家的前进，每个人的文件夹中都会添加新的记录页，这些记录页的集合就是记录交易的记录簿。</p>
+
+<p>2.什么时候发生交易？</p>
+
+<p>接下来，这个网络中的每个人手机都拿着一张纸额一支笔，每个人都准备记录系统中发生的任何交易。</p>
+
+<p>假设2号想要给9号转10美元。</p>
+
+<p>为了达成交易，2号要向大家喊：“我想给9号转10美元，所以，你们每个人都在自己的记录页上记下这笔交易。”</p>
+
+<p><img src="/media/what-is-blockchain/5.png" alt="" /></p>
+
+<p>每个人都会检查2号是否有10美元转给9号，如果有的话，他们每个人都会在自己的记录页上写下这笔交易。</p>
+
+<p><img src="/media/what-is-blockchain/6.png" alt="" /></p>
+
+<p>然后这笔交易就被视作完成了。</p>
+
+<p>3.交易不断发生</p>
+
+<p>随着时间的推移，系统中的每个人都有交易的需求。每当他们想交易时，都会向所有人公布，别人听完公布并检查后，都会将交易写在自己的记录页上。</p>
+
+<p>这个流程会一直进行下去，知道每个人都用光了当前的记录页。假设一个记录页可以记录十笔交易，当第十笔交易完成后，就证明每个人都用光了当前的记录页。</p>
+
+<p><img src="/media/what-is-blockchain/7.png" alt="" /></p>
+
+<p>现在是时候将记录页放到文件夹中，再取出一个新的记录页，重复上述的流程。</p>
+
+<p>4.收回记录页</p>
+
+<p>在我们将记录页放回文件夹之前，需要使用一个唯一的密钥来密封它，而且这个密钥要经过系统中每个人的同意。通过密封，我们将确保，无论今天、明天、甚至是一年后，一旦它的副本放在每个人自己的文件夹中，就没有人可以再对它进行任何更改。一旦进入文件夹，它就将永远在文件夹中密封。而且，如果每个人都信任印章，那么每个人都信任记录页的内容，<strong>记录页的密封</strong>也正是这个方法的关键之处。</p>
+
+<blockquote>
+  <p>这在现实中称作“挖矿”，不过简单起见，我们仍然称它为“密封”。</p>
+</blockquote>
+
+<p>先前，第三方/中间人为我们提供信任，我们相信他们在记录簿上记录的内容不会改变。而在我们的这种分布式系统中，密封的手段为我们提供信任。</p>
+
+<h2 id="很有趣那么我们如何密封记录页呢">很有趣！那么我们如何密封记录页呢？</h2>
+
+<p>通常，在学习如何密封之前，我们将对密封的工作原理有一个大致的了解。作为前提，你需要知道这几个名词。</p>
+
+<h3 id="魔法机器">魔法机器</h3>
+
+<p>想象一个被厚重墙壁包裹的机器，如果你从左边输入一个装有东西的盒子，它会从右边吐出一个装有其他东西的盒子。</p>
+
+<blockquote>
+  <p>事实上，这台机器叫“哈希函数”，不过我不太想技术化，现在，他就是台神奇的机器。</p>
+</blockquote>
+
+<p><img src="/media/what-is-blockchain/8.png" alt="" /></p>
+
+<p>假设，你从左边输入4，它可能从右边返回这些单词：dcbea。</p>
+
+<p>它是如何把数字4转换成这个单词的呢？没有人知道。而且，这是一个不可逆的过程。有了 dcbea 这个词，却不可能知道机器的左边被输入了什么。但每次你把数字4输入机器时，它总会吐出相同的单词 dcbea。</p>
+
+<p><img src="/media/what-is-blockchain/9.png" alt="" /></p>
+
+<p>让我们再尝试输入一个不同的数字，比如说 26。</p>
+
+<p><img src="/media/what-is-blockchain/10.png" alt="" /></p>
+
+<p>这次我们得到了 94c8e。很有趣不是吗！原来单词也可以包含数字。</p>
+
+<p>好，接下来请你思考这样一个问题：</p>
+
+<p><strong>你能告诉我我应该从机器的左边输入什么，才能从右边得到一个以三个0开头的单词吗？例如，000ab 或 00098 或 000fa 或其他单词。</strong></p>
+
+<p><img src="/media/what-is-blockchain/11.png" alt="" /></p>
+
+<p>好好想一会这个问题。</p>
+
+<p>之前说过，这台机器的一个性质就是无法从右边的输出结果推测出左边的输入内容，那么怎么才能回答我提出的问题呢？</p>
+
+<p>我能想到一个方法，为什么不一个一个尝试世界上所有的数呢，直到得到一个以三个0开头的单词？</p>
+
+<p><img src="/media/what-is-blockchain/12.png" alt="" /></p>
+
+<p>乐观地看，经过几千次尝试后，我们才会得到一个所需的输出。</p>
+
+<p><img src="/media/what-is-blockchain/13.png" alt="" /></p>
+
+<p>可见，根据输出来计算输入是一件很困难很困难的事情。但与此同时，要验证输入是否产生一个所需的输出总是非常容易的。记住，输入相同的数组机器总产生同样的单词。</p>
+
+<p>如果我给你一个数，比如说 72533，然后问你：“把这个数从左边放入机器中，是否能得到一个以三个0开头的单词？”</p>
+
+<p>那么你需要做的，就仅仅是把这个数字扔进机器中，然后观察右边产生的单词，你看，就是它。</p>
+
+<p>这种机器最重要的一个性质就是——“已知一个输出，很难计算出它的输入是什么，不过已知一个输入和一个输出，却很容易验证它们是否匹配。”</p>
+
+<p>在文章的剩余部分，一定要记住魔法机器（或者叫哈希函数）的这一特性：</p>
+
+<p><strong>已知一个输出，很难计算出它的输入是什么，不过已知一个输入和一个输出，却很容易验证它们是否匹配。</strong></p>
+
+<h3 id="如何使用这些机器来密封记录页">如何使用这些机器来密封记录页？</h3>
+
+<p>我们将使用这种魔法机器来为记录页产生印章。同样，举个例子来说明。</p>
+
+<p>假设给你两个盒子，其中一个盒子中的数字是 20893，那么请问你能不能找出一个数字，使它加上20893并放入机器后产生一个以三个0开头的单词？</p>
+
+<p><img src="/media/what-is-blockchain/14.png" alt="" /></p>
+
+<p>这和之前的情况类似，我们已经知道答案了，计算这样一个数字的一个唯一的方法就是枚举世界上的每个数字。</p>
+
+<p>经过了几千次尝试后，我们或许能偶然发现一个数字，比如说21191，加上20893（21191 + 20893 = 42084）后放入机器中，可以得到一个满足需求的单词。</p>
+
+<p><img src="/media/what-is-blockchain/15.png" alt="" /></p>
+
+<p>在这种情况下，21191这个数字就是20893的印章。假设有一个记录页上写着20893，那么要密封该页（即任何人都不能更改该页的内容），我们就会在该页贴上21191的标签，封口号（即21191）一贴在记录页上，就表明该记录页已经被密封了。</p>
+
+<p><img src="/media/what-is-blockchain/16.png" alt="" /></p>
+
+<blockquote>
+  <p>封口号被称为“工作证明（Proof Of Work）”，表明这个编号是经过努力的计算得来的，不过为了说明，我们更乐意叫它封口号。</p>
+</blockquote>
+
+<p>这样，想要验证一个记录页是否被篡改就很简单了，只需将记录页的内容加上封口号，再输入到魔法机器中，观察产生的结果是否以三个0开头。如果出现的单词不符合我们的要求，那就证明该页被更改了，没有任何用处。</p>
+
+<p>我们将使用类似的密封机制来密封所有记录页，并排列好它们放入各自的文件夹中。</p>
+
+<h3 id="最后密封我们的记录页">最后，密封我们的记录页</h3>
+
+<p>为了密封包含系统中交易的记录页，我们需要计算出一个数字，这个数字添加到交易列表并输入到机器中，得到一个以三个0开头的单词。</p>
+
+<p><img src="/media/what-is-blockchain/17.png" alt="" /></p>
+
+<blockquote>
+  <p>“以三个0为开头的单词”只是一个例子，它说明了哈希函数的工作原理，实际情况比这复杂得多。</p>
+</blockquote>
+
+<p>花费时间和电力计算出的这个数字，就被用来作为记录页的封口号。如果有人试图篡改该页的内容，其他人可以使用封口号来验证它的完整性。</p>
+
+<p>现在，我们已经知道了如何封页。那么转回我们在记录页上完成第十笔交易的时间，我们已经用光了空间不能再增加新的交易了。</p>
+
+<p>当每个人都用完了记录页的空间时，他们就会沉迷于计算记录页的封口号，以便将它们放入文件夹中。系统中的每个人都会计算，第一个计算出封口号的人会向其他人宣布这个数字。</p>
+
+<p><img src="/media/what-is-blockchain/18.png" alt="" /></p>
+
+<p>一听到密封号，每个人都会立刻验证它是否产生了所需的输出。如果通过了验证，那么每个人都将使用这个数字来密封他们的记录页，并放入文件夹中。</p>
+
+<p>但是，对于某个人（比如7号）来说，公布的密封号不能产生所需的输出结果，该怎么办？这种情况并不罕见，可能有以下几个原因：</p>
+
+<ul>
+  <li>他可能听错了系统中的某个交易</li>
+  <li>他可能写错了系统中的某个交易</li>
+  <li>在记录某些交易时，他可能试图伪造以使自己或系统中的其他人受益</li>
+</ul>
+
+<p>不管原因是什么，7号只剩下一个选择，那就是放弃他的记录页，从其他人哪里拷贝一份，然后放进他的文件夹中。如果他表示反对，那么他就无法继续进行交易，而且被禁止成为系统的一部分。</p>
+
+<p><strong>多数人通过的密封号就是真实的密封号。</strong></p>
+
+<p>可能你会问，既然知道了别人计算出密封号后会向他们公布，那为什么他们自己还要花费资源计算呢？为什么不闲坐着静静等待公布呢？</p>
+
+<p>这是一个很好的问题，恰恰指明了区块链的激励来源，第一个计算出密封号的人会因为他的努力（即消耗的 CPU 功率和电力）而获得免费的金钱。</p>
+
+<p>试想一下，如果5号计算出一个记录页的封口号，他就会得到免费的金钱，比如说1美元。这些钱是凭空冒出来的，换句话说，5号的账户余额会增加1美元，而其他人的余额不会减少。</p>
+
+<p>比特币就是这样诞生的，它是区块链上进行交易的第一种货币。为了回报对封口号努力的计算，人们被授予比特币。</p>
+
+<p>当足够数量的人获得比特币时，它们的价值就会增加，促使其他人也想获得比特币。</p>
+
+<p><strong>奖励让系统中的每个人都保持工作。</strong></p>
+
+<p>一旦每个人都将记录页放入文件夹中，他们就会拿出一个新的记录页，并永远重复这个流程。</p>
+
+<blockquote>
+  <p>将一个记录页想象成一个交易区块，将一个文件夹想象成一个记录页（区块）的链表，这样，就演变成了区块链。</p>
+</blockquote>
+
+<p>至此，你已经掌握了区块链的工作原理。</p>
+
+<hr />
+
+<p>还有一个小问题没有告诉你。</p>
+
+<p>假设文件夹中已经有了五个密封好的记录页，如何有人想篡改第二页的一笔交易呢？为修改后的记录页生成一个新的密封号就可以了吗？</p>
+
+<p>为了防止有人返回修改记录页和密封号，需要在计算密封号的过程中稍微变化一下。</p>
+
+<h3 id="保护密封号的修改">保护密封号的修改</h3>
+
+<p>还记得刚才讲过的两个盒子吗？一个盒子中包含数字20893，另一个盒子中的数字需要你计算。在现实中，要计算一个区块的密封号，不是两个盒子，而是两个填充好的，一个需要计算的。</p>
+
+<p>当这三个盒子的内容加和并输入机器时，从右边出来的答案必须满足要求的条件。</p>
+
+<p>我们已经知道，一个盒子包含交易列表，一个盒子包含封口号，第三个盒子有些不同，它包含了前一页魔法机器的输出结果。</p>
+
+<p><img src="/media/what-is-blockchain/19.png" alt="" /></p>
+
+<p>通过这个简单的小技巧，我们确保了每个记录页都依赖于上一个记录页。因此，如果某个人必须修改历史的记录页，那么他还需要修改之后的所有记录页的内容和封封口号，以保持链表的一致。</p>
+
+<p>如果我们一开始想象的十个人中的一个试图欺骗篡改区块链的内容，他就部分不调整几个记录页，并为这些记录页计算出新的封口号。我们知道计算封口号是一个很困难的过程，因此系统中的一个不诚实的人无法打败其他九个诚实的人。</p>
+
+<p>还有可能发生这种情况，一个不诚实的人作弊，他会创建一个新的链表。不过这个新的链表永远无法赶上诚实的链表，因为一个人的努力和速度无法打败其他九个人的累计之和。因此，<strong>系统中最长的链表是最诚实的链表。</strong></p>
+
+<p><img src="/media/what-is-blockchain/20.png" alt="" /></p>
+
+<p>当我告诉你一个不诚实的人无法打败九个诚实的人时，你是不是有新的疑问呢？</p>
+
+<h3 id="不是一个如果六个人都变得不诚实呢">不是一个，如果六个人都变得不诚实呢？</h3>
+
+<p>在这种情况下，协议将彻底失败，这被称为“51%攻击”。如果系统中的大多数个体u决定变得不诚实并欺骗系统中的其他部分时，协议就毫无价值了。</p>
+
+<p>这也是个区块链可能崩溃的唯一脆弱原因，要知道，这几乎是不可能发生的，但我们都必须知道系统的弱点，它是建立在大多数人始终诚实的基础上的。</p>
+
+<p>朋友们，这就是关于区块链的所有内容了。如果你发现有人被这项技术甩在身后，那么就把这篇文章分享给他，让他将链接添加至书签。</p>]]></content><author><name>隐秀</name></author><summary type="html"><![CDATA[区块链现在是紧跟着人工智能、大数据的新名词，提起区块链，大多数人首先想到的是炒币，充斥着虚假、浮躁，再加上前几年国家对这种现象的抵制，让很多人对区块链技术望而却步。]]></summary></entry><entry><title type="html">💻【环境搭建】最新超详细 VMware 的下载与安装</title><link href="https://blog.seriouszyx.com/2021/vmware-download-and-install.html" rel="alternate" type="text/html" title="💻【环境搭建】最新超详细 VMware 的下载与安装" /><published>2021-05-30T14:28:30+00:00</published><updated>2021-05-30T14:28:30+00:00</updated><id>https://blog.seriouszyx.com/2021/vmware-download-and-install</id><content type="html" xml:base="https://blog.seriouszyx.com/2021/vmware-download-and-install.html"><![CDATA[<div class="ant-alert ant-alert-info">
+  <p class="mb-1"><strong>更新日志</strong></p>
+
+  <ul>
+    <li>2022-04-10 新增两个 16 版本的秘钥</li>
+  </ul>
+
+</div>
+
+<p>我的 CSDN 站点上破 80w 浏览量的 <a href="https://blog.csdn.net/qq_40950957/article/details/80467513">VMware 安装教程</a>，由于 CSDN 文章中发现写有激活码审核不通过，所以将其放于本独立博客站点。</p>
+
+<!--more-->
+
+<h2 id="vmware-下载">VMware 下载</h2>
+
+<p>进入官网的 <a href="https://www.vmware.com/cn/products/workstation-pro.html">VMware Workstation Pro 页面</a>，浏览功能特性、应用场景、系统要求等。下滑页面点击 <code class="highlighter-rouge">试用 Workstation 16 Pro</code> 下方的下载链接，跳转至<a href="https://www.vmware.com/products/workstation-pro/workstation-pro-evaluation.html">下载页面</a>。</p>
+
+<p><img src="/media/vmware-download-and-install/1.png" alt="" /></p>
+
+<p>在下载页面中下滑，根据操作系统选择合适的产品，在这里以 Windows10 系统为例，选择  <code class="highlighter-rouge">Workstation 16 Pro for Windows</code>，开始下载安装文件。</p>
+
+<p><img src="/media/vmware-download-and-install/2.png" alt="" /></p>
+
+<h2 id="vmware-安装">VMware 安装</h2>
+
+<p>打开下载好的 <code class="highlighter-rouge">.exe</code> 文件， 即可开始安装。</p>
+
+<p><img src="/media/vmware-download-and-install/3.png" alt="" /></p>
+
+<p>安装位置默认在 C 盘下，在这里我选择安装在 D 盘，安装路径尽量不要有中文。可勾选 <code class="highlighter-rouge">增强型键盘驱动程序</code> ，此功能可更好地处理国际键盘和带有额外按键的键盘。</p>
+
+<p><img src="/media/vmware-download-and-install/4.png" alt="" /></p>
+
+<p>一直点击 <code class="highlighter-rouge">下一步</code> 等待软件安装完成。</p>
+
+<p><img src="/media/vmware-download-and-install/5.png" alt="" /></p>
+
+<p>安装成功后点击 <code class="highlighter-rouge">许可证</code> 输入密钥激活软件。</p>
+
+<p><img src="/media/vmware-download-and-install/6.png" alt="" /></p>
+
+<p>下面是一些网上搜集的可用密钥，复制到文本框中点击 <code class="highlighter-rouge">输入</code>。</p>
+
+<ul>
+  <li>VMware Workstation Pro 16
+    <ul>
+      <li>ZF3R0-FHED2-M80TY-8QYGC-NPKYF</li>
+      <li>YF390-0HF8P-M81RQ-2DXQE-M2UT6</li>
+      <li>ZF71R-DMX85-08DQY-8YMNC-PPHV8</li>
+    </ul>
+  </li>
+  <li>VMware Workstation Pro 15
+    <ul>
+      <li>FG78K-0UZ15-085TQ-TZQXV-XV0CD</li>
+      <li>ZA11U-DVY97-M81LP-4MNEZ-X3AW0</li>
+      <li>YU102-44D86-48D2Z-Z4Q5C-MFAWD</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="/media/vmware-download-and-install/7.png" alt="" /></p>
+
+<p>安装后可能要求重启系统，重启后进入软件。依次点击导航栏中的 <code class="highlighter-rouge">帮助 -&gt; 关于 VMware Workstation</code> ，查看许可证信息的状态，如下图所示即为激活成功。</p>
+
+<p><img src="/media/vmware-download-and-install/8.png" alt="" /></p>]]></content><author><name>隐秀</name></author><summary type="html"><![CDATA[更新日志]]></summary></entry><entry><title type="html">💻【环境搭建】服务器内网穿透</title><link href="https://blog.seriouszyx.com/2021/expose-local-server.html" rel="alternate" type="text/html" title="💻【环境搭建】服务器内网穿透" /><published>2021-02-14T13:40:49+00:00</published><updated>2021-02-14T13:40:49+00:00</updated><id>https://blog.seriouszyx.com/2021/expose-local-server</id><content type="html" xml:base="https://blog.seriouszyx.com/2021/expose-local-server.html"><![CDATA[<p>本科 AI 实验室的服务器在内网部署，疫情期间大家都没办法在学校，又需要使用 GPU 完成一些工作。正好老板又添置了一台服务器，派我做一下内网穿透，方便远程使用。</p>
+
+<h2 id="服务器配置">服务器配置</h2>
+
+<p>主要想记录一下软件方面的配置，所以怎么安装滑轨、怎么接线这类问题就不赘述了，下面的表格中记录了两台服务器的软硬件配置。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>server1</th>
+      <th>server2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GPU</td>
+      <td>Tesla V100 16G×2</td>
+      <td>Quadro RTX 6000 24G×2</td>
+    </tr>
+    <tr>
+      <td>CPU</td>
+      <td>Intel Xeon Gold 5117 @ 2.00GHz</td>
+      <td>Intel Xeon Gold 6240R @ 2.40GHz</td>
+    </tr>
+    <tr>
+      <td>内存</td>
+      <td>128G</td>
+      <td>128G</td>
+    </tr>
+    <tr>
+      <td>硬盘</td>
+      <td>20TB</td>
+      <td>24TB</td>
+    </tr>
+    <tr>
+      <td>操作系统</td>
+      <td>Ubuntu 18.04 LTS</td>
+      <td>Ubuntu 18.04 LTS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="内网穿透">内网穿透</h2>
+
+<p>上述两台服务器都在学院机房里，此局域网的限制很大，甚至学校提供的 VPN 都无法访问，必须要在学院内部的网络才能访问。当用户在宿舍或者校外，是没有官方提供的代理工具来连接服务器的，所以就需要一台公网服务器做转发，用户通过公网 ip 来访问内网的服务器，这就需要内网穿透技术。</p>
+
+<p>市面上有一些成熟的内网穿透软件，如花生壳、蒲公英等，但免费版本大多有带宽限制，且速度极慢，无法正常使用。然而这些软件底层或多或少都依赖 <a href="https://github.com/fatedier/frp">frp</a>，一款专注于内网穿透的高性能反向代理应用，支持多种协议，可以安全的将内网服务通过公网 ip 节点的中转暴露到公网。</p>
+
+<p>经调研后发现，frp 原生支持端口复用，也就是多个服务通过同一个服务端端口暴露。这样可以使用一台公网服务器同时代理两台内网服务，通过不同外网端口访问不同的内网服务。</p>
+
+<p>frp 的安装包在 <a href="https://github.com/fatedier/frp/releases">GitHub </a>上，值得注意的是，要想使 frp 正常工作，必须在不同服务器上下载相同版本的 frp 包。</p>
+
+<h3 id="服务端设置">服务端设置</h3>
+
+<blockquote>
+  <p>frp 的服务端是进行中转的公网服务器，具有独立的公网 ip。</p>
+</blockquote>
+
+<p>下载解压 frp 包，我一般放置在 <code class="highlighter-rouge">/usr/local/frp/</code> 目录下，编辑服务端配置文件 <code class="highlighter-rouge">frps.ini</code> 。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>common]
+bind_port <span class="o">=</span> 7000
+vhost_http_port <span class="o">=</span> 8899
+</code></pre></div></div>
+
+<p>其中：</p>
+
+<ul>
+  <li>“bind_port”表示用于客户端和服务端连接的端口，这个端口号我们之后在配置客户端的时候要用到。</li>
+  <li>“vhost_http_port”和“vhost_https_port”用于反向代理 HTTP 主机时使用，本文不涉及 HTTP 协议，因而照抄或者删除这条均可。</li>
+</ul>
+
+<p>编辑完成后即可保存，运行服务端应用。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./frps <span class="nt">-c</span> frps.ini
+</code></pre></div></div>
+
+<p>此时的服务端仅运行在前台，如果 <code class="highlighter-rouge">Ctrl+C</code> 停止或者关闭 SSH 窗口后，frps 均会停止运行，因而我们使用 <a href="https://www.runoob.com/linux/linux-comm-nohup.html">nohup 命令</a>将其运行在后台。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">nohup</span> ./frps <span class="nt">-c</span> frps.ini &amp;
+</code></pre></div></div>
+
+<p>至此，服务端即设置完成，你可以关闭SSH窗口了。</p>
+
+<h3 id="客户端配置">客户端配置</h3>
+
+<blockquote>
+  <p>frp 的客户端是真正想要访问的内网服务器。</p>
+</blockquote>
+
+<p>同样下载解压好 frp 软件，注意版本的统一，编辑两台客户端配置文件 <code class="highlighter-rouge">frpc.ini</code>。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>common]
+server_addr <span class="o">=</span> 39.106.21.214
+server_port <span class="o">=</span> 7000
+ 
+<span class="o">[</span>ssh]
+<span class="nb">type</span> <span class="o">=</span> tcp
+local_ip <span class="o">=</span> 172.10.1.185
+local_port <span class="o">=</span> 22
+remote_port <span class="o">=</span> 6666
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>common]
+server_addr <span class="o">=</span> 39.106.21.214
+server_port <span class="o">=</span> 7000
+
+<span class="o">[</span>ssh1]
+<span class="nb">type</span> <span class="o">=</span> tcp
+local_ip <span class="o">=</span> 172.10.1.184
+local_port <span class="o">=</span> 22
+remote_port <span class="o">=</span> 6667
+</code></pre></div></div>
+
+<p>其中：</p>
+
+<ul>
+  <li>“server_addr”为服务端 ip 地址，填入即可。</li>
+  <li>“server_port”为服务器端口，填入你设置的端口号即可，如果未改变就是7000。</li>
+  <li>“[xxx]”表示一个规则名称，自己定义，便于查询即可。</li>
+  <li>“type”表示转发的协议类型，有 TCP 和 UDP 等选项可以选择，如有需要请自行查询 frp 手册。</li>
+  <li>“local_port”是本地应用的端口号，按照实际应用工作在本机的端口号填写即可。</li>
+  <li>“remote_port”是该条规则在服务端开放的端口号，自己填写并记录即可。</li>
+</ul>
+
+<p>配置好后可以使用同样的方法后台运行客户端程序。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">nohup</span> ./frpc <span class="nt">-c</span> frpc.ini &amp;
+</code></pre></div></div>
+
+<h2 id="服务链架构">服务链架构</h2>
+
+<p>下面是整个 frp 服务链的架构（图中 ip 及端口号皆为模拟值）：</p>
+
+<p><img src="/assets/posts/expose-local-server/image.png" alt="frp 架构" /></p>
+
+<p>实线代表直接网络连接，虚线代表虚拟网络连接。在内网服务器（frpc）中配置的 <code class="highlighter-rouge">remote_port</code> 将在启动后向公网服务器（frps）发送（通过7000端口）注册信息，发送成功后，公网服务器开始监听6666和6667两个端口。</p>
+
+<p>在实际访问时，直接在 SSH 客户端输入公网服务器的 ip 地址，通过6666和6667两个端口号控制访问两台内网服务器，而其中的 <code class="highlighter-rouge">server_port</code> 、 <code class="highlighter-rouge">server_addr</code> 、 <code class="highlighter-rouge">local_ip</code> 和 <code class="highlighter-rouge">local_port</code> 等信息对用户透明，简单方便。</p>
+
+<blockquote>
+  <p>参考：</p>
+  <ul>
+    <li><a href="https://sspai.com/post/52523">使用frp进行内网穿透</a></li>
+    <li><a href="https://github.com/fatedier/frp/issues/174">frp issues 174</a></li>
+  </ul>
+</blockquote>]]></content><author><name>隐秀</name></author><summary type="html"><![CDATA[本科 AI 实验室的服务器在内网部署，疫情期间大家都没办法在学校，又需要使用 GPU 完成一些工作。正好老板又添置了一台服务器，派我做一下内网穿透，方便远程使用。]]></summary></entry><entry><title type="html">🎞️【字幕】一个人的字幕组</title><link href="https://blog.seriouszyx.com/2021/subtitle-group-for-one-person.html" rel="alternate" type="text/html" title="🎞️【字幕】一个人的字幕组" /><published>2021-02-04T14:36:11+00:00</published><updated>2021-02-04T14:36:11+00:00</updated><id>https://blog.seriouszyx.com/2021/subtitle-group-for-one-person</id><content type="html" xml:base="https://blog.seriouszyx.com/2021/subtitle-group-for-one-person.html"><![CDATA[<h2 id="前言">前言</h2>
+
+<p>我不是很懂当代流量的导向，人们到底乐意为怎样的内容驻足，是我很困惑的问题，就像我的 CSDN 最高互动量是一篇很简单的 VMware 安装教程，我的 GitHub 最高 star 数是只进行了几周的 CS61B 课程实验。它们算不上我心目中内容产出最高的两位，却被大众普遍接受，唯一的共同点可能是门槛较低、需求较广。然而，对于这些可能是互联网上占比最大的群体，现有的资源鱼龙混杂，多少内容靠着标题吸引流量，看完后才发现是贩卖焦虑、治标不治本。所以，我想为这种情况的改变做出点贡献。</p>
+
+<p>我搜索着 CS61B 的国内生态，这门完全公开、享誉世界的数据结构神课，虽在知乎、一亩三分地等处推荐强烈，但实际高质量完成的人数稀少。这要归因于语言和网络的阻碍，机翻字幕味同嚼蜡，YouTube 的访问也劝退了一大批初学者。于是我便有了方向，我决意用自己闲暇的时光，化身一个人的字幕组，翻译出这门课的所有视频资料，并搬运到 B 站。</p>
+
+<p>这两天，我调研了相关的工具，考虑了一些取舍，这期间实为不易，总结出一套满意的工作流，记录于此。</p>
+
+<h2 id="工作流">工作流</h2>
+
+<h3 id="片源">片源</h3>
+
+<p>视频源在 Josh Hug 的<a href="https://www.youtube.com/channel/UC7FzTMO4rKvlqIyU5vwzFKQ/playlists">播放列表</a>中，他把每周的视频整理成一个列表，下载最高画质我比较喜欢用 <a href="https://www.y2mate.com/">y2mate</a>，甚至可以提取出音频文件。字幕提取 <a href="https://downsub.com/">downsub</a> 挺不错的，直接下载 srt 格式，CS61B 2018 Spring 这个版本的视频有自带的 CC 字幕，但是时间轴还是有点奇怪，需要自己调整一下。如果有字幕文件格式转换的需求，我一般使用 <a href="https://gotranscript.com/subtitle-converter">subtitle-converter</a>。</p>
+
+<h3 id="打轴">打轴</h3>
+
+<p>这一步就开始麻烦起来了，简单解释起来就是把每一句轴对准。此外还要考虑断句，要简单读一下每句的意思，以便后期翻译。最后，下载的英文字幕可能有出错的地方，发现也要纠正一下。</p>
+
+<p>具体的操作我参考的<a href="https://www.bilibili.com/video/BV1ps411b7as">【Aegisub教程】快速打轴法</a>。将字幕和对应的视频文件导入 <a href="https://github.com/Aegisub/Aegisub">Aegisub</a>，只显示音频和字幕。左手放置在 SDFG 四个键位上，控制每句话的播放、确认等操作，我还把时间轴合并设置了热键，因为原版断句很多太细碎了。右手操纵鼠标左右键，控制每段时间轴的开始和结束位置，特别注意 Josh Hug 经常有一些语气词，我一般不把它们包含在轴内。</p>
+
+<p><img src="/media/subtitle-group-for-one-person/1.png" alt="image.png" /></p>
+
+<h3 id="初翻">初翻</h3>
+
+<p>我习惯用 <a href="https://zh.tern.1c7.me/">Tern</a> 先初次翻译一下，导入单语字幕后会自动机翻并生成双语字幕。因为英文的时间轴已经调整过了，断句肯定要比原版更好，即便是机翻也不会像 YouTube CC 机翻那么生硬。在软件设置里修改一下输出格式，原文译文分成两行，原文全部在前，译文全部在后。</p>
+
+<p><img src="/media/subtitle-group-for-one-person/2.png" alt="image.png" /></p>
+
+<p>srt 是标准的外轨字幕，没有样式和动画，我倾向设置样式，加重中文的显示效果。Aegisub 有样式管理器，我的样式基于 Crash Course 字幕组的<a href="https://1c7.me/open-source-subtitle-file/">公开样式</a>，他们组织的代表作是<a href="https://www.bilibili.com/video/av21376839/">计算机速成课</a>，也超过了百万播放量。</p>
+
+<p><img src="/media/subtitle-group-for-one-person/3.png" alt="image.png" /></p>
+
+<p>分别全选所有中英文字幕，设置中英文样式模板，再把字幕以开始时间排序。保存后字幕文件会自动转换为 ass 格式，之后打开会直接链接视频文件并加载字母样式。</p>
+
+<p><img src="/media/subtitle-group-for-one-person/4.png" alt="image.png" /></p>
+
+<p>虽然这步的名字我起为“初翻”，但主要目的是生成中文时间轴，并调整样式，为下面的翻译做准备。事实上，简单的句子机翻表现得还不错，但几乎90%的句子都需要重新修改，所以在内容翻译上，这步只是一个辅助作用。</p>
+
+<h3 id="翻译">翻译</h3>
+
+<p>终于到了重头戏，这步难点不在工具的使用，而在于翻译。既要考虑遵于原意，又要让语言易懂，不那么生硬。特别是 Josh Hug 口语化严重，很多细节需要格外考量。另外断句也很繁琐，很多时候把一大段文字翻译完，发现会错意，又要重新逐句更改。</p>
+
+<p>还有一些细碎的注意事项，全部加起来让工作量成倍增加，也出乎了我的设想。同时背后的专业能力也要跟上，遇到不懂的地方还要去网上查询资料。但不管怎样，还是以质量为主。</p>
+
+<p>下面是翻译后的译文，可以将这几段轴与上一张图片机翻的作比较，哪一个过分生硬，哪一个一眼就能明白，显而易见。这还是开篇简单的几句话，涉及到专业的内容，机翻与手翻的差异会更加明显。</p>
+
+<p><img src="/media/subtitle-group-for-one-person/5.png" alt="image.png" /></p>
+
+<h3 id="审片">审片</h3>
+
+<p>每一小集视频制作完成后，我都需要再整体带 ass 字幕看几遍视频，检查有没有字幕错误、不同步，时间轴是否有重合，错别字，翻译语句是否不通畅等等小问题。我其实不急于压制，也不急于发布，在制作完几个视频后，再回过头来审阅每个视频，保证错误率降到最低。</p>
+
+<p><img src="/media/subtitle-group-for-one-person/6.png" alt="image.png" /></p>
+
+<h3 id="压制">压制</h3>
+
+<p>压制即将原视频和制作好的字幕整合在一起，并设置码率等配置在保持一定清晰度的前提下大幅度压缩体积。小丸工具箱是很主流的选择，官网的网盘链接失效了，不过 B 站<a href="https://dl.hdslb.com/video-press/xiaowantoolsrev194.zip">创作中心</a>有提供。</p>
+
+<p>为了保证视频的质量，x264和 CRF 等压缩选项都输出最高画质，之后便可以压缩成 MP4 格式，上传到 B 站。</p>
+
+<p><img src="/media/subtitle-group-for-one-person/7.png" alt="image.png" /></p>
+
+<h2 id="关于课程">关于课程</h2>
+
+<p>大概是周一萌生了这个想法，周二周三调研相关工具后亲手制作了将近20分钟时长的视频，周四写下了这篇记录，所以还有很多不成熟的地方，我会随时修改。</p>
+
+<p>这件事情本源于我的心血来潮，真正去实践起来，花费的时间要比我预想的多得多。我还没有确定发布的进度，可能凑几周发布一次，也可能全制作好后一起发布，也可能永远搁置了。</p>
+
+<p>但值得庆幸的是，虽然包含很多重复的工作，我投入起来却干劲十足，甚至有点茶饭不思的激情。审片是整个流程中最开心的时刻，看着原版难以理解的视频，一步一步经过我手变得通俗易懂，我想这种成就感会推动我一直走下去，直至课程尽头。</p>]]></content><author><name>隐秀</name></author><summary type="html"><![CDATA[前言]]></summary></entry></feed>
