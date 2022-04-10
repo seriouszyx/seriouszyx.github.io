@@ -1,48 +1,28 @@
-<!DOCTYPE html>
-<html lang="en"><head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" /><!-- Begin Jekyll SEO tag v2.8.0 -->
-<meta name="generator" content="Jekyll v4.0.1" />
-<meta property="og:title" content="🛡️【攻击检测】网络扫描探测工具的分析与识别" />
-<meta name="author" content="隐秀" />
-<meta property="og:locale" content="en_US" />
-<meta name="description" content="扫描探测工具识别" />
-<meta property="og:description" content="扫描探测工具识别" />
-<link rel="canonical" href="https://blog.seriouszyx.com/2021/scanner-analysis-and-detect.html" />
-<meta property="og:url" content="https://blog.seriouszyx.com/2021/scanner-analysis-and-detect.html" />
-<meta property="og:site_name" content="seriouszyx’ Blog" />
-<meta property="og:type" content="article" />
-<meta property="article:published_time" content="2021-09-01T14:30:24+00:00" />
-<meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="🛡️【攻击检测】网络扫描探测工具的分析与识别" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"隐秀"},"dateModified":"2021-09-01T14:30:24+00:00","datePublished":"2021-09-01T14:30:24+00:00","description":"扫描探测工具识别","headline":"🛡️【攻击检测】网络扫描探测工具的分析与识别","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.seriouszyx.com/2021/scanner-analysis-and-detect.html"},"url":"https://blog.seriouszyx.com/2021/scanner-analysis-and-detect.html"}</script>
-<!-- End Jekyll SEO tag -->
-<!-- local css -->
-  <link rel="stylesheet" href="https://blog.seriouszyx.com/assets/css/main.css" />
-  <link rel="shortcut icon" type="image/x-icon" href="/./favicon.ico" />
-  <link rel="stylesheet" href="https://blog.seriouszyx.com/assets/css/grayscale.css" />
-  <!-- docsearch -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
-  <!-- utils -->
-  <link href="https://unpkg.com/tailwindcss@^2/dist/utilities.min.css" rel="stylesheet">
-</head>
+<!DOCTYPE html><html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <title>🛡️【攻击检测】网络扫描探测工具的分析与识别 [ 隐秀 ]</title>
+  
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.1"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('https://unpkg.com/tailwindcss@^2/dist/utilities.min.css');loadCss('https://cdn.jsdelivr.net/npm/prism-themes@1.9.0/themes/prism-one-light.min.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="https://unpkg.com/tailwindcss@^2/dist/utilities.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1.9.0/themes/prism-one-light.min.css"></noscript></head>
 <body>
-    <main class="page-content" aria-label="Content">
-        <div class="wrapper">
-            <article
-  class="post h-entry"
-  id="post"
-  itemscope
-  itemtype="http://schema.org/BlogPosting"
->
-  <head>
-    <title>🛡️【攻击检测】网络扫描探测工具的分析与识别</title>
-  </head>
+
+<main class="page-content" aria-label="Content">
+  
+
+  <div class="wrapper">
+    
+    
+  <article class="post h-entry" id="post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+      <title>🛡️【攻击检测】网络扫描探测工具的分析与识别</title>
+    
+
   <header class="post-header">
     <div class="post-back">
-      <a class="black-link" href="https://blog.seriouszyx.com">
+      <a class="black-link" href="/">
         ← Home
       </a>
     </div>
@@ -51,484 +31,284 @@
       🛡️【攻击检测】网络扫描探测工具的分析与识别
     </h1>
     <p class="post-meta">
-      <time
-        class="dt-published"
-        datetime="2021-09-01T14:30:24+00:00"
-        itemprop="datePublished"
-      >Sep 1, 2021
-      </time><span class="busuanzi_container_page">
-        <span id="busuanzi_container_page_pv">
-          •
-          <span id="busuanzi_value_page_pv"></span> View
-        </span>
-      </span>
+      <time class="dt-published" datetime="1630477824000" itemprop="datePublished">
+        Sep 01, 2021
+      </time>•
+      <span itemprop="author" itemscope="" itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">seriouszyx</span></span>
     </p>
   </header>
 
-  
-
-
-
-<ul>
-  <li><a href="#扫描探测工具识别">扫描探测工具识别</a></li>
-  <li><a href="#zmap">Zmap</a>
-    <ul>
-      <li><a href="#抓包分析">抓包分析</a></li>
-      <li><a href="#源码分析">源码分析</a></li>
-    </ul>
-  </li>
-  <li><a href="#angry-ip-scanner">Angry IP Scanner</a>
-    <ul>
-      <li><a href="#抓包分析-1">抓包分析</a></li>
-      <li><a href="#源码分析-1">源码分析</a></li>
-    </ul>
-  </li>
-  <li><a href="#masscan">Masscan</a>
-    <ul>
-      <li><a href="#抓包分析-2">抓包分析</a></li>
-      <li><a href="#源码分析-2">源码分析</a></li>
-    </ul>
-  </li>
-  <li><a href="#demo-设计与实现">Demo 设计与实现</a></li>
-</ul>
-
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <h2 id="扫描探测工具识别">扫描探测工具识别</h2>
-
-<p>网络扫描探测通常是发起网络入侵的第一步，攻击者可以利用扫描探测工具获取网络中的主机系统、TCP/UDP 端口的开放情况、子域名、网站指纹、WAF、CDN、中间件类别等重要信息，识别出存在安全漏洞的主机或系统，从而发起有针对性的网络入侵行为。此外，一些扫描工具同时具备漏洞利用的能力。因此，对网络扫描探测行为进行识别和研究，有利于及时发现网络攻击的前兆，发现网络攻击行为，快速定位网络服务中存在的漏洞，对网络安全防护工作十分有意义。</p>
-
+    <h1>🛡️【攻击检测】网络扫描探测工具的分析与识别</h1>
+    <h2 id="扫描探测工具识别"><a href="#扫描探测工具识别" class="headerlink" title="扫描探测工具识别"></a>扫描探测工具识别</h2><p>网络扫描探测通常是发起网络入侵的第一步，攻击者可以利用扫描探测工具获取网络中的主机系统、TCP/UDP 端口的开放情况、子域名、网站指纹、WAF、CDN、中间件类别等重要信息，识别出存在安全漏洞的主机或系统，从而发起有针对性的网络入侵行为。此外，一些扫描工具同时具备漏洞利用的能力。因此，对网络扫描探测行为进行识别和研究，有利于及时发现网络攻击的前兆，发现网络攻击行为，快速定位网络服务中存在的漏洞，对网络安全防护工作十分有意义。</p>
 <p>本文以下列三个常见扫描器为代表，探究扫描器的特有指纹信息，编写 Demo 进行扫描器的识别。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044955.png#vwid=1999&amp;vhei=694" alt="" /></p>
-
-<h2 id="zmap">Zmap</h2>
-
-<h3 id="抓包分析">抓包分析</h3>
-
-<p>ZMap 被设计用来针对整个 IPv4 地址空间或其中的大部分实施综合扫描的工具。</p>
-
+<p><img src="https://img.seriouszyx.com/202109011044955.png#vwid=1999&amp;vhei=694"></p>
+<h2 id="Zmap"><a href="#Zmap" class="headerlink" title="Zmap"></a>Zmap</h2><h3 id="抓包分析"><a href="#抓包分析" class="headerlink" title="抓包分析"></a>抓包分析</h3><p>ZMap 被设计用来针对整个 IPv4 地址空间或其中的大部分实施综合扫描的工具。</p>
 <p>默认情况下，ZMap 会对于指定端口实施尽可能大速率的 TCP SYN 扫描。如下图所示，客户端在发送一个 SYN 包的时候，如果对方端口开放，就会发送一个 SYN-ACK，那么就表明这个端口开放，这时候我们发送 RST 包，防止占用对方资源；如果对方端口不开放，那么我们就会收到对方主机的 RST 包。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044047.png#vwid=2652&amp;vhei=1128" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044047.png#vwid=2652&amp;vhei=1128"></p>
 <p>较为保守的情况下，对 10,000 个随机的地址的 80 端口以 10Mbps 的速度扫描，如下所示：</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044067.png#vwid=2225&amp;vhei=653" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044067.png#vwid=2225&amp;vhei=653"></p>
 <p>在生成的 csv 结果文件中，以下 IP 地址的 80 端口开放：</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>47.243.139.246
-20.205.204.152
-121.36.193.65
-156.245.39.71
-13.238.233.150
-142.234.31.240
-68.183.75.244
-185.48.122.237
-52.25.116.123
-104.127.1.181
-185.248.102.245
-95.217.201.8
-3.125.24.134
-23.15.117.202
-</code></pre></div></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token number">47.243</span>.139.246
+<span class="token number">20.205</span>.204.152
+<span class="token number">121.36</span>.193.65
+<span class="token number">156.245</span>.39.71
+<span class="token number">13.238</span>.233.150
+<span class="token number">142.234</span>.31.240
+<span class="token number">68.183</span>.75.244
+<span class="token number">185.48</span>.122.237
+<span class="token number">52.25</span>.116.123
+<span class="token number">104.127</span>.1.181
+<span class="token number">185.248</span>.102.245
+<span class="token number">95.217</span>.201.8
+<span class="token number">3.125</span>.24.134
+<span class="token number">23.15</span>.117.202<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>抓包结果如下所示，Zmap 向随机的 10,000 个 IP 的 80 端口发送 SYN 数据包。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044558.png#vwid=2560&amp;vhei=908" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044558.png#vwid=2560&amp;vhei=908"></p>
 <p>如果 IP 的 80 端口开放，以 47.243.139.246 为例，筛选出的数据包如下图所示，具体解释为：</p>
-
 <ol>
-  <li>向 47.243.139.246 的 80 端口发送 SYN 数据包</li>
-  <li>接收到 47.243.139.246 的 80 端口的 SYN/ACK 包，证明该 IP 的 80 端口可用</li>
-  <li>向 47.243.139.246 的 80 端口发送 RST 数据包，防止占用对方资源</li>
+<li>向 47.243.139.246 的 80 端口发送 SYN 数据包</li>
+<li>接收到 47.243.139.246 的 80 端口的 SYN/ACK 包，证明该 IP 的 80 端口可用</li>
+<li>向 47.243.139.246 的 80 端口发送 RST 数据包，防止占用对方资源</li>
 </ol>
-
-<p><img src="https://img.seriouszyx.com/202109011044591.png#vwid=2560&amp;vhei=371" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044591.png#vwid=2560&amp;vhei=371"></p>
 <p>如果 IP 的 80 端口不开放，以 44.102.170.124 为例，筛选出的数据包如下图所示。Zmap 向其发送 SYN 请求后没有得到应答，故判断该 IP 的 80 端口不可用。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044623.png#vwid=2560&amp;vhei=235" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044623.png#vwid=2560&amp;vhei=235"></p>
 <p>查看 Zmap 向哪些 IP 发送了 RST 数据包，则证明这些 IP 的 80 端口可用。筛选结果如下图所示，目的地址与上述的 csv 结果文件一致。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044663.png#vwid=2560&amp;vhei=798" alt="" /></p>
-
-<h3 id="源码分析">源码分析</h3>
-
-<p>Zmap 整体函数调用图如下所示。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044692.png#vwid=942&amp;vhei=522" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044663.png#vwid=2560&amp;vhei=798"></p>
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p>Zmap 整体函数调用图如下所示。</p>
+<p><img src="https://img.seriouszyx.com/202109011044692.png#vwid=942&amp;vhei=522"></p>
 <p>通过图我们可以直观的看到整个程序调用的过程。Zmap 在启动时候，先获取环境信息，如 IP、网关等。然后读取配置文件选择使用哪种扫描方式，然后在 Probe_modules 切换到对应的模块，然后启动。</p>
-
 <p>下面侧重分析 SYN 扫描这个模块，整个执行的过程中，会有一个线程专门负责发送，另外有一个使用 libpcap 组件抓包，发送和接收就独立开来。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/zmap/zmap/blob/main/src/probe_modules/module_tcp_synscan.c">zmap/src/probe_modules/module_tcp_synscan.c</a> 是用于执行 TCP SYN 扫描的探测模块，在初始化阶段的 synscan_init_perthread 函数中，依次调用 make_ip_header 函数和 make_tcp_header 函数进行数据包 header 的封装。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">synscan_init_perthread</span><span class="token punctuation">(</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">macaddr_t</span> <span class="token operator">*</span>src<span class="token punctuation">,</span> <span class="token class-name">macaddr_t</span> <span class="token operator">*</span>gw<span class="token punctuation">,</span>
+    <span class="token class-name">port_h_t</span> dst_port<span class="token punctuation">,</span>
+    UNUSED <span class="token keyword">void</span> <span class="token operator">*</span><span class="token operator">*</span>arg_ptr<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">struct</span> <span class="token class-name">ether_header</span> <span class="token operator">*</span>eth_header <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">ether_header</span> <span class="token operator">*</span><span class="token punctuation">)</span>buf<span class="token punctuation">;</span>
+    <span class="token function">make_eth_header</span><span class="token punctuation">(</span>eth_header<span class="token punctuation">,</span> src<span class="token punctuation">,</span> gw<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">ip</span> <span class="token operator">*</span>ip_header <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">ip</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>eth_header<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> len <span class="token operator">=</span> <span class="token function">htons</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">ip</span><span class="token punctuation">)</span> <span class="token operator">+</span> ZMAP_TCP_SYNSCAN_TCP_HEADER_LEN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">make_ip_header</span><span class="token punctuation">(</span>ip_header<span class="token punctuation">,</span> IPPROTO_TCP<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">tcphdr</span> <span class="token operator">*</span>tcp_header <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">tcphdr</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>ip_header<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">make_tcp_header</span><span class="token punctuation">(</span>tcp_header<span class="token punctuation">,</span> dst_port<span class="token punctuation">,</span> TH_SYN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">set_mss_option</span><span class="token punctuation">(</span>tcp_header<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> EXIT_SUCCESS<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><a href="https://github.com/zmap/zmap/blob/main/src/probe_modules/module_tcp_synscan.c">zmap/src/probe_modules/module_tcp_synscan.c</a> 是用于执行 TCP SYN 扫描的探测模块，在初始化阶段的 synscan_init_perthread 函数中，依次调用 make_ip_header 函数和 make_tcp_header 函数进行数据包 header 的封装。</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">int</span> <span class="nf">synscan_init_perthread</span><span class="p">(</span>
-    <span class="kt">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="n">macaddr_t</span> <span class="o">*</span><span class="n">src</span><span class="p">,</span> <span class="n">macaddr_t</span> <span class="o">*</span><span class="n">gw</span><span class="p">,</span>
-    <span class="n">port_h_t</span> <span class="n">dst_port</span><span class="p">,</span>
-    <span class="n">UNUSED</span> <span class="kt">void</span> <span class="o">**</span><span class="n">arg_ptr</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">struct</span> <span class="n">ether_header</span> <span class="o">*</span><span class="n">eth_header</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ether_header</span> <span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="p">;</span>
-    <span class="n">make_eth_header</span><span class="p">(</span><span class="n">eth_header</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">gw</span><span class="p">);</span>
-    <span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">ip_header</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="p">)(</span><span class="o">&amp;</span><span class="n">eth_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-    <span class="kt">uint16_t</span> <span class="n">len</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">ip</span><span class="p">)</span> <span class="o">+</span> <span class="n">ZMAP_TCP_SYNSCAN_TCP_HEADER_LEN</span><span class="p">);</span>
-    <span class="n">make_ip_header</span><span class="p">(</span><span class="n">ip_header</span><span class="p">,</span> <span class="n">IPPROTO_TCP</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
-    <span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_header</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="p">)(</span><span class="o">&amp;</span><span class="n">ip_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-    <span class="n">make_tcp_header</span><span class="p">(</span><span class="n">tcp_header</span><span class="p">,</span> <span class="n">dst_port</span><span class="p">,</span> <span class="n">TH_SYN</span><span class="p">);</span>
-    <span class="n">set_mss_option</span><span class="p">(</span><span class="n">tcp_header</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">EXIT_SUCCESS</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>这两个函数编写于 <a href="https://github.com/zmap/zmap/blob/main/src/probe_modules/packet.c">zmap/src/probe_modules/packet.c</a> 中。分析 make_ip_header 函数可知，在下示第 7 行，IP 的 identification number 被设置为固定的 54321。</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">make_ip_header</span><span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">iph</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">protocol</span><span class="p">,</span> <span class="kt">uint16_t</span> <span class="n">len</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_hl</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>  <span class="c1">// Internet Header Length</span>
-    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_v</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>   <span class="c1">// IPv4</span>
-    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_tos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// Type of Service</span>
-    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_len</span> <span class="o">=</span> <span class="n">len</span><span class="p">;</span>
-    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_id</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="mi">54321</span><span class="p">);</span> <span class="c1">// identification number</span>
-    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_off</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>	   <span class="c1">// fragmentation flag</span>
-    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_ttl</span> <span class="o">=</span> <span class="n">MAXTTL</span><span class="p">;</span>      <span class="c1">// time to live (TTL)</span>
-    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_p</span> <span class="o">=</span> <span class="n">protocol</span><span class="p">;</span>      <span class="c1">// upper layer protocol =&gt; TCP</span>
-    <span class="c1">// we set the checksum = 0 for now because that's</span>
-    <span class="c1">// what it needs to be when we run the IP checksum</span>
-    <span class="n">iph</span><span class="o">-&gt;</span><span class="n">ip_sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
+<p>这两个函数编写于 <a target="_blank" rel="noopener" href="https://github.com/zmap/zmap/blob/main/src/probe_modules/packet.c">zmap/src/probe_modules/packet.c</a> 中。分析 make_ip_header 函数可知，在下示第 7 行，IP 的 identification number 被设置为固定的 54321。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">make_ip_header</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">ip</span> <span class="token operator">*</span>iph<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> protocol<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    iph<span class="token operator">-&gt;</span>ip_hl <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>  <span class="token comment">// Internet Header Length</span>
+    iph<span class="token operator">-&gt;</span>ip_v <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>   <span class="token comment">// IPv4</span>
+    iph<span class="token operator">-&gt;</span>ip_tos <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">// Type of Service</span>
+    iph<span class="token operator">-&gt;</span>ip_len <span class="token operator">=</span> len<span class="token punctuation">;</span>
+    iph<span class="token operator">-&gt;</span>ip_id <span class="token operator">=</span> <span class="token function">htons</span><span class="token punctuation">(</span><span class="token number">54321</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// identification number</span>
+    iph<span class="token operator">-&gt;</span>ip_off <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>	   <span class="token comment">// fragmentation flag</span>
+    iph<span class="token operator">-&gt;</span>ip_ttl <span class="token operator">=</span> MAXTTL<span class="token punctuation">;</span>      <span class="token comment">// time to live (TTL)</span>
+    iph<span class="token operator">-&gt;</span>ip_p <span class="token operator">=</span> protocol<span class="token punctuation">;</span>      <span class="token comment">// upper layer protocol =&gt; TCP</span>
+    <span class="token comment">// we set the checksum = 0 for now because that's</span>
+    <span class="token comment">// what it needs to be when we run the IP checksum</span>
+    iph<span class="token operator">-&gt;</span>ip_sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>分析 make_tcp_header 函数可知，在下示第 10 行，TCP 的 window 被设置为固定的 65535。</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">make_tcp_header</span><span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_header</span><span class="p">,</span> <span class="n">port_h_t</span> <span class="n">dest_port</span><span class="p">,</span>
-		     <span class="kt">uint16_t</span> <span class="n">th_flags</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_seq</span> <span class="o">=</span> <span class="n">random</span><span class="p">();</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_ack</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_x2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_off</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span> <span class="c1">// data offset</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_flags</span> <span class="o">|=</span> <span class="n">th_flags</span><span class="p">;</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_win</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="mi">65535</span><span class="p">);</span> <span class="c1">// largest possible window</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_urp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">tcp_header</span><span class="o">-&gt;</span><span class="n">th_dport</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">dest_port</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">make_tcp_header</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">tcphdr</span> <span class="token operator">*</span>tcp_header<span class="token punctuation">,</span> <span class="token class-name">port_h_t</span> dest_port<span class="token punctuation">,</span>
+		     <span class="token class-name">uint16_t</span> th_flags<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    tcp_header<span class="token operator">-&gt;</span>th_seq <span class="token operator">=</span> <span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    tcp_header<span class="token operator">-&gt;</span>th_ack <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    tcp_header<span class="token operator">-&gt;</span>th_x2 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    tcp_header<span class="token operator">-&gt;</span>th_off <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span> <span class="token comment">// data offset</span>
+    tcp_header<span class="token operator">-&gt;</span>th_flags <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    tcp_header<span class="token operator">-&gt;</span>th_flags <span class="token operator">|=</span> th_flags<span class="token punctuation">;</span>
+    tcp_header<span class="token operator">-&gt;</span>th_win <span class="token operator">=</span> <span class="token function">htons</span><span class="token punctuation">(</span><span class="token number">65535</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// largest possible window</span>
+    tcp_header<span class="token operator">-&gt;</span>th_sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    tcp_header<span class="token operator">-&gt;</span>th_urp <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    tcp_header<span class="token operator">-&gt;</span>th_dport <span class="token operator">=</span> <span class="token function">htons</span><span class="token punctuation">(</span>dest_port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>查看抓取的 SYN 数据包，如下图所示，IP 的 ID 和 TCP 的 window 确实为 54321 和 65535，所以这两个固定值可作为扫描器特征。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044714.png#vwid=2560&amp;vhei=1275" alt="" /></p>
-
-<h2 id="angry-ip-scanner">Angry IP Scanner</h2>
-
-<h3 id="抓包分析-1">抓包分析</h3>
-
-<p>Angry IP Scanner（简称 angryip） 是一款开源跨平台的网络扫描器，主要用于扫描 IP 地址和端口。</p>
-
+<p><img src="https://img.seriouszyx.com/202109011044714.png#vwid=2560&amp;vhei=1275"></p>
+<h2 id="Angry-IP-Scanner"><a href="#Angry-IP-Scanner" class="headerlink" title="Angry IP Scanner"></a>Angry IP Scanner</h2><h3 id="抓包分析-1"><a href="#抓包分析-1" class="headerlink" title="抓包分析"></a>抓包分析</h3><p>Angry IP Scanner（简称 angryip） 是一款开源跨平台的网络扫描器，主要用于扫描 IP 地址和端口。</p>
 <p>angryip 默认使用 Windows ICMP 方法扫描各个 ip 地址，扫描每个 IP 的 80、443 和 8080 端口。以 IP 范围 123.56.104.200~123.56.104.250 为例，扫描结果如下图所示，红色代表 IP 不可用，蓝色代表 IP 可用端口不可用，绿色代表 IP 和端口均可用。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044740.png#vwid=2558&amp;vhei=1534" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044740.png#vwid=2558&amp;vhei=1534"></p>
 <p>在捕获的数据包中，以 123.56.104.218 为例，该 IP 被标记为绿色，下面是与它有关的数据包抓取结果。</p>
-
 <p>图中第一个红框处 angryip 与 123.56.104.218 进行了 3 次 ping，且都予以回复，说明该 IP 可用。第二个红框处 angryip 分别测试 123.56.104.218 的 80、443 和 8080 端口，其中 80 和 443 端口予以回复，说明这两个端口可用。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044760.png#vwid=2560&amp;vhei=930" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044760.png#vwid=2560&amp;vhei=930"></p>
 <p>在不可用的 IP 中，以 123.56.104.204 为例，与它相关的数据包抓取结果如下。angryip 向其发送 3 次 ping 请求，都没有得到回复，则判断其 IP 不可用，也没有向其端口发送数据包。</p>
+<p><img src="https://img.seriouszyx.com/202109011044783.png#vwid=2560&amp;vhei=325"></p>
+<h3 id="源码分析-1"><a href="#源码分析-1" class="headerlink" title="源码分析"></a>源码分析</h3><p>因为无论 IP 和端口是否可用，angryip 都会先发送 ping 数据包，所以通过 ping 阶段的源码分析其工具的特征。</p>
+<p>分析 <a target="_blank" rel="noopener" href="https://github.com/angryip/ipscan/blob/64ec7090acdba380a62d5d2e1a6c630cc5302197/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java">ipscan/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java</a> 源码，该测试类调用 pinger.ping () 方法 3 次，并计算平均时长。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">ICMPSharedPingerTest</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Test</span> <span class="token annotation punctuation">@Ignore</span><span class="token punctuation">(</span><span class="token string">"this test works only under root"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">testPing</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{</span>
+	<span class="token class-name">Pinger</span> pinger <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ICMPSharedPinger</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token class-name">PingResult</span> result <span class="token operator">=</span> pinger<span class="token punctuation">.</span><span class="token function">ping</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">ScanningSubject</span><span class="token punctuation">(</span><span class="token class-name">InetAddress</span><span class="token punctuation">.</span><span class="token function">getLocalHost</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">assertTrue</span><span class="token punctuation">(</span>result<span class="token punctuation">.</span><span class="token function">getAverageTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&gt;=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">assertTrue</span><span class="token punctuation">(</span>result<span class="token punctuation">.</span><span class="token function">getAverageTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">assertTrue</span><span class="token punctuation">(</span>result<span class="token punctuation">.</span><span class="token function">getTTL</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&gt;=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="https://img.seriouszyx.com/202109011044783.png#vwid=2560&amp;vhei=325" alt="" /></p>
+<p>该方法在 <a target="_blank" rel="noopener" href="https://github.com/angryip/ipscan/blob/master/src/net/azib/ipscan/core/net/WindowsPinger.java">ipscan/test/net/azib/ipscan/core/net/WindowsPinger.java</a> 中，源码如下所示，判断 IP 类型，并调用 IPv6 和 IPv4 对应的方法。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token class-name">PingResult</span> <span class="token function">ping</span><span class="token punctuation">(</span><span class="token class-name">ScanningSubject</span> subject<span class="token punctuation">,</span> <span class="token keyword">int</span> count<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>subject<span class="token punctuation">.</span><span class="token function">isIPv6</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token keyword">return</span> <span class="token function">ping6</span><span class="token punctuation">(</span>subject<span class="token punctuation">,</span> count<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">else</span>
+	<span class="token keyword">return</span> <span class="token function">ping4</span><span class="token punctuation">(</span>subject<span class="token punctuation">,</span> count<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="源码分析-1">源码分析</h3>
+<p>以 IPv4 为例，方法中定义了数据包的数据大小为 32，即 sendDataSize = 32。后续使用 Memory () 方法创建 SendData 对象，并未对其进行赋值，故默认值应全为 0。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">private</span> <span class="token class-name">PingResult</span> <span class="token function">ping4</span><span class="token punctuation">(</span><span class="token class-name">ScanningSubject</span> subject<span class="token punctuation">,</span> <span class="token keyword">int</span> count<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span> <span class="token punctuation">{</span>
+    <span class="token class-name">Pointer</span> handle <span class="token operator">=</span> <span class="token class-name"><span class="token namespace">dll<span class="token punctuation">.</span></span>IcmpCreateFile</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>handle <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IOException</span><span class="token punctuation">(</span><span class="token string">"Unable to create Windows native ICMP handle"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-<p>因为无论 IP 和端口是否可用，angryip 都会先发送 ping 数据包，所以通过 ping 阶段的源码分析其工具的特征。</p>
+    <span class="token keyword">int</span> sendDataSize <span class="token operator">=</span> <span class="token number">32</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> replyDataSize <span class="token operator">=</span> sendDataSize <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">IcmpEchoReply</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">10</span><span class="token punctuation">;</span>
+    <span class="token class-name">Pointer</span> sendData <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Memory</span><span class="token punctuation">(</span>sendDataSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    sendData<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span>sendDataSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">Pointer</span> replyData <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Memory</span><span class="token punctuation">(</span>replyDataSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-<p>分析 <a href="https://github.com/angryip/ipscan/blob/64ec7090acdba380a62d5d2e1a6c630cc5302197/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java">ipscan/test/net/azib/ipscan/core/net/ICMPSharedPingerTest.java</a> 源码，该测试类调用 pinger.ping()方法 3 次，并计算平均时长。</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ICMPSharedPingerTest</span> <span class="o">{</span>
-    <span class="nd">@Test</span> <span class="nd">@Ignore</span><span class="o">(</span><span class="s">"this test works only under root"</span><span class="o">)</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testPing</span><span class="o">()</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
-	<span class="nc">Pinger</span> <span class="n">pinger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ICMPSharedPinger</span><span class="o">(</span><span class="mi">1000</span><span class="o">);</span>
-	<span class="nc">PingResult</span> <span class="n">result</span> <span class="o">=</span> <span class="n">pinger</span><span class="o">.</span><span class="na">ping</span><span class="o">(</span><span class="k">new</span> <span class="nc">ScanningSubject</span><span class="o">(</span><span class="nc">InetAddress</span><span class="o">.</span><span class="na">getLocalHost</span><span class="o">()),</span> <span class="mi">3</span><span class="o">);</span>
-	<span class="n">assertTrue</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getAverageTime</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">);</span>
-	<span class="n">assertTrue</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getAverageTime</span><span class="o">()</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="o">);</span>
-	<span class="n">assertTrue</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getTTL</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">);</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>该方法在 <a href="https://github.com/angryip/ipscan/blob/master/src/net/azib/ipscan/core/net/WindowsPinger.java">ipscan/test/net/azib/ipscan/core/net/WindowsPinger.java</a> 中，源码如下所示，判断 IP 类型，并调用 IPv6 和 IPv4 对应的方法。</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="nc">PingResult</span> <span class="nf">ping</span><span class="o">(</span><span class="nc">ScanningSubject</span> <span class="n">subject</span><span class="o">,</span> <span class="kt">int</span> <span class="n">count</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">subject</span><span class="o">.</span><span class="na">isIPv6</span><span class="o">())</span>
-	<span class="k">return</span> <span class="nf">ping6</span><span class="o">(</span><span class="n">subject</span><span class="o">,</span> <span class="n">count</span><span class="o">);</span>
-    <span class="k">else</span>
-	<span class="k">return</span> <span class="nf">ping4</span><span class="o">(</span><span class="n">subject</span><span class="o">,</span> <span class="n">count</span><span class="o">);</span>
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>以 IPv4 为例，方法中定义了数据包的数据大小为 32，即 sendDataSize = 32。后续使用 Memory()方法创建 SendData 对象，并未对其进行赋值，故默认值应全为 0。</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="nc">PingResult</span> <span class="nf">ping4</span><span class="o">(</span><span class="nc">ScanningSubject</span> <span class="n">subject</span><span class="o">,</span> <span class="kt">int</span> <span class="n">count</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
-    <span class="nc">Pointer</span> <span class="n">handle</span> <span class="o">=</span> <span class="n">dll</span><span class="o">.</span><span class="na">IcmpCreateFile</span><span class="o">();</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">handle</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">IOException</span><span class="o">(</span><span class="s">"Unable to create Windows native ICMP handle"</span><span class="o">);</span>
-
-    <span class="kt">int</span> <span class="n">sendDataSize</span> <span class="o">=</span> <span class="mi">32</span><span class="o">;</span>
-    <span class="kt">int</span> <span class="n">replyDataSize</span> <span class="o">=</span> <span class="n">sendDataSize</span> <span class="o">+</span> <span class="o">(</span><span class="k">new</span> <span class="nc">IcmpEchoReply</span><span class="o">().</span><span class="na">size</span><span class="o">())</span> <span class="o">+</span> <span class="mi">10</span><span class="o">;</span>
-    <span class="nc">Pointer</span> <span class="n">sendData</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Memory</span><span class="o">(</span><span class="n">sendDataSize</span><span class="o">);</span>
-    <span class="n">sendData</span><span class="o">.</span><span class="na">clear</span><span class="o">(</span><span class="n">sendDataSize</span><span class="o">);</span>
-    <span class="nc">Pointer</span> <span class="n">replyData</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Memory</span><span class="o">(</span><span class="n">replyDataSize</span><span class="o">);</span>
-
-    <span class="nc">PingResult</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PingResult</span><span class="o">(</span><span class="n">subject</span><span class="o">.</span><span class="na">getAddress</span><span class="o">(),</span> <span class="n">count</span><span class="o">);</span>
-    <span class="k">try</span> <span class="o">{</span>
-	<span class="nc">IpAddrByVal</span> <span class="n">ipaddr</span> <span class="o">=</span> <span class="n">toIpAddr</span><span class="o">(</span><span class="n">subject</span><span class="o">.</span><span class="na">getAddress</span><span class="o">());</span>
-	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">count</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">currentThread</span><span class="o">().</span><span class="na">isInterrupted</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
-            <span class="kt">int</span> <span class="n">numReplies</span> <span class="o">=</span> <span class="n">dll</span><span class="o">.</span><span class="na">IcmpSendEcho</span><span class="o">(</span><span class="n">handle</span><span class="o">,</span> <span class="n">ipaddr</span><span class="o">,</span> <span class="n">sendData</span><span class="o">,</span> <span class="o">(</span><span class="kt">short</span><span class="o">)</span> <span class="n">sendDataSize</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">replyData</span><span class="o">,</span> <span class="n">replyDataSize</span><span class="o">,</span> <span class="n">timeout</span><span class="o">);</span>
-	    <span class="nc">IcmpEchoReply</span> <span class="n">echoReply</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">IcmpEchoReply</span><span class="o">(</span><span class="n">replyData</span><span class="o">);</span>
-	    <span class="k">if</span> <span class="o">(</span><span class="n">numReplies</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">echoReply</span><span class="o">.</span><span class="na">status</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">echoReply</span><span class="o">.</span><span class="na">address</span><span class="o">.</span><span class="na">bytes</span><span class="o">,</span> <span class="n">ipaddr</span><span class="o">.</span><span class="na">bytes</span><span class="o">))</span> <span class="o">{</span>
-		<span class="n">result</span><span class="o">.</span><span class="na">addReply</span><span class="o">(</span><span class="n">echoReply</span><span class="o">.</span><span class="na">roundTripTime</span><span class="o">);</span>
-		<span class="n">result</span><span class="o">.</span><span class="na">setTTL</span><span class="o">(</span><span class="n">echoReply</span><span class="o">.</span><span class="na">options</span><span class="o">.</span><span class="na">ttl</span> <span class="o">&amp;</span> <span class="mh">0xFF</span><span class="o">);</span>
-	    <span class="o">}</span>
-	<span class="o">}</span>
-    <span class="o">}</span>
-    <span class="k">finally</span> <span class="o">{</span>
-	<span class="n">dll</span><span class="o">.</span><span class="na">IcmpCloseHandle</span><span class="o">(</span><span class="n">handle</span><span class="o">);</span>
-    <span class="o">}</span>
-    <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
-<span class="o">}</span>
-</code></pre></div></div>
+    <span class="token class-name">PingResult</span> result <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PingResult</span><span class="token punctuation">(</span>subject<span class="token punctuation">.</span><span class="token function">getAddress</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> count<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+	<span class="token class-name">IpAddrByVal</span> ipaddr <span class="token operator">=</span> <span class="token function">toIpAddr</span><span class="token punctuation">(</span>subject<span class="token punctuation">.</span><span class="token function">getAddress</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> count <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">currentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">isInterrupted</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">int</span> numReplies <span class="token operator">=</span> <span class="token class-name"><span class="token namespace">dll<span class="token punctuation">.</span></span>IcmpSendEcho</span><span class="token punctuation">(</span>handle<span class="token punctuation">,</span> ipaddr<span class="token punctuation">,</span> sendData<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">short</span><span class="token punctuation">)</span> sendDataSize<span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> replyData<span class="token punctuation">,</span> replyDataSize<span class="token punctuation">,</span> timeout<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	    <span class="token class-name">IcmpEchoReply</span> echoReply <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">IcmpEchoReply</span><span class="token punctuation">(</span>replyData<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	    <span class="token keyword">if</span> <span class="token punctuation">(</span>numReplies <span class="token operator">&gt;</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> echoReply<span class="token punctuation">.</span>status <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token class-name">Arrays</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>echoReply<span class="token punctuation">.</span>address<span class="token punctuation">.</span>bytes<span class="token punctuation">,</span> ipaddr<span class="token punctuation">.</span>bytes<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		result<span class="token punctuation">.</span><span class="token function">addReply</span><span class="token punctuation">(</span>echoReply<span class="token punctuation">.</span>roundTripTime<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		result<span class="token punctuation">.</span><span class="token function">setTTL</span><span class="token punctuation">(</span>echoReply<span class="token punctuation">.</span>options<span class="token punctuation">.</span>ttl <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	    <span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+	<span class="token class-name"><span class="token namespace">dll<span class="token punctuation">.</span></span>IcmpCloseHandle</span><span class="token punctuation">(</span>handle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>在实际抓包中，每个发出的 ICMP 请求中，Data 的大小均为 32 字节，且全为 0，所以可将它作为 angryip 的特征。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044806.png#vwid=2560&amp;vhei=1068" alt="" /></p>
-
-<h2 id="masscan">Masscan</h2>
-
-<h3 id="抓包分析-2">抓包分析</h3>
-
-<p>Masscan 默认使用 SYN 扫描，以 IP 123.56.104.218 为例，扫描其 1~600 端口，结果如下所示。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044826.png#vwid=1346&amp;vhei=278" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044806.png#vwid=2560&amp;vhei=1068"></p>
+<h2 id="Masscan"><a href="#Masscan" class="headerlink" title="Masscan"></a>Masscan</h2><h3 id="抓包分析-2"><a href="#抓包分析-2" class="headerlink" title="抓包分析"></a>抓包分析</h3><p>Masscan 默认使用 SYN 扫描，以 IP 123.56.104.218 为例，扫描其 1~600 端口，结果如下所示。</p>
+<p><img src="https://img.seriouszyx.com/202109011044826.png#vwid=1346&amp;vhei=278"></p>
 <p>抓包结果如下所示，Masscan 向 123.56.104.218 的 1~600 端口进行随机化扫描，发出 SYN 请求。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044847.png#vwid=2560&amp;vhei=1250" alt="" /></p>
-
-<p>查看 80 端口的数据包，下图可知 80 端口向 Masscan 回复，说明该端口可用。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044871.png#vwid=2560&amp;vhei=277" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044847.png#vwid=2560&amp;vhei=1250"></p>
+<p> 查看 80 端口的数据包，下图可知 80 端口向 Masscan 回复，说明该端口可用。</p>
+<p><img src="https://img.seriouszyx.com/202109011044871.png#vwid=2560&amp;vhei=277"></p>
 <p>查看 81 端口的数据包，发现并没有数据包回复，说明该端口不可用。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044891.png#vwid=2560&amp;vhei=162" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044891.png#vwid=2560&amp;vhei=162"></p>
 <p>筛选收到的 SYN/ACK 数据包，得到 22、443 和 80 端口，说明 123.56.104.218 的 1~600 中这 3 个端口可用。</p>
+<p><img src="https://img.seriouszyx.com/202109011044912.png#vwid=2560&amp;vhei=260"></p>
+<h3 id="源码分析-2"><a href="#源码分析-2" class="headerlink" title="源码分析"></a>源码分析</h3><p>观察抓包分析中结果可以发现，所有发出的 SYN 请求中，窗口大小都是 1024。</p>
+<p><img src="https://img.seriouszyx.com/202109011044935.png#vwid=2560&amp;vhei=1250"></p>
+<p>在 Masscan 的主函数 <a target="_blank" rel="noopener" href="https://github.com/robertdavidgraham/masscan/blob/master/src/main.c">masscan/src/main.c</a> 文件中，默认使用以下代码初始化 TCP 数据包的模板。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token function">template_packet_init</span><span class="token punctuation">(</span>
+    parms<span class="token operator">-&gt;</span>tmplset<span class="token punctuation">,</span>
+    parms<span class="token operator">-&gt;</span>source_mac<span class="token punctuation">,</span>
+    parms<span class="token operator">-&gt;</span>router_mac_ipv4<span class="token punctuation">,</span>
+    parms<span class="token operator">-&gt;</span>router_mac_ipv6<span class="token punctuation">,</span>
+    masscan<span class="token operator">-&gt;</span>payloads<span class="token punctuation">.</span>udp<span class="token punctuation">,</span>
+    masscan<span class="token operator">-&gt;</span>payloads<span class="token punctuation">.</span>oproto<span class="token punctuation">,</span>
+    <span class="token function">stack_if_datalink</span><span class="token punctuation">(</span>masscan<span class="token operator">-&gt;</span>nic<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">.</span>adapter<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    masscan<span class="token operator">-&gt;</span>seed<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="https://img.seriouszyx.com/202109011044912.png#vwid=2560&amp;vhei=260" alt="" /></p>
-
-<h3 id="源码分析-2">源码分析</h3>
-
-<p>观察抓包分析中结果可以发现，所有发出的 SYN 请求中，窗口大小都是 1024。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044935.png#vwid=2560&amp;vhei=1250" alt="" /></p>
-
-<p>在 Masscan 的主函数 <a href="https://github.com/robertdavidgraham/masscan/blob/master/src/main.c">masscan/src/main.c</a> 文件中，默认使用以下代码初始化 TCP 数据包的模板。</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">template_packet_init</span><span class="p">(</span>
-    <span class="n">parms</span><span class="o">-&gt;</span><span class="n">tmplset</span><span class="p">,</span>
-    <span class="n">parms</span><span class="o">-&gt;</span><span class="n">source_mac</span><span class="p">,</span>
-    <span class="n">parms</span><span class="o">-&gt;</span><span class="n">router_mac_ipv4</span><span class="p">,</span>
-    <span class="n">parms</span><span class="o">-&gt;</span><span class="n">router_mac_ipv6</span><span class="p">,</span>
-    <span class="n">masscan</span><span class="o">-&gt;</span><span class="n">payloads</span><span class="p">.</span><span class="n">udp</span><span class="p">,</span>
-    <span class="n">masscan</span><span class="o">-&gt;</span><span class="n">payloads</span><span class="p">.</span><span class="n">oproto</span><span class="p">,</span>
-    <span class="n">stack_if_datalink</span><span class="p">(</span><span class="n">masscan</span><span class="o">-&gt;</span><span class="n">nic</span><span class="p">[</span><span class="n">index</span><span class="p">].</span><span class="n">adapter</span><span class="p">),</span>
-    <span class="n">masscan</span><span class="o">-&gt;</span><span class="n">seed</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>该函数位于 <a href="https://github.com/robertdavidgraham/masscan/blob/master/src/templ-pkt.c">masscan/src/templ.pkt.c</a> 中，其中对于 TCP 的初始化代码如下所示。</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* [TCP] */</span>
-<span class="n">_template_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">templset</span><span class="o">-&gt;</span><span class="n">pkts</span><span class="p">[</span><span class="n">Proto_TCP</span><span class="p">],</span>
-               <span class="n">source_mac</span><span class="p">,</span> <span class="n">router_mac_ipv4</span><span class="p">,</span> <span class="n">router_mac_ipv6</span><span class="p">,</span>
-               <span class="n">default_tcp_template</span><span class="p">,</span>
-               <span class="k">sizeof</span><span class="p">(</span><span class="n">default_tcp_template</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-               <span class="n">data_link</span><span class="p">);</span>
-<span class="n">templset</span><span class="o">-&gt;</span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
-</code></pre></div></div>
+<p>该函数位于 <a target="_blank" rel="noopener" href="https://github.com/robertdavidgraham/masscan/blob/master/src/templ-pkt.c">masscan/src/templ.pkt.c</a> 中，其中对于 TCP 的初始化代码如下所示。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* [TCP] */</span>
+<span class="token function">_template_init</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>templset<span class="token operator">-&gt;</span>pkts<span class="token punctuation">[</span>Proto_TCP<span class="token punctuation">]</span><span class="token punctuation">,</span>
+               source_mac<span class="token punctuation">,</span> router_mac_ipv4<span class="token punctuation">,</span> router_mac_ipv6<span class="token punctuation">,</span>
+               default_tcp_template<span class="token punctuation">,</span>
+               <span class="token keyword">sizeof</span><span class="token punctuation">(</span>default_tcp_template<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span>
+               data_link<span class="token punctuation">)</span><span class="token punctuation">;</span>
+templset<span class="token operator">-&gt;</span>count<span class="token operator">++</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>其中调用的 default_tcp_template 定义在该文件头部，下述 7 行指定 IP 的 length 为 40，下述 10 行指定 TLL 为 255，下述 18 行指定 ack 为 0，下述 21 行指定 window 的大小为 1024，可以将这些指标视为 Masscan 的特征。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">unsigned</span> <span class="token keyword">char</span> default_tcp_template<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span>
+    <span class="token string">"\0\1\2\3\4\5"</span>  <span class="token comment">/* Ethernet: destination */</span>
+    <span class="token string">"\6\7\x8\x9\xa\xb"</span>  <span class="token comment">/* Ethernet: source */</span>
+    <span class="token string">"\x08\x00"</span>      <span class="token comment">/* Ethernet type: IPv4 */</span>
+    <span class="token string">"\x45"</span>          <span class="token comment">/* IP type */</span>
+    <span class="token string">"\x00"</span>
+    <span class="token string">"\x00\x28"</span>      <span class="token comment">/* total length = 40 bytes */</span>
+    <span class="token string">"\x00\x00"</span>      <span class="token comment">/* identification */</span>
+    <span class="token string">"\x00\x00"</span>      <span class="token comment">/* fragmentation flags */</span>
+    <span class="token string">"\xFF\x06"</span>      <span class="token comment">/* TTL=255, proto=TCP */</span>
+    <span class="token string">"\xFF\xFF"</span>      <span class="token comment">/* checksum */</span>
+    <span class="token string">"\0\0\0\0"</span>      <span class="token comment">/* source address */</span>
+    <span class="token string">"\0\0\0\0"</span>      <span class="token comment">/* destination address */</span>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">default_tcp_template</span><span class="p">[]</span> <span class="o">=</span>
-    <span class="s">"</span><span class="se">\0\1\2\3\4\5</span><span class="s">"</span>  <span class="cm">/* Ethernet: destination */</span>
-    <span class="s">"</span><span class="se">\6\7</span><span class="s">\x8\x9\xa\xb"</span>  <span class="cm">/* Ethernet: source */</span>
-    <span class="s">"</span><span class="se">\x08\x00</span><span class="s">"</span>      <span class="cm">/* Ethernet type: IPv4 */</span>
-    <span class="s">"</span><span class="se">\x45</span><span class="s">"</span>          <span class="cm">/* IP type */</span>
-    <span class="s">"</span><span class="se">\x00</span><span class="s">"</span>
-    <span class="s">"</span><span class="se">\x00\x28</span><span class="s">"</span>      <span class="cm">/* total length = 40 bytes */</span>
-    <span class="s">"</span><span class="se">\x00\x00</span><span class="s">"</span>      <span class="cm">/* identification */</span>
-    <span class="s">"</span><span class="se">\x00\x00</span><span class="s">"</span>      <span class="cm">/* fragmentation flags */</span>
-    <span class="s">"</span><span class="se">\xFF\x06</span><span class="s">"</span>      <span class="cm">/* TTL=255, proto=TCP */</span>
-    <span class="s">"</span><span class="se">\xFF\xFF</span><span class="s">"</span>      <span class="cm">/* checksum */</span>
-    <span class="s">"</span><span class="se">\0\0\0\0</span><span class="s">"</span>      <span class="cm">/* source address */</span>
-    <span class="s">"</span><span class="se">\0\0\0\0</span><span class="s">"</span>      <span class="cm">/* destination address */</span>
+    <span class="token string">"\0\0"</span>          <span class="token comment">/* source port */</span>
+    <span class="token string">"\0\0"</span>          <span class="token comment">/* destination port */</span>
+    <span class="token string">"\0\0\0\0"</span>      <span class="token comment">/* sequence number */</span>
+    <span class="token string">"\0\0\0\0"</span>      <span class="token comment">/* ack number */</span>
+    <span class="token string">"\x50"</span>          <span class="token comment">/* header length */</span>
+    <span class="token string">"\x02"</span>          <span class="token comment">/* SYN */</span>
+    <span class="token string">"\x04\x0"</span>        <span class="token comment">/* window fixed to 1024 */</span>
+    <span class="token string">"\xFF\xFF"</span>      <span class="token comment">/* checksum */</span>
+    <span class="token string">"\x00\x00"</span>      <span class="token comment">/* urgent pointer */</span>
+    <span class="token string">"\x02\x04\x05\xb4"</span>  <span class="token comment">/* added options [mss 1460] */</span>
+<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-    <span class="s">"</span><span class="se">\0\0</span><span class="s">"</span>          <span class="cm">/* source port */</span>
-    <span class="s">"</span><span class="se">\0\0</span><span class="s">"</span>          <span class="cm">/* destination port */</span>
-    <span class="s">"</span><span class="se">\0\0\0\0</span><span class="s">"</span>      <span class="cm">/* sequence number */</span>
-    <span class="s">"</span><span class="se">\0\0\0\0</span><span class="s">"</span>      <span class="cm">/* ack number */</span>
-    <span class="s">"</span><span class="se">\x50</span><span class="s">"</span>          <span class="cm">/* header length */</span>
-    <span class="s">"</span><span class="se">\x02</span><span class="s">"</span>          <span class="cm">/* SYN */</span>
-    <span class="s">"</span><span class="se">\x04</span><span class="s">\x0"</span>        <span class="cm">/* window fixed to 1024 */</span>
-    <span class="s">"</span><span class="se">\xFF\xFF</span><span class="s">"</span>      <span class="cm">/* checksum */</span>
-    <span class="s">"</span><span class="se">\x00\x00</span><span class="s">"</span>      <span class="cm">/* urgent pointer */</span>
-    <span class="s">"</span><span class="se">\x02\x04\x05\xb4</span><span class="s">"</span>  <span class="cm">/* added options [mss 1460] */</span>
-<span class="p">;</span>
-</code></pre></div></div>
-
-<h2 id="demo-设计与实现">Demo 设计与实现</h2>
-
-<p>经过抓包分析和源码分析后，可以总结三个扫描器的特征如下表所示。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044988.png#vwid=1524&amp;vhei=877" alt="" /></p>
-
+<h2 id="Demo-设计与实现"><a href="#Demo-设计与实现" class="headerlink" title="Demo 设计与实现"></a>Demo 设计与实现</h2><p>经过抓包分析和源码分析后，可以总结三个扫描器的特征如下表所示。</p>
+<p><img src="https://img.seriouszyx.com/202109011044988.png#vwid=1524&amp;vhei=877"></p>
 <p>总体来看，三个扫描器工具都是基于单包的头部信息进行识别，且经过源码确认，属于强特征。那么识别的具体设计也就很容易了，对 pcap 文件的每个数据包进行分类，判断其是否满足上述三个指纹，核心识别流程图如下图所示。</p>
-
-<p><img src="https://img.seriouszyx.com/202109011044015.png#vwid=622&amp;vhei=624" alt="" /></p>
-
+<p><img src="https://img.seriouszyx.com/202109011044015.png#vwid=622&amp;vhei=624"></p>
 <p>具体实现使用 Python 的 Scrapy 包解析 pcap，进行相关操作，代码很短，核心部分如下。</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">for</span> data <span class="token keyword">in</span> packets<span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token string">'TCP'</span> <span class="token keyword">in</span> data<span class="token punctuation">:</span>
+        <span class="token comment"># 识别 Zmap</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">'TCP'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>window <span class="token operator">==</span> <span class="token number">65535</span><span class="token punctuation">)</span> <span class="token keyword">and</span> <span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">'IP'</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token builtin">id</span> <span class="token operator">==</span> <span class="token number">54321</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            isZmap <span class="token operator">=</span> <span class="token boolean">True</span>
+        <span class="token comment"># 识别 Masscan</span>
+        <span class="token keyword">if</span> data<span class="token punctuation">[</span><span class="token string">'TCP'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>window <span class="token operator">==</span> <span class="token number">1024</span> <span class="token keyword">and</span> data<span class="token punctuation">[</span><span class="token string">'TCP'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>ack <span class="token operator">==</span> <span class="token number">0</span> \
+                <span class="token keyword">and</span> data<span class="token punctuation">[</span><span class="token string">'IP'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>ttl <span class="token operator">==</span> <span class="token number">255</span> <span class="token keyword">and</span> data<span class="token punctuation">[</span><span class="token string">'IP'</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">==</span> <span class="token number">40</span><span class="token punctuation">:</span>
+            isMasscan <span class="token operator">=</span> <span class="token boolean">True</span>
+    <span class="token comment"># 识别 Angry IP Scanner</span>
+    <span class="token keyword">if</span> <span class="token string">'ICMP'</span> <span class="token keyword">in</span> data<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token string">'Raw'</span> <span class="token keyword">in</span> data<span class="token punctuation">:</span>
+            items <span class="token operator">=</span> processStr<span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">'Raw'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>load<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">'Raw'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">32</span> <span class="token keyword">and</span> items <span class="token operator">==</span> ANGRYIP_FLAG<span class="token punctuation">:</span>
+                isAngryip <span class="token operator">=</span> <span class="token boolean">True</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">packets</span><span class="p">:</span>
-    <span class="k">if</span> <span class="s">'TCP'</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-        <span class="c1"># 识别 Zmap
-</span>        <span class="k">if</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'TCP'</span><span class="p">].</span><span class="n">window</span> <span class="o">==</span> <span class="mi">65535</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'IP'</span><span class="p">].</span><span class="nb">id</span> <span class="o">==</span> <span class="mi">54321</span><span class="p">):</span>
-            <span class="n">isZmap</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="c1"># 识别 Masscan
-</span>        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s">'TCP'</span><span class="p">].</span><span class="n">window</span> <span class="o">==</span> <span class="mi">1024</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s">'TCP'</span><span class="p">].</span><span class="n">ack</span> <span class="o">==</span> <span class="mi">0</span> \
-                <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s">'IP'</span><span class="p">].</span><span class="n">ttl</span> <span class="o">==</span> <span class="mi">255</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s">'IP'</span><span class="p">].</span><span class="nb">len</span> <span class="o">==</span> <span class="mi">40</span><span class="p">:</span>
-            <span class="n">isMasscan</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="c1"># 识别 Angry IP Scanner
-</span>    <span class="k">if</span> <span class="s">'ICMP'</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s">'Raw'</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-            <span class="n">items</span> <span class="o">=</span> <span class="n">processStr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'Raw'</span><span class="p">].</span><span class="n">load</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'Raw'</span><span class="p">])</span> <span class="o">==</span> <span class="mi">32</span> <span class="ow">and</span> <span class="n">items</span> <span class="o">==</span> <span class="n">ANGRYIP_FLAG</span><span class="p">:</span>
-                <span class="n">isAngryip</span> <span class="o">=</span> <span class="bp">True</span>
-</code></pre></div></div>
-
-<p>代码放置于 <a href="https://github.com/seriouszyx/ScannerRecognition">GitHub</a>。</p>
-
-<hr />
-
+<p>代码放置于 <a target="_blank" rel="noopener" href="https://github.com/seriouszyx/ScannerRecognition">GitHub</a>。</p>
+<hr>
 <p>参考：</p>
+<p><a target="_blank" rel="noopener" href="https://linux.cn/article-5860-1.html">互联网扫描器 ZMap 完全手册</a></p>
+<p><a target="_blank" rel="noopener" href="https://nanshihui.github.io/2017/03/29/zmap%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB%E4%B9%8Bzmap%E6%89%AB%E6%8F%8F%E5%BF%AB%E7%9A%84%E5%8E%9F%E5%9B%A0/">zmap 源码解读之 zmap 扫描快的原因</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/al0ne/Nmap_Bypass_IDS">Nmap_Bypass_IDS</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44288604/article/details/115656891">入侵检测 ——masscan (扫描篇)</a></p>
 
-<p><a href="https://linux.cn/article-5860-1.html">互联网扫描器 ZMap 完全手册</a></p>
+  </article>
 
-<p><a href="https://nanshihui.github.io/2017/03/29/zmap%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB%E4%B9%8Bzmap%E6%89%AB%E6%8F%8F%E5%BF%AB%E7%9A%84%E5%8E%9F%E5%9B%A0/">zmap 源码解读之 zmap 扫描快的原因</a></p>
-
-<p><a href="https://github.com/al0ne/Nmap_Bypass_IDS">Nmap_Bypass_IDS</a></p>
-
-<p><a href="https://blog.csdn.net/weixin_44288604/article/details/115656891">入侵检测——masscan(扫描篇)</a></p>
+  <div id="paginator">
+    
+  </div>
 
   </div>
 
-  <a class="u-url" href="/2021/scanner-analysis-and-detect.html" hidden></a>
-</article>
+</main>
 
-<div class="ant-alert mb-0">
-  <ul>
-    <li>版权声明：本文采用<a target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">知识共享 3.0 许可证</a> (<strong>保持署名</strong>-自由转载-非商用-非衍生)</li>
-    <li>发表于 2021-09-01
-    </li>
-  </ul>
+<footer class="site-footer h-card">
   
-</div>
-
-<div class="page-navigation">
-  
-  <a class="prev" href="/2021/publish-to-maven.html">&laquo; 上一篇</a>
-   
-  <a class="next" href="/2021/deploy-typecho-blog.html">下一篇 &raquo;</a>
-  
-</div><div id="gitalk-container">
-</div>
-<script>
-    var gitalk = new Gitalk({
-        clientID: '',
-        clientSecret: '',
-        repo: 'blog',
-        owner: 'imageslr',
-        admin: ['imageslr'],
-        id: md5(location.pathname),      // Ensure uniqueness and length less than 50
-        distractionFreeMode: false,  // Facebook-like distraction free mode
-        createIssueManually: true,
-        pagerDirection: "first",
-        perPage: 25,
-    })
-    gitalk.render('gitalk-container')
-</script>
-        </div>
-    </main><footer class="site-footer h-card">
-    <data class="u-url" href="/"></data>
-    <div class="wrapper">
-      <div class="footer-col-wrapper">
-        <div class="footer-col">
-          <ul class="contact-list">
-            <li class="p-name"><a class="black-link" href="https://blog.seriouszyx.com/about.html">
-                  隐秀 
-                </a></li><li>
-              <a class="u-email black-link" href="mailto:seriouszyx@gmail.com">seriouszyx@gmail.com</a></li></ul>
-        </div>
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <ul class="contact-list">
+          <li class="p-name"><a class="black-link" href="/">
+                seriouszyx 
+              </a></li></ul>
       </div>
     </div>
-    <div class="text-center">
-      <a class="text-gray-300 text-sm" href="https://beian.miit.gov.cn">辽ICP备19014015号</a>
-    </div>
-  </footer>
+  </div>
+  <div class="text-center">
+    <a class="text-gray-300 text-sm" target="_blank" rel="noopener" href="https://beian.miit.gov.cn">京ICP备2021035401号</a>
+  </div>
+</footer>
 
-  <!-- highlight js -->
-  <script src="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
-  <script>
-    hljs.initHighlightingOnLoad();
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-chtml.js"></script>
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } });
-  </script>
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-        processEscapes: true
-      }
-    });
-  </script><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><!-- gitalk --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
-  <script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
-  <script src="/assets/js/md5.min.js"></script><!-- viewerjs -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/viewerjs@1.10.4/dist/viewer.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/viewerjs@1.10.4/dist/viewer.min.js"></script>
-  <script>
-    var el = document.getElementById('post');
-    if (el) new Viewer(el);
-  </script>
 
-  
-  <!-- google analytics --><link type="application/atom+xml" rel="alternate" href="https://blog.seriouszyx.com/feed.xml" title="seriouszyx' Blog" /><script>
-  (function(){
-      var bp = document.createElement('script');
-      var curProtocol = window.location.protocol.split(':')[0];
-      if (curProtocol === 'https') {
-          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
-      }
-      else {
-          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-      }
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(bp, s);
-  })();
-  </script></body>
-</html>
+
+
+
+
+<script src="/bundle.js"></script></body></html>
