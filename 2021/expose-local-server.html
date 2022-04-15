@@ -1,12 +1,31 @@
-<!DOCTYPE html><html lang="zh-CN"><head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
   <meta charset="UTF-8">
   <title>💻【环境搭建】服务器内网穿透 [ 隐秀 ]</title>
   
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1.9.0/themes/prism-one-light.min.css">
   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
-  
-  
-<meta name="generator" content="Hexo 5.4.1"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('https://unpkg.com/tailwindcss@^2/dist/utilities.min.css');loadCss('https://cdn.jsdelivr.net/npm/prism-themes@1.9.0/themes/prism-one-light.min.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="https://unpkg.com/tailwindcss@^2/dist/utilities.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1.9.0/themes/prism-one-light.min.css"></noscript></head>
+
+  <link rel="stylesheet" href="/css/third_party/utilities.min.css">
+  <link rel="stylesheet" href="/css/star.css">
+<meta name="generator" content="Hexo 6.1.0"></head>
 <body>
 
 <main class="page-content" aria-label="Content">
@@ -15,10 +34,12 @@
   <div class="wrapper">
     
     
-  <article class="post h-entry" id="post" itemscope="" itemtype="http://schema.org/BlogPosting">
-    
-      <title>💻【环境搭建】服务器内网穿透</title>
-    
+  <article 
+    class="post h-entry"
+    id="post"
+    itemscope
+    itemtype="http://schema.org/BlogPosting"
+  >
 
   <header class="post-header">
     <div class="post-back">
@@ -31,14 +52,31 @@
       💻【环境搭建】服务器内网穿透
     </h1>
     <p class="post-meta">
-      <time class="dt-published" datetime="1613281249000" itemprop="datePublished">
+      <time
+        class="dt-published"
+        datetime="1613281249000"
+        itemprop="datePublished"
+      >
         Feb 14, 2021
       </time>•
-      <span itemprop="author" itemscope="" itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">seriouszyx</span></span>
+      <span itemprop="author" itemscope itemtype="http://schema.org/Person"
+        ><span class="p-author h-card" itemprop="name"
+          >seriouszyx</span
+        ></span
+      >
+        <span class="busuanzi_container_page">
+          <span id="busuanzi_container_page_pv">
+            •
+          <span id="busuanzi_value_page_pv"></span> View
+          </span>
+        </span>
+      
     </p>
   </header>
 
-    <h1>💻【环境搭建】服务器内网穿透</h1>
+  <div class="js-toc"></div>
+
+  <div class="post-content" itemprop="articleBody">
     <p>本科 AI 实验室的服务器在内网部署，疫情期间大家都没办法在学校，又需要使用 GPU 完成一些工作。正好老板又添置了一台服务器，派我做一下内网穿透，方便远程使用。</p>
 <h2 id="服务器配置"><a href="#服务器配置" class="headerlink" title="服务器配置"></a>服务器配置</h2><p>主要想记录一下软件方面的配置，所以怎么安装滑轨、怎么接线这类问题就不赘述了，下面的表格中记录了两台服务器的软硬件配置。</p>
 <table>
@@ -142,7 +180,7 @@ remote_port <span class="token operator">=</span> <span class="token number">666
 
 
 <h2 id="服务链架构"><a href="#服务链架构" class="headerlink" title="服务链架构"></a>服务链架构</h2><p>下面是整个 frp 服务链的架构（图中 ip 及端口号皆为模拟值）：</p>
-<p><img src="/assets/postss/expose-local-server/image.png" alt="frp 架构"></p>
+<p><img src="/assets/posts/expose-local-server/image.png" alt="frp 架构"></p>
 <p>实线代表直接网络连接，虚线代表虚拟网络连接。在内网服务器（frpc）中配置的 <code>remote_port</code> 将在启动后向公网服务器（frps）发送（通过 7000 端口）注册信息，发送成功后，公网服务器开始监听 6666 和 6667 两个端口。</p>
 <p>在实际访问时，直接在 SSH 客户端输入公网服务器的 ip 地址，通过 6666 和 6667 两个端口号控制访问两台内网服务器，而其中的 <code>server_port</code> 、 <code>server_addr</code> 、 <code>local_ip</code> 和 <code>local_port</code> 等信息对用户透明，简单方便。</p>
 <blockquote>
@@ -153,6 +191,7 @@ remote_port <span class="token operator">=</span> <span class="token number">666
 </ul>
 </blockquote>
 
+  </div>
   </article>
 
   <div id="paginator">
@@ -175,14 +214,52 @@ remote_port <span class="token operator">=</span> <span class="token number">666
       </div>
     </div>
   </div>
-  <div class="text-center">
-    <a class="text-gray-300 text-sm" target="_blank" rel="noopener" href="https://beian.miit.gov.cn">京ICP备2021035401号</a>
-  </div>
+  
+    <div class="text-center">
+      
+        <span class="text-gray-300 text-sm" id="busuanzi_container_site_pv">
+          本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        </span>
+      
+      
+        <span class="text-gray-300 text-sm">•</span>
+      
+      
+          <span class="text-gray-300 text-sm" id="busuanzi_container_site_uv">
+            本站访客数<span id="busuanzi_value_site_uv"></span>人次
+          </span>
+      
+    </div>
+  
+  
+    <div class="text-center">
+      <a class="text-gray-300 text-sm" target="_blank" rel="noopener" href="https://beian.miit.gov.cn">辽ICP备19014015号</a>
+    </div>
+  
 </footer>
 
 
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
 
 
+  <script async src="https://cdn.jsdelivr.net/gh/sukkaw/busuanzi@latest/bsz.pure.mini.js">
+</script>
 
 
-<script src="/bundle.js"></script></body></html>
+  <script src="https://cdn.jsdelivr.net/npm/tocbot@4.18.2/dist/tocbot.min.js"></script>
+
+<script>
+  var Star = window.Star || {};
+  var CONFIG = {
+    fancybox: true,
+    tocbot: true
+  };
+  window.CONFIG = CONFIG;
+</script>
+<script src="/js/utils.js"></script>
+<script src="/js/star.js"></script>
+
+</body>
+</html>

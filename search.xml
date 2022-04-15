@@ -1175,7 +1175,7 @@ remote_port <span class="token operator">=</span> <span class="token number">666
 
 
 <h2 id="服务链架构"><a href="#服务链架构" class="headerlink" title="服务链架构"></a>服务链架构</h2><p>下面是整个 frp 服务链的架构（图中 ip 及端口号皆为模拟值）：</p>
-<p><img src="/assets/postss/expose-local-server/image.png" alt="frp 架构"></p>
+<p><img src="/assets/posts/expose-local-server/image.png" alt="frp 架构"></p>
 <p>实线代表直接网络连接，虚线代表虚拟网络连接。在内网服务器（frpc）中配置的 <code>remote_port</code> 将在启动后向公网服务器（frps）发送（通过 7000 端口）注册信息，发送成功后，公网服务器开始监听 6666 和 6667 两个端口。</p>
 <p>在实际访问时，直接在 SSH 客户端输入公网服务器的 ip 地址，通过 6666 和 6667 两个端口号控制访问两台内网服务器，而其中的 <code>server_port</code> 、 <code>server_addr</code> 、 <code>local_ip</code> 和 <code>local_port</code> 等信息对用户透明，简单方便。</p>
 <blockquote>
