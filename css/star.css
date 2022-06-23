@@ -370,6 +370,9 @@ details[open] summary {
   .post-list li {
     margin-bottom: 2.5px; }
 
+.post-item {
+  display: flex; }
+
 .post-year {
   margin-top: 2rem;
   margin-bottom: 0.25rem;
@@ -383,6 +386,7 @@ details[open] summary {
 .post-meta {
   display: inline-block;
   min-width: 60px;
+  margin-top: 3px;
   font-size: 18px;
   color: #515151; }
   @media (max-width: 500px) {
