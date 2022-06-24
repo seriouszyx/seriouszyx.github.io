@@ -1,0 +1,294 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <title>📘【论文阅读】通过响应式网络望远镜揭开扫描器的新面纱 [ 隐秀 ]</title>
+
+  
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/others/favicon.png">
+  
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1.9.0/themes/prism-one-light.min.css">
+  
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@latest/dist/gitalk.min.css">
+  
+
+  <link rel="stylesheet" href="/css/third_party/utilities.min.css">
+  <link rel="stylesheet" href="/css/star.css">
+<meta name="generator" content="Hexo 6.1.0"></head>
+<body>
+
+<main class="page-content" aria-label="Content">
+  
+
+  <div class="wrapper">
+    
+    
+  <article 
+    class="post h-entry"
+    id="post"
+    itemscope
+    itemtype="http://schema.org/BlogPosting"
+  >
+
+  <header class="post-header">
+    <div class="post-back">
+      <a class="black-link" href="/">
+        ← Home
+      </a>
+    </div>
+
+    <h1 class="post-title p-name" itemprop="name headline">
+      📘【论文阅读】通过响应式网络望远镜揭开扫描器的新面纱
+    </h1>
+    <p class="post-meta">
+      <time
+        class="dt-published"
+        datetime="1656046931000"
+        itemprop="datePublished"
+      >
+        Jun 24, 2022
+      </time>•
+      <span itemprop="author" itemscope itemtype="http://schema.org/Person"
+        ><span class="p-author h-card" itemprop="name"
+          >seriouszyx</span
+        ></span
+      >
+        <span class="busuanzi_container_page">
+          <span id="busuanzi_container_page_pv">
+            •
+          <span id="busuanzi_value_page_pv"></span> View
+          </span>
+        </span>
+      
+    </p>
+  </header>
+
+  <div class="js-toc"></div>
+
+  <div class="post-content" itemprop="articleBody">
+    <p class="ant-alert ant-alert-warning">
+💡本篇文章是根据我在 22 年 6 月的 MESA 讨论班分享整理而成，文中图片皆由本人制作的 PPT 导出。
+</p>
+
+<h2 id="一、背景介绍"><a href="#一、背景介绍" class="headerlink" title="一、背景介绍"></a>一、背景介绍</h2><h3 id="论文简介"><a href="#论文简介" class="headerlink" title="论文简介"></a>论文简介</h3><p>本次分享的论文题目是《通过响应式网络望远镜揭开扫描器的新面纱》。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%871.PNG"></p>
+<p>本篇论文发表在 <strong>USENIX Security 2022</strong> 中，一作是德国汉堡应用技术大学的博士生。</p>
+<p>本文主要讨论大规模网络扫描中的无状态扫描，<strong>设计并实现了一个实时运行的响应式网络望远镜</strong>，检查互联网范围内的扫描流量，对异步的 TCP SYN 数据包做出回应，并参与两阶段扫描第二阶段发起的 TCP 握手。</p>
+<p>本工作在全球范围内部署 Spoki 进行了一系列的<strong>测量</strong>，结果表明如今的扫描器具有明确的特征：高度的针对性；不同观测地区的扫描活动明显不同；很大一部分来自恶意来源。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%874.PNG"></p>
+<h3 id="作者信息"><a href="#作者信息" class="headerlink" title="作者信息"></a>作者信息</h3><p>本文一作是 <a target="_blank" rel="noopener" href="https://inet.haw-hamburg.de/members/raphael-hiesgen">Raphael Hiesgen</a>，来自德国汉堡应用技术大学 <a target="_blank" rel="noopener" href="https://inet.haw-hamburg.de/members/raphael-hiesgen">inet</a> 团队。</p>
+<p>二作是 <a target="_blank" rel="noopener" href="https://www.nawrocki.berlin/">Marcin Nawrocki</a>，来自柏林自由大学 <a target="_blank" rel="noopener" href="https://www.mi.fu-berlin.de/en/inf/groups/ilab/index.html">ilab</a> 团队。</p>
+<p>右边的 <a target="_blank" rel="noopener" href="https://www.mi.fu-berlin.de/en/inf/groups/ilab/members/waehlisch.html">Matthias Wählisch</a> 是他们两个的导师，柏林自由大学 ilab 组的组长。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%875.PNG"></p>
+<h3 id="背景知识"><a href="#背景知识" class="headerlink" title="背景知识"></a>背景知识</h3><p>如今互联网正遭受不断的攻击，主机扫描（host scanning）对于发现脆弱服务、创建僵尸网络和发起网络攻击十分重要。</p>
+<p>传统的扫描器使用 OS 的 TCP/IP 协议栈收发包，新发展的无状态扫描技术为了提高扫描速度，不利用 OS 的 TCP/IP 协议栈，如左下图所示，无状态扫描器第一阶段发送手工构造的 TCP SYN 数据包检测目标是否可用，如果可用，再使用 OS 的 TCP/IP 协议栈发送真实的握手包进行进一步操作。</p>
+<p>因为可以分为两个阶段，所以这种无状态扫描技术的应用也可以称为<strong>两阶段扫描器</strong>。</p>
+<p>无状态扫描技术最早在 2002 年的 scanrand 中得以使用，随后还出现于 unicorn、masscan、zmap 等，去年 USENIX Security 的 LZR 也是使用了这种技术。</p>
+<p>因此，可以看出无状态扫描技术是在不断发展的。</p>
+<p>另外，在攻击 IoT 设备的 Mirai 僵尸网络的复制模块中，也是用了这种无状态的扫描技术。右下图是 Mirai 僵尸网络复制模块的原理，① 过程扫描整个互联网来寻找可用的目标并发起攻击，实际上就进行了两阶段的扫描。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%876.PNG"></p>
+<p>本研究很重要的一部分工作就是开发了一个网络望远镜，并将其部署测量。那么在介绍系统之前，先来介绍一些网络望远镜的概念。</p>
+<p>首先路由分配的 IP 地址中，一部分 IP 地址是不运行任何服务的，这个部分 IP 地址空间称为 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Darknet">darknet</a>。</p>
+<p>网络望远镜可以收集并记录 darknet 流量。如下图所示，网络望远镜可部署在一些路由或交换中心比如 IXP 上，指定一个 IP 地址前缀，监听该 IP 地址空间的网络流量。</p>
+<p>监听的一部分 IP 地址空间没有主机，所以一般是不会有网络来请求这些 IP 的，不过仍能发现一些恶意的请求，恶意请求中，两种类型最为明显。</p>
+<p>一种是扫描流量，因为扫描器一般是指定一段 IP 范围，扫描主机或端口是否可用；另一种是 backscatter 通信，攻击者试图通过随机选择一个与他们真实身份不同的 IP 来掩盖他们的身份，然后，他们使用伪造的源 IP 向受害者 IP 传输大量的流量。如果伪造的 IP 恰好属于网络望远镜监控的黑暗 IP 空间，那么受害者对该 IP 的响应将到达 darknet。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%877.PNG"></p>
+<p>以上这些恶意的流量大多为 TCP SYN 流量，在两阶段扫描器的扫描过程中，这些 TCP SYN 数据包是手工构造的，所以跟基于 OS TCP/IP 协议栈传输的数据包不太一样。</p>
+<p>作者通过对一台亚洲的 ISP 和一台欧洲的 IXP 的流量，以及一些现有网络望远镜的流量进行分析，挖掘异常 TCP SYN 流量的特征。</p>
+<p>第一个特征是异常 TCP SYN 数据包的 <strong>TTL 值过高</strong>，右上角的这张图是网络望远镜中 13 到 20 年 TTL 大于 200 的数据包的占比，可以看出七年来急剧上升的趋势，目前达到了 80%。</p>
+<p>第二个特征是这些 TTL 大于 200 的数据包大多<strong>缺少 TCP options</strong>，而且其中 5% 的 TCP 的 <strong>IP ID 为固定值 54321</strong>，这个是 Zmap 的特征，之前的<a href="https://blog.seriouszyx.com/2021/scanner-analysis-and-detect.html#Zmap">《网络扫描探测工具的分析与识别》</a>这篇文章中也发现并讨论过这个特征。</p>
+<p>作者把它们仨做为判定异常 TCP SYN 流量的特征，下图是 TTL 大于 200 和无 TCP options 在网络望远镜以及 IXP、ISP 中的比例，可以看出占比还是很高的。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%878.PNG"></p>
+<h2 id="二、Spoki"><a href="#二、Spoki" class="headerlink" title="二、Spoki"></a>二、Spoki</h2><h3 id="设计与实现"><a href="#设计与实现" class="headerlink" title="设计与实现"></a>设计与实现</h3><p>根据上面我们对两阶段扫描器及异常 TCP SYN 流量的分析，可以设计如下图所示的决策树。</p>
+<p>接收到的 SYN 数据包可以分为常规和非常规 SYN。在这两种情况下，我们都用 SYN-ACK 回复，远程主机要么忽略我们的回复，要么用 RST 回复，要么用 ACK 完成 TCP 握手。</p>
+<p>对于两阶段扫描器来说，不久后在第二阶段用一个规则 SYN 到达相同的 IP 地址和端口，我们同样回复 ACK。一旦第二阶段的握手完成，我们就收集 payloads，并在短暂的延迟后重置连接。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8710.PNG"></p>
+<p>下面是 spoki 的系统架构，主要分为五个组件。</p>
+<ul>
+<li>Router 基于 libtrace 并行捕获数据包，并提取流信息和 payload，然后将数据包转发到 shard 组件上，这里的路由策略是 ip hash，使同一个 ip 发送的数据包总是转发到同一个 shard 上。</li>
+<li>Shard 实现了上述提到的决策树，决定如何回复并将数据转发 broker。</li>
+<li>Broker 基于 scamper 构建并发送消息。</li>
+<li>Collector 和 Decoder 分别记录接收到的数据包和发送的消息。</li>
+</ul>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8711.PNG"></p>
+<h3 id="性能评估"><a href="#性能评估" class="headerlink" title="性能评估"></a>性能评估</h3><p>因为 spoki 需要监听很多 IP 地址空间，并且需要快速回复 TCP 的请求，所以需要考虑可扩展性（Scalable）。</p>
+<p>这里对 spoki 进行了性能评估，在最高发包速率为 1Mpps 的情况下，每个组件的数量是多少。</p>
+<p>本实验证明了 spoki 可以部署在最大的 IPv4 网络望远镜上，监听超过 1200 万个 IP 地址，流量峰值达 83.4M/min。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8712.PNG"></p>
+<h2 id="三、测量工作"><a href="#三、测量工作" class="headerlink" title="三、测量工作"></a>三、测量工作</h2><p>接下来作者部署了 4 个 spoki，3 个位于欧洲，1 个位于美国，进行了三大类的测量工作。</p>
+<h3 id="两阶段扫描器的特点"><a href="#两阶段扫描器的特点" class="headerlink" title="两阶段扫描器的特点"></a>两阶段扫描器的特点</h3><p>首先是分析两阶段扫描器的特点。分析前 1 万个端口的流量，每天大概有 1 万个不同的信号源扫描，单阶段扫描器端口覆盖广，两阶段扫描器端口非常集中。</p>
+<p>第二个图将源地址换为目的地址进行测量，显示网络中每个端口和每天被扫描的主机数量，两阶段扫描器的扫描模式清晰可见，单阶段扫描器仍然分散。</p>
+<p>由此可见，两阶段扫描器和一阶段扫描器都进行垂直扫描，但<strong>两阶段扫描器更专注于水平扫描，更具有针对性</strong>。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8714.PNG"></p>
+<p>然后分析两阶段扫描器的<strong>交互类型</strong>，大体可以分为以下三种目的。</p>
+<ul>
+<li>查看服务公告</li>
+<li>发送 Payload 探测端口背后的服务类型</li>
+<li>发送 Payload 对系统进行攻击</li>
+</ul>
+<p>下表列出了收到的两阶段事件的数量，以及在第二阶段收到 ACK 或 Payload 的两阶段事件的份额。Payload 按类型进一步区分。可解码的 ASCII 数据，我们以 HEX 形式存储的二进制数据，以及包含下载器的 ASCII Payload。</p>
+<p>可以看到图中两阶段扫描中没有 ACK 的占比较大，可以推测是无状态扫描检测端口关闭，且这部分中端口分布是很广泛的，也符合我们的推测；另一个可能是存在一定的丢包，不过这个占比不会很高。</p>
+<p>Downloader 在美国更常见，偏爱 80、8089、8080、60001 端口，这些端口常用作物联网设备的 web 服务器。</p>
+<p>HEX 在欧盟主要分布在 1433（MS SQL）和 445（active directory/SMB）端口，在美国主要分布在 5555（ADB）和 443（HTTPS）端口。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8715.PNG"></p>
+<p>下表左侧列出了观察到的<strong>两阶段扫描器来源在各国家的占比</strong>，值得注意的是，乌克兰和波兰在欧盟占很大份额，台湾是美国两阶段扫描器的主要来源。</p>
+<p>作者研究了 4~6 月流量占比的变化过程。美国的网络望远镜，4 月的数据与下表类似，5 月台湾的占比达到 14.5%，超过美国；欧洲的网络望远镜，4 月最大份额是乌克兰，其次是中国和美国，来自俄罗斯和波兰的流量在这几个月明显增加，来自台湾的流量占比在 5 月也达到高峰。</p>
+<p>下表右侧列出了每个观测点前五个 AS 的类型和国家，基本是跨境和接入供应商（70%），欧洲有两个位于波兰和俄罗斯的企业，美国只有一个托管供应商 Digital Ocean 位于前五。</p>
+<p>详细检查跨境 / 接入 AS，是属于住宅中断主机还是服务器的基础设施。可以得出结论，<strong>云端的两阶段扫描器并不流行，攻击者倾向于渗透到终端主机并创建一个 P2P 僵尸网络</strong>。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8716.PNG"></p>
+<h3 id="传输-Payload"><a href="#传输-Payload" class="headerlink" title="传输 Payload"></a>传输 Payload</h3><p>下面对传输的 Payload 进行分析，首先根据 payload <strong>评估扫描的恶意程度</strong>。</p>
+<p>如下表所示，欧洲有 15 万个 POST 事件，美国有 600 个，这些流量与 Realtek 的 UPnP 漏洞有关，可能导致代码注入；另外两个频繁的是 Debugging port 和 Hardcoded auth，与嵌入式中的设备漏洞有关。</p>
+<p>欧洲两阶段扫描器主要攻击 1433 端口（Microsoft SQL/SIMATIC），在美国分布在 443 和 5555 之间（TLS 和 ADB）。</p>
+<p>将源 IP 与 GN 封锁名单和数据进行比对，GN 将 56%（欧洲）和 70%（美国）的两阶段扫描器 Payload 归为恶意的。</p>
+<p>总之，对 Payload 和数据源的分析，<strong>在两阶段扫描器中，恶意行为者占据相当显著的份额</strong>。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8717.PNG"></p>
+<p>在 Payload 中，将含有 curl 或 wget 的称为 Downloader，对其 URL 的最后一个路径提取出一个 name。</p>
+<p>经过分析，最常见的是 arm，其余有 mpsl 和 le.bot.arm7（暗示僵尸网络）等。</p>
+<p>对 Downloader 中的可执行文件进行分析，其中 70% 是 32 位的 ELF 二进制文件，14.8% 为 shell 脚本，以及大多标题中带有疑似网络钓鱼警告的 HTML 文件。</p>
+<p>使用 VirusTotal 对这些二进制文件进行分类，<strong>只有 18% 被标记为良性</strong>。</p>
+<p>此外，数据是从 2021 年 2 月至 3 月和 8 月至 9 月收集的。第一个时期塞尔维亚占 65%，其次是印度（21%）和中国（4.8%），第二个时期塞尔维亚消失了，中国占 69%，印度下降到 11.3%。</p>
+<p>这种高度不稳定性可能标志着<strong>感染从一个地区转移到了另一个地区</strong>。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8718.PNG"></p>
+<h3 id="本地性"><a href="#本地性" class="headerlink" title="本地性"></a>本地性</h3><p>最后分析一下两阶段扫描的本地性。作者统计了最活跃的 10 个前缀中，本地的两阶段扫描的占比，可以看出<strong>本地的扫描占有相当大的份额</strong>。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8719.PNG"></p>
+<h2 id="四、论文总结"><a href="#四、论文总结" class="headerlink" title="四、论文总结"></a>四、论文总结</h2><h3 id="主要贡献"><a href="#主要贡献" class="headerlink" title="主要贡献"></a>主要贡献</h3><p>最后来总结一下，为了提高效率，现在大多的扫描探测行为都是两阶段的了，先测活，再深入探测，本文也是定义并系统探讨了这种新式扫描模式。</p>
+<p>作者开发的工具 Spoki，本质是一个网络望远镜，这东西国内几乎找不到什么资料，国外用得似乎多一些。但是网络望远镜是被动的收集流量的，这里的创新点，所谓 “响应式”，就是欺骗两阶段扫描器，获取第二阶段的指纹信息。但跟蜜罐又不相同，没有模拟完整的服务或协议栈，作者也将其视为网络望远镜与蜜罐之间的一个工具，代码开源在 <a target="_blank" rel="noopener" href="https://github.com/inetrg/spoki">GitHub</a>。</p>
+<p>测量部分做了很多工作和分析，但大致可以对两阶段扫描分析出三个特点。</p>
+<ul>
+<li>较强的针对性</li>
+<li>很大一部分来自恶意来源</li>
+<li>不同观测地区的扫描活动明显不同</li>
+</ul>
+<p>我介绍的不是很详细，感兴趣可以去翻原文。</p>
+<h3 id="展望"><a href="#展望" class="headerlink" title="展望"></a>展望</h3><p>我之前是做扫描器分类的，调研后发现近 5 年相关文章真的很少，而且发表的期刊 / 会议也不太好，突然在今年的 USENIX Security 发现这篇，是特别惊喜的。</p>
+<p>但 Spoki 并不是租台云服务器部署一下就可以了，作者也貌似是跟运营商有合作，所以复现起来难度较高。</p>
+<p>作者提到的三点展望，我对前两点还是蛮有兴趣的，没准会成为我的硕士题目。我也会尝试跑一下开源代码，关注一下相关工作，希望能做出些好的成果。</p>
+<p><img src="../assets/posts/paper-share-spoki/%E5%B9%BB%E7%81%AF%E7%89%8721.PNG"></p>
+
+  </div>
+  </article>
+
+  <div class="ant-alert mb-0">
+    <ul>
+      <li>版权声明：本文采用<a target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">知识共享 3.0 许可证</a> (<strong>保持署名</strong>-自由转载-非商用-非衍生)</li>
+      <li>
+        发表于 2022-06-24
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-navigation">
+  
+  <a class="prev" href="/2022/paper-share-deepaid.html">&laquo; 上一篇</a>
+   
+  
+  </div> 
+
+  <div id="gitalk-container"></div>
+
+  </div>
+
+</main>
+
+<footer class="site-footer h-card">
+  
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <ul class="contact-list">
+          <li class="p-name"><a class="black-link" href="/">
+                seriouszyx 
+              </a></li></ul>
+      </div>
+    </div>
+  </div>
+  
+    <div class="text-center">
+      
+        <span class="text-gray-300 text-sm" id="busuanzi_container_site_pv">
+          本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        </span>
+      
+      
+        <span class="text-gray-300 text-sm">•</span>
+      
+      
+          <span class="text-gray-300 text-sm" id="busuanzi_container_site_uv">
+            本站访客数<span id="busuanzi_value_site_uv"></span>人次
+          </span>
+      
+    </div>
+  
+  
+    <div class="text-center">
+      <a class="text-gray-300 text-sm" target="_blank" rel="noopener" href="https://beian.miit.gov.cn">辽ICP备19014015号</a>
+    </div>
+  
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/sukkaw/busuanzi@latest/bsz.pure.mini.js">
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/tocbot@4.18.2/dist/tocbot.min.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@latest/dist/gitalk.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-md5@latest/src/md5.min.js"></script>
+  <script>
+    var gitalk = new Gitalk({
+      clientID: '44642f49cf7294147771',
+      clientSecret: '0fd99e38c9c741ef79230463f1acf1bba20bb527',
+      repo: 'seriouszyx.github.io',
+      owner: 'seriouszyx',
+      admin: ['seriouszyx'],
+      id: md5(window.location.pathname),
+      distractionFreeMode: false,
+      createIssueManually: true,
+      pagerDirection: 'first',
+      perPage: 25,
+    })
+
+    gitalk.render('gitalk-container')
+  </script>
+
+<script>
+  var Star = window.Star || {};
+  var CONFIG = {
+    fancybox: true,
+    tocbot: true
+  };
+  window.CONFIG = CONFIG;
+</script>
+<script src="/js/utils.js"></script>
+<script src="/js/star.js"></script>
+
+</body>
+</html>
